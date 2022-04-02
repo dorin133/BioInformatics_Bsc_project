@@ -36,7 +36,7 @@ def mtx_to_numpy_csv(file_path, path_out):
             curr_feature, curr_barcode, curr_value = int(curr_feature), int(curr_barcode), int(curr_value)
             table[curr_feature, curr_barcode] = curr_value
 
-            if index % 10000 == 0:
+            if index % 1000000 == 0:
                 print(f'status: reached line #{index}')
                 
     f_input.close()
@@ -58,7 +58,7 @@ def all_mtx_to_pandas(folder_path="./raw_data", path_out_folder="./raw_data"):
     for mtx in raw_files:
         sample_num = mtx[-15:-11]
         path_out_file = path_out_folder + '/' + sample_num + "_matrix2.csv"
-        mtx_to_numpy_csv(mtx, path_out_file)
+        mtx_to_numpy_csv(folder_path + "/" + mtx, path_out_file)
 
 
 def stack_all_csv_together(folder_path, out_file_path='./parsed_data/stacked_mtx.csv'):
@@ -121,10 +121,10 @@ def merge_all_files(folder_path='./raw_data', out_folder_path='./raw_data'):
 if __name__ == '__main__':
     # prepare_single_files()
     # merge_all_files()
-    
-    mtx_to_numpy_csv('./raw_data/tmp2.mtx', './parsed_data/tmp22.csv')
 
-    # all_mtx_to_pandas()
+    # mtx_to_numpy_csv('./raw_data/tmp2.mtx', './parsed_data/tmp22.csv')
+
+    all_mtx_to_pandas(path_out_folder="./raw_data2")
     # stack_all_csv_together('./parsed_data')
     
     print("Done")
