@@ -64,7 +64,8 @@ def all_mtx_to_pandas(folder_path="./raw_data", path_out_folder="./raw_data"):
 def stack_all_csv_together(folder_path, out_file_path='./parsed_data/stacked_mtx.csv'):
     raw_files = os.listdir(folder_path)  # list all raw files
     # print(raw_files)
-    raw_files = list(filter(lambda x: '_matrix2.csv' in x, raw_files))  # filter files which are not barcodes files
+    # raw_files = list(filter(lambda x: '_matrix2.csv' in x, raw_files))
+    raw_files = list(filter(lambda x: '.csv' in x, raw_files))
     print(raw_files)
 
     stacked_mtx = pd.read_csv(folder_path + "/" + raw_files[0], index_col=0, header=0, dtype=np.int32)
