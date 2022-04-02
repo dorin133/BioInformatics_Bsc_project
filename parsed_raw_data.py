@@ -135,3 +135,4 @@ if __name__ == '__main__':
     # merge_matrix_barcode_features()
     merge_all_files()
     print("Done")
+    print("!")
