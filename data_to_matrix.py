@@ -70,8 +70,50 @@ def stack_all_csv_together(folder_path):
     for mtx in raw_files[1:]:
         stacked_mtx = pd.concat([stacked_mtx, mtx], axis=1, )
 
+def prepare_single_files(folder_path='./raw_data', out_folder_path='./raw_data'):
+    raw_files = os.listdir(folder_path)  # list all raw files
+    # print(raw_files)
+    raw_files = list(filter(lambda x: '_barcodes.tsv' in x, raw_files))  # filter files which are not barcodes files
+    # print(raw_files)
+    dataset  = pd.read_excel('./raw_data/MEA_dimorphism_samples.xlsx', names =['sample_id', 'female', 'parent'],index_col=None)
+    for file_name in raw_files:
+        tmp = file_name.index('_barcodes')
+        file_id = file_name[:tmp]
+        input_file_path = folder_path + "/" + file_name
+        f_input = open(input_file_path, 'r')
+        output_file_path = out_folder_path + "/" +file_id +'_metadata' + '.csv'
+        f_output = open(output_file_path, 'a+')
+        line_to_write_female = str(dataset[dataset['sample_id']==file_id].female.unique()[0])
+        line_to_write_parent = str(dataset[dataset['sample_id']==file_id].parent.unique()[0])
+        for line in f_input:
+            line_to_write = line[:-3] + '_' + file_id + ' '+ file_id
+            final_line  = line_to_write + ' ' + line_to_write_female + ' ' + line_to_write_parent + '\n'
+            f_output.write(final_line)
+        f_input.close()
+        f_output.close()
+
+
+
+def merge_all_files(folder_path='./raw_data', out_folder_path='./raw_data'):
+    raw_files = os.listdir(folder_path)  # list all raw files
+    # print(raw_files)
+    raw_files = list(filter(lambda x: '_metadata.csv' in x, raw_files))  # filter files which are barcodes files
+    # print(raw_files)
+
+    output_file_path = out_folder_path + "/all_samples_barcodes.csv"
+    f_output = open(output_file_path, 'a+')
+    for file_name in raw_files:
+        input_file_path = folder_path + "/" + file_name
+        f_input = open(input_file_path, 'r')
+        f_output.write(f_input.read())
+        f_input.close()
+    f_output.close()
+    return  # TODO
+
 
 
 if __name__ == '__main__':
-    mtx_to_numpy_csv('./raw_data/35_1_matrix.mtx', './raw_data/mtx22.csv')
+    prepare_single_files()
+    merge_all_files()
+    # mtx_to_numpy_csv('./raw_data/35_1_matrix.mtx', './raw_data/mtx22.csv')
     print("hi")
