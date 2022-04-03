@@ -4,6 +4,7 @@ import numpy as np
 from sklearn import preprocessing
 import os
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 
@@ -77,21 +78,60 @@ def print_hist_mul(folder_path):
     raw_files = os.listdir(folder_path) 
     raw_files = list(filter(lambda x: '_filterd_matrix' in x, raw_files))
 
+    labels = []
     for mtx in raw_files:
         df = pd.read_csv(folder_path + "/" + mtx, index_col=0, header=0, dtype=np.int32)
-        hist = np.histogram(df.sum(), bins= range(df.sum().min(),(df.sum()).max())) 
-        _ = plt.plot(hist[1][:-1], hist[0], lw=2)
+        sns.distplot(df.sum(), hist=False)
+        labels.append(mtx)
+
         del df
+    plt.xlim(left = 2000)
+    plt.legend(labels)
+    plt.title("PDF of molecules per sample")
+    plt.xlabel("molecules number")
+    plt.ylabel("probability")
     plt.show()
-    
 
 
+def print_hist_gens(folder_path):
+    raw_files = os.listdir(folder_path) 
+    raw_files = list(filter(lambda x: '_filterd_matrix' in x, raw_files))
+
+    labels = []
+    for mtx in raw_files:
+        df = pd.read_csv(folder_path + "/" + mtx, index_col=0, header=0, dtype=np.int32)
+        sns.distplot(df.sum(axis=1), hist=False)
+        labels.append(mtx)
+
+        del df
+    plt.legend(labels)
+    plt.title("PDF of genes per sample")
+    plt.xlabel("gene")
+    plt.ylabel("probability")
+    plt.show()
+
+
+def print_hist_gens2(folder_path):
+    raw_files = os.listdir(folder_path) 
+    raw_files = list(filter(lambda x: '_filterd_matrix' in x, raw_files))
+
+    for mtx in raw_files:
+        df = pd.read_csv(folder_path + "/" + mtx, index_col=0, header=0, dtype=np.int32)
+        df.drop(df[df.sum(axis=1) == 0].index, inplace=True)
+        sns.distplot(df.sum(axis=1), hist=False)
+        del df
+        plt.title(f"PDF of genes per sample {mtx}")
+        plt.xlabel("gene")
+        plt.ylabel("probability")
+        plt.show()
 
 
 if __name__ == '__main__':
     # filter_by_min_sum('./parsed_data/tmp22.csv', './parsed_data/tmp33_filtered.csv')
     # filter_all_by_min_sum('./raw_data2', './parsed_data')
-    print_hist_mul('./raw_data3')
+    # print_hist_mul('./raw_data3')
+    # print_hist_gens('./raw_data3')
+    print_hist_gens2('./raw_data3')
 
     print('Done')
     
