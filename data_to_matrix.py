@@ -49,7 +49,7 @@ def mtx_to_numpy_csv(file_path, path_out):
     # tmp.tofile(path_out, sep = ",")
 
 
-def all_mtx_to_pandas(folder_path="./raw_data", path_out_folder="./raw_data"):
+def all_mtx_to_numpy_csv(folder_path="./raw_data", path_out_folder="./raw_data"):
     raw_files = os.listdir(folder_path)  # list all raw files
     # print(raw_files)
     raw_files = list(filter(lambda x: '_matrix.mtx' in x, raw_files))  # filter files which are not barcodes files
