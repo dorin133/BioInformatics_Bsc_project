@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import numpy as np
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
@@ -10,9 +11,14 @@ import seaborn as sns
 tmp = pd.DataFrame(0, index=[i for i in range(1, 10)], columns=[i for i in range(1, 4)])
 tmp.iloc[5-1, 2-1] = 2  # cell [5][2]
 tmp.iloc[4-1, 2-1] = 1  # cell [4][2]
+tmp.iloc[3-1, 2-1] = 12  # cell [3][2]
 tmp.iloc[2-1, 1-1] = 1  # cell [2][1]
 tmp.iloc[3-1, 1-1] = 3  # cell [3][1]
 
+print(tmp)
+# print(np.linalg.norm(tmp, axis=0))
+print((tmp != 0).sum())
+tmp = tmp.loc[:, ((tmp != 0).sum() > 2500)]  # filter cols with less than different 2500 different gens
 print(tmp)
 
 sns.distplot(tmp.sum(axis=1), hist=True)

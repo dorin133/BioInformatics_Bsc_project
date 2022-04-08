@@ -34,11 +34,12 @@ import seaborn as sns
 def normalize_data(path_in_file, path_out_file, alpha=20000, flag_round=True):
     df = pd.read_csv(path_in_file, index_col=0, header=0, dtype=np.float128)
     
-    normalized_df= alpha*df/df.sum()
-    normalized_df.to_csv(path_out_file, sep=',')
+    # normalized_df= alpha*df/df.sum()
+    # normalized_df.to_csv(path_out_file, sep=',')
 
-    if flag_round:
-        df=round(alpha*df/df.sum())
+    if flag_round:  # TODO change to norm by the | vec norm | instead of simple sum
+        df=round(alpha*df/df.sum())  # TODO change round to ceil
+        # df = round(alpha*df/np.linalg.norm(df, axis=0))  # TODO
     else:
         df=alpha*df/df.sum()
     print(f'status: finish normalizing {path_in_file}. result saved to {path_out_file}')
@@ -63,6 +64,23 @@ def filter_by_min_sum(path_in_file, path_out_file, min_value=3000):
     df.to_csv(path_out_file, sep=',')
     print(f'status: finish filtering {path_in_file}. result saved to {path_out_file}')
 
+
+    # TODO add a plot of how many col were before and how many we left with
+
+
+# TODO יחס של כל תא למספר הגנים שהם mt- . לפני שלב הפילטר. להדפיס בגרף
+
+# TODO feature selection: choose best feature for the
+
+# TODO
+''' 
+CV = שונות מנורמלת בממוצע
+לחבר את כל הקבצים. לחשב את המדד הזה. ולייצר קו פיט על זה ולצייר אותו. לחשב את המרחק של כל פיצ׳ר ביחס לזה. לבחור את 100 הםפיצ׳רים הכי רחוקים מהקו
+להוציא לקובץ נפרד מי הכי קרוב/רחוק מהקו הזה
+'''
+
+
+# TODO: add filter for min different types of gens is bigger than 2500
 
 def filter_all_by_min_sum(folder_path="./raw_data", path_out_folder="./parsed_data"):
     raw_files = os.listdir(folder_path)  # list all raw files
@@ -129,9 +147,11 @@ def print_hist_gens2(folder_path):
 if __name__ == '__main__':
     # filter_by_min_sum('./parsed_data/tmp22.csv', './parsed_data/tmp33_filtered.csv')
     # filter_all_by_min_sum('./raw_data2', './parsed_data')
-    # print_hist_mul('./raw_data3')
+    print_hist_mul('./raw_data3')
     # print_hist_gens('./raw_data3')
-    print_hist_gens2('./raw_data3')
+    # print_hist_gens2('./raw_data3')
+
+
 
     print('Done')
     

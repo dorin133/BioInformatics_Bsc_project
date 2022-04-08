@@ -38,7 +38,7 @@ def mtx_to_numpy_csv(file_path, path_out):
 
             if index % 1000000 == 0:
                 print(f'status: reached line #{index}')
-                
+
     f_input.close()
     print(f'status: finish proccessing mtx file. creating csv file')
     df = pd.DataFrame(table)
@@ -59,6 +59,7 @@ def all_mtx_to_numpy_csv(folder_path="./raw_data", path_out_folder="./raw_data")
         sample_num = mtx[-15:-11]
         path_out_file = path_out_folder + '/' + sample_num + "_matrix2.csv"
         mtx_to_numpy_csv(folder_path + "/" + mtx, path_out_file)
+
 
 
 def stack_all_csv_together(folder_path, out_file_path='./parsed_data/stacked_mtx.csv'):
