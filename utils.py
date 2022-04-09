@@ -33,14 +33,14 @@ def stack_csv_together(folder_path, out_file_path='./merged_data/stacked_mtx.csv
 
     stacked_csv = pd.read_csv(folder_path + "/" + chosen_files[0], index_col=0, header=0)
     log_info = []
-    sum_index = stacked_csv.shape[1]
-    log_info.append((chosen_files[0], sum_index))
+    sum_index = stacked_csv.shape[1] + 1
+    log_info.append((chosen_files[0], 1))
     for file in chosen_files[1:]:
         tmp = pd.read_csv(folder_path + "/" + file, index_col=0, header=0)
         stacked_csv = pd.concat([stacked_csv, tmp], axis=1)
 
-        sum_index += tmp.shape[1]
         log_info.append((file, sum_index))
+        sum_index += tmp.shape[1]
 
     print(log_info)
     f = open(f'./ml_run_logs.txt', 'a+')
