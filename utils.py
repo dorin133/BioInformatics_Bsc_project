@@ -27,7 +27,7 @@ def stack_csv_together(folder_path, out_file_path='./merged_data/stacked_mtx.csv
     chosen_files = os.listdir(folder_path)  # list all raw files
     # print(raw_files)
     # raw_files = list(filter(lambda x: '_matrix2.csv' in x, raw_files))
-    chosen_files = list(filter(lambda x: '.csv' in x, chosen_files))
+    chosen_files = list(filter(lambda x: 'matrix_normalized.csv' in x, chosen_files))
     chosen_files.sort()
     print('status: stack_csv_together for', chosen_files)
 
@@ -49,4 +49,25 @@ def stack_csv_together(folder_path, out_file_path='./merged_data/stacked_mtx.csv
 
     stacked_csv.to_csv(out_file_path)
     print('status: finish stack_csv_together. the new concat file called', out_file_path)
+
+def merge_all_metadata(folder_path='./raw_csv_data', out_folder_path='./raw_csv_data'):
+    chosen_files = os.listdir(folder_path)  # list all raw files
+    chosen_files = list(filter(lambda x: '_metadata_filtered.csv' in x, chosen_files)) 
+    chosen_files.sort()
+    print('status: merge_all_metadata for', chosen_files)
+    output_file_path = out_folder_path + "/all_samples_metadata.csv"
+    metadatas_csv = pd.read_csv(folder_path + "/" + chosen_files[0], index_col=0, header=0)
+    for file in chosen_files[1:]:
+        tmp = pd.read_csv(folder_path + "/" + file, index_col=0, header=0)
+        metadatas_csv = pd.concat([metadatas_csv, tmp])
+    metadatas_csv.to_csv(output_file_path)
+    print('status: finish merge_all_metadata. the new concat file called', output_file_path)
+
+
+def find_indeces_of_gene(folder_path='./raw_csv_data', gene_to_filter='mt-'):
+    raw_files = os.listdir(folder_path)  # list all raw files
+    chosen_files = list(filter(lambda x: 'features.csv' in x, raw_files))
+    features_csv = pd.read_csv(folder_path + "/" + chosen_files[0], index_col=0, header=0)
+    return np.array(features_csv[features_csv['geneName'].str.startswith(gene_to_filter)].index)
+
 

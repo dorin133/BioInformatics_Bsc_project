@@ -1,9 +1,27 @@
 import pandas as pd
 import numpy as np
+import seaborn as sns
 import os
 import datetime
 import matplotlib.pyplot as plt
 
+def features_to_csv(folder_path='./raw_data', out_folder_path='./raw_csv_data'):
+    raw_files = os.listdir(folder_path)  # list all raw files
+    file_name = list(filter(lambda x: '_features.tsv' in x, raw_files))[0]
+    lst = []
+    input_file_path = folder_path + "/" + file_name
+    f_input = open(input_file_path, 'r')
+    output_file_path = out_folder_path + '/features.csv'
+    for line in f_input:
+        lst_to_append = []
+        lst_to_append.append(line.split("\t")[0])
+        lst_to_append.append(line.split("\t")[1])
+        lst.append(lst_to_append)
+    f_input.close()
+    arr = np.array(lst)
+    df = pd.DataFrame(arr, columns=['geneID', 'geneName'])
+    df.index = df.index + 1 
+    df.to_csv(output_file_path)
 
 def raw_mtx_to_csv(file_path, path_out):
     print(f'status: start processing {file_path}')
@@ -30,6 +48,36 @@ def raw_mtx_to_csv(file_path, path_out):
     df.drop([0], inplace=True, axis=1)
     df.to_csv(path_out)
     print(f'status: created the file "{path_out}"')
+    
+
+def prepare_metadata_single_files(folder_path='./raw_data', out_folder_path='./raw_data'):
+    raw_files = os.listdir(folder_path)  # list all raw files
+    # print(raw_files)
+    raw_files = list(filter(lambda x: '_barcodes.tsv' in x, raw_files))  # filter files which are not barcodes files
+    # print(raw_files)
+    dataset  = pd.read_excel(folder_path+'/MEA_dimorphism_samples.xlsx', names =['sample_id', 'female', 'parent'],index_col=None)
+    for file_name in raw_files:
+        lst = []
+        tmp = file_name.index('_barcodes')
+        file_id = file_name[tmp-4:tmp]
+        input_file_path = folder_path + "/" + file_name
+        f_input = open(input_file_path, 'r')
+        output_file_path = out_folder_path + "/" +file_id +'_metadata' + '.csv'
+        # f_output = open(output_file_path, 'a+')
+        bool_female = str(dataset[dataset['sample_id']==file_id].female.unique()[0])
+        bool_parent = str(dataset[dataset['sample_id']==file_id].parent.unique()[0])
+        for line in f_input:
+            lst_to_append = []
+            lst_to_append.append(line[:-3] + '_' + file_id)
+            lst_to_append.append(file_id)
+            lst_to_append.append(bool_female)
+            lst_to_append.append(bool_parent)
+            lst.append(lst_to_append)
+        f_input.close()
+        arr = np.array(lst)
+        df = pd.DataFrame(arr, columns=['barcode', 'sampleID', 'female', 'parent'])
+        df.index = df.index + 1 
+        df.to_csv(output_file_path)
 
 
 def filter_cols(path_in_file, path_out_file, min_sum_for_col=3000, min_diff_for_col=2500):
@@ -38,7 +86,7 @@ def filter_cols(path_in_file, path_out_file, min_sum_for_col=3000, min_diff_for_
     df = pd.read_csv(path_in_file, index_col=0, header=0, dtype=np.int32)
     num_col_start = df.shape[1]
     df = df.loc[:, (df.sum(numeric_only=True) >= min_sum_for_col)]  # filter cols with sum less than 3000
-    df = df.loc[:, ((df != 0).sum() > min_diff_for_col)]  # filter cols with less than different 2500 different gens
+    df = df.loc[:, ((df != 0).sum() > min_diff_for_col)]  # filter cols with less than 2500 different gens
     df.to_csv(path_out_file, sep=',')
     num_col_end = df.shape[1]
     msg = f'Note: started with {num_col_start} cols, after filtering left with {num_col_end} (filtered ' \
@@ -49,34 +97,79 @@ def filter_cols(path_in_file, path_out_file, min_sum_for_col=3000, min_diff_for_
     f.write(msg)
     print(f'status: finish filtering {path_in_file}. result saved to {path_out_file}')
 
+def filter_metadata_rows(folder_path, out_folder_path):
+    raw_files = os.listdir(folder_path)  # list all raw files
+    raw_files = list(filter(lambda x: '_matrix_filtered.csv' in x, raw_files))  
+    for file_name in raw_files:
+        print(f'status: start filtering {file_name}')
+        input_file_path = folder_path + "/" + file_name
+        df = pd.read_csv(input_file_path, index_col=0, header=0, dtype=np.int32)
+        tmp = file_name.index('_matrix_filtered')
+        file_id = file_name[tmp-4:tmp]
+
+        path_to_metadata = folder_path + '/' + file_id + '_metadata.csv'
+        path_output = out_folder_path + '/' + file_id + '_metadata.csv'
+
+        df_metadata = pd.read_csv(path_to_metadata, index_col=0, header=0)
+        results = map(int, df.columns.tolist())
+        df_metadata = df_metadata.loc[results]
+        df_metadata.to_csv(path_output[:-4]+'_filtered.csv', sep=',')
 
 def normalize_data(path_in_file, path_out_file, alpha=20000):
     df = pd.read_csv(path_in_file, index_col=0, header=0)
-
-    # print(np.linalg.norm(df, axis=0))
-    # print(len(np.linalg.norm(df, axis=0)))
     df = np.ceil(alpha*df/np.linalg.norm(df, axis=0))
 
     print(f'status: finish normalizing {path_in_file}. result saved to {path_out_file}')
-    df.to_csv(path_out_file, sep=',')
+    df.to_csv(path_out_file[:-13]+'_normalized.csv', sep=',')
 
+# don't forget to write critical info to log
+# f = open(f'./ml_run_logs.txt', 'a+')
+#     msg = str(datetime.datetime.now()) + " stack_csv_together: " + log_info.__str__() + "\n"
+#     f.write(msg)
 
-def calc_and_plot_cv(path_in_file):
+def calc_and_plot_cv(path_in_file, path_to_features_csv='./raw_csv_data/features.csv'):
     df = pd.read_csv(path_in_file, index_col=0, header=0)
-    print(df.shape)
-    # cv = lambda x: np.std(x, ddof=1) / np.mean(x) * 100  # TODO check this formula
-    cv_res = df.apply(lambda x: np.std(x, ddof=1) / np.mean(x) * 100, axis=1)  # TODO check this formula
-    print("cv results:")
-    print(type(cv_res))
-    print(cv_res)
+    
+    # calculating cv and mean for each gene
+    cv_res = df.apply(lambda x: np.std(x, ddof=1) / np.mean(x), axis=1) 
+    mean_res = df.apply(lambda x: np.mean(x), axis=1) 
     cv_res = cv_res.dropna()
-    print("cv results after drop NaN:")
-    print(cv_res)
-    cv_res_df = cv_res.to_frame()
-    print("cv results as DataFrame:")
-    print(cv_res_df)
+    mean_res = mean_res[mean_res>0]
+    msg = "cv and mean shape after removing zeros: " + str(cv_res.shape)+"\n"
+    print(msg)
+    cv_res = cv_res.to_numpy(dtype=np.float32, copy=True)
+    mean_res = mean_res.to_numpy(dtype=np.float32, copy=True)
 
-    cv_res_df.plot(style="o", ms=2)
+    # apply log to the mean and cv
+    cv_res = np.log10(cv_res)
+    mean_res = np.log10(mean_res)
+
+    # plot the scatter and the best linear line (named p) to fit it
+    plt.scatter(mean_res, cv_res,c='green', s =0.4, marker="o")
+    p = np.poly1d(np.polyfit(mean_res, cv_res, 1))
+    plt.plot(np.unique(mean_res), p(np.unique(mean_res)))
+
+    # find the 100 farthest genes from p
+    dist_idx = np.argsort(cv_res - p(mean_res))[-100:]
+    df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
+    labels = df_features.loc[dist_idx].geneName.unique()
+    i = 0
+    # add to the plot the names of the farthest genes
+    for x,y in zip(mean_res[dist_idx],cv_res[dist_idx]):
+        plt.annotate(labels[i], # this is the text
+                    (x,y), # these are the coordinates to position the label
+                    textcoords="offset points", # how to position the text
+                    xytext=(0,2), # distance from text to points (x,y)
+                    ha='center') # horizontal alignment can be left, right or center
+        i += 1
+    plt.title("log(mean) as function of log(cv) for each gene")
+    plt.xlabel("log(mean)")
+    plt.ylabel("log(cv)")
     plt.show()
+    f = open(f'./ml_run_logs.txt', 'a+')
+    msg = str(datetime.datetime.now())+" calc_and_plot_cv: finished plotting mean as a function of cv for each gene\n"
+    f.write(msg)
+    f.close()
+
 
 
