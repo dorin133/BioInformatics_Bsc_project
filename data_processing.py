@@ -50,7 +50,7 @@ def raw_mtx_to_csv(file_path, path_out):
     print(f'status: created the file "{path_out}"')
     
 
-def prepare_metadata_single_files(folder_path='./raw_data', out_folder_path='./raw_data'):
+def prepare_metadata_single_files(folder_path='./raw_data', out_folder_path='./raw_csv_data'):
     raw_files = os.listdir(folder_path)  # list all raw files
     # print(raw_files)
     raw_files = list(filter(lambda x: '_barcodes.tsv' in x, raw_files))  # filter files which are not barcodes files
@@ -97,18 +97,18 @@ def filter_cols(path_in_file, path_out_file, min_sum_for_col=3000, min_diff_for_
     f.write(msg)
     print(f'status: finish filtering {path_in_file}. result saved to {path_out_file}')
 
-def filter_metadata_rows(folder_path, out_folder_path):
-    raw_files = os.listdir(folder_path)  # list all raw files
+def filter_metadata_rows(folder_mtx_path, folder_to_metadata, out_folder_path):
+    raw_files = os.listdir(folder_mtx_path)  # list all raw files
     raw_files = list(filter(lambda x: '_matrix_filtered.csv' in x, raw_files))  
     for file_name in raw_files:
-        print(f'status: start filtering {file_name}')
-        input_file_path = folder_path + "/" + file_name
+        input_file_path = folder_mtx_path + "/" + file_name
         df = pd.read_csv(input_file_path, index_col=0, header=0, dtype=np.int32)
         tmp = file_name.index('_matrix_filtered')
         file_id = file_name[tmp-4:tmp]
 
-        path_to_metadata = folder_path + '/' + file_id + '_metadata.csv'
+        path_to_metadata = folder_to_metadata + '/' + file_id + '_metadata.csv'
         path_output = out_folder_path + '/' + file_id + '_metadata.csv'
+        print(f'status: start filtering {path_to_metadata}')
 
         df_metadata = pd.read_csv(path_to_metadata, index_col=0, header=0)
         results = map(int, df.columns.tolist())
@@ -118,17 +118,14 @@ def filter_metadata_rows(folder_path, out_folder_path):
 def normalize_data(path_in_file, path_out_file, alpha=20000):
     df = pd.read_csv(path_in_file, index_col=0, header=0)
     df = np.ceil(alpha*df/np.linalg.norm(df, axis=0))
-
+    path_out_file = path_out_file[:-13]+'_normalized.csv'
     print(f'status: finish normalizing {path_in_file}. result saved to {path_out_file}')
-    df.to_csv(path_out_file[:-13]+'_normalized.csv', sep=',')
+    df.to_csv(path_out_file, sep=',')
 
 # don't forget to write critical info to log
-# f = open(f'./ml_run_logs.txt', 'a+')
-#     msg = str(datetime.datetime.now()) + " stack_csv_together: " + log_info.__str__() + "\n"
-#     f.write(msg)
 
-def calc_and_plot_cv(path_in_file, path_to_features_csv='./raw_csv_data/features.csv'):
-    df = pd.read_csv(path_in_file, index_col=0, header=0)
+def calc_and_plot_cv(path_stacked_mtx_file='./merged_data/stacked_normalized_mtx.csv', path_to_features_csv='./raw_csv_data/features.csv'):
+    df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
     
     # calculating cv and mean for each gene
     cv_res = df.apply(lambda x: np.std(x, ddof=1) / np.mean(x), axis=1) 

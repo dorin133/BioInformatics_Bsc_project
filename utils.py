@@ -50,7 +50,7 @@ def stack_csv_together(folder_path, out_file_path='./merged_data/stacked_mtx.csv
     stacked_csv.to_csv(out_file_path)
     print('status: finish stack_csv_together. the new concat file called', out_file_path)
 
-def merge_all_metadata(folder_path='./raw_csv_data', out_folder_path='./raw_csv_data'):
+def merge_all_metadata(folder_path='./filtered_data', out_folder_path='./merged_data'):
     chosen_files = os.listdir(folder_path)  # list all raw files
     chosen_files = list(filter(lambda x: '_metadata_filtered.csv' in x, chosen_files)) 
     chosen_files.sort()

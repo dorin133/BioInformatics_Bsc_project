@@ -24,9 +24,9 @@ def print_hist_mt_percentage(features_folder_path = './raw_csv_data',folder_path
     plt.show()
 
 
-def print_hist_mul(folder_path = './filtered_mtx'):
+def print_hist_mul(folder_path = './filtered_data'):
     raw_files = os.listdir(folder_path)
-    raw_files = list(filter(lambda x: '.csv' in x, raw_files))
+    raw_files = list(filter(lambda x: 'matrix_filtered.csv' in x, raw_files))
 
     labels = []
     for mtx in raw_files:
