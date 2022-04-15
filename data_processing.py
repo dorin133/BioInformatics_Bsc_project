@@ -5,6 +5,7 @@ import os
 import datetime
 import matplotlib.pyplot as plt
 
+
 def features_to_csv(folder_path='./raw_data', out_folder_path='./raw_csv_data'):
     raw_files = os.listdir(folder_path)  # list all raw files
     file_name = list(filter(lambda x: '_features.tsv' in x, raw_files))[0]
@@ -55,14 +56,14 @@ def prepare_metadata_single_files(folder_path='./raw_data', out_folder_path='./r
     # print(raw_files)
     raw_files = list(filter(lambda x: '_barcodes.tsv' in x, raw_files))  # filter files which are not barcodes files
     # print(raw_files)
-    dataset  = pd.read_excel(folder_path+'/MEA_dimorphism_samples.xlsx', names =['sample_id', 'female', 'parent'],index_col=None)
+    dataset = pd.read_excel(folder_path+'/MEA_dimorphism_samples.xlsx', names=['sample_id', 'female', 'parent'], index_col=None)
     for file_name in raw_files:
         lst = []
         tmp = file_name.index('_barcodes')
         file_id = file_name[tmp-4:tmp]
         input_file_path = folder_path + "/" + file_name
         f_input = open(input_file_path, 'r')
-        output_file_path = out_folder_path + "/" +file_id +'_metadata' + '.csv'
+        output_file_path = out_folder_path + "/" + file_id +'_metadata' + '.csv'
         # f_output = open(output_file_path, 'a+')
         bool_female = str(dataset[dataset['sample_id']==file_id].female.unique()[0])
         bool_parent = str(dataset[dataset['sample_id']==file_id].parent.unique()[0])
