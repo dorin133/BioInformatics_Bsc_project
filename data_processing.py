@@ -164,15 +164,15 @@ def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_fi
     dist_cv = cv_res - p(mean_res)
     dist_idx = np.argsort(dist_cv)[-100:]
     df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
-    labels = df_features.loc[dist_idx].geneName.unique()
+    labels = df_features.loc[dist_idx].geneName.unique()  # TODO check starting from index 0 vs. index 1
     i = 0
     # add to the plot the names of the farthest genes
     for x, y in zip(mean_res[dist_idx], cv_res[dist_idx]):
-        plt.annotate(labels[i], # this is the text
-                    (x,y), # these are the coordinates to position the label
-                    textcoords="offset points", # how to position the text
-                    xytext=(0,2), # distance from text to points (x,y)
-                    ha='center') # horizontal alignment can be left, right or center
+        plt.annotate(labels[i],  # this is the text
+                    (x, y),  # these are the coordinates to position the label
+                    textcoords="offset points",  # how to position the text
+                    xytext=(0, 2),  # distance from text to points (x,y)
+                    ha='center')  # horizontal alignment can be left, right or center
         i += 1
     plt.title("log(mean) as function of log(cv) for each gene")
     plt.xlabel("log(mean)")
@@ -214,9 +214,16 @@ def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_fi
     df_threshold = df[dist_cv <= knee_point[1]]  # TODO double check this
     print(f'Status: removing rows (gens) which their distance from their CV point to the fit-line is greater then the '
           f'threshold={round(knee_point[1], 4)}')
-    print(f'That removes {df.shape[0]-df_threshold.shape[0]} genes. The new csv file saved as {path_out}')
+
+    manually_remove = ['Xist', 'Tsix', 'Eif2s3y', 'Ddx3y', 'Uty', 'Kdm5d']
+    print(f'Also manually removing {manually_remove}')
+    drop_idx = []
+    for index, row in df_features.iterrows():  # index start from 1
+        if row['geneName'] in manually_remove and index in df_threshold.index:
+            drop_idx.append(index)
+    df_threshold = df_threshold.drop(drop_idx)
+
     df_threshold.to_csv(path_out, sep=',')
-
-
+    print(f'That removes {df.shape[0]-df_threshold.shape[0]} genes. The new csv file saved as {path_out}')
 
 
