@@ -156,23 +156,28 @@ def split_merged_into_M_F(path_stacked_file='./merged_data5/stacked_normalized_f
     # print('Females:', f_list)
     # print('Males:', m_list)
 
-    df = pd.read_csv(path_stacked_file, index_col=0, header=0)
-
     stacked_m, stacked_f = None, None
+    index = 0
 
-    for curr_col_tmp in df:
-        col = df[curr_col_tmp]
-        curr_num = col.name.split('__')[1]
-        if curr_num in f_list:
-            if stacked_f is None:
-                stacked_f = pd.DataFrame(col)
-            else:
-                stacked_f = pd.concat([stacked_f, col], axis=1)
-        else:
-            if stacked_m is None:
-                stacked_m = pd.DataFrame(col)
-            else:
-                stacked_m = pd.concat([stacked_m, col], axis=1)
+    with pd.read_csv(path_stacked_file, index_col=0, header=0, low_memory=False, chunksize=10**4) as reader:
+        for chunk in reader:
+            for curr_col_tmp in chunk:
+                col = chunk[curr_col_tmp]
+                curr_num = col.name.split('__')[1]
+                if curr_num in f_list:
+                    if stacked_f is None:
+                        stacked_f = pd.DataFrame(col)
+                    else:
+                        stacked_f = pd.concat([stacked_f, col], axis=1)
+                else:
+                    if stacked_m is None:
+                        stacked_m = pd.DataFrame(col)
+                    else:
+                        stacked_m = pd.concat([stacked_m, col], axis=1)
+
+                index += 1
+                if index % 1000 == 0:
+                    print(f'reached {index} columns')
 
     print(f'Status: finish processing. now creating the csv files')
     stacked_m.to_csv(out_file_M, sep=',')
