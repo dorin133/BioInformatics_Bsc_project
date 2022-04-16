@@ -92,11 +92,21 @@ def stack_csv_together(folder_path, out_file_path='./merged_data5/stacked_mtx.cs
     print('status: stack_csv_together for', chosen_files)
 
     stacked_csv = pd.read_csv(folder_path + "/" + chosen_files[0], index_col=0, header=0)
+    num_sample = chosen_files[0][:4]
+    col_list = list(stacked_csv.columns)
+    col_list = [str(x) + "__" + num_sample for x in col_list]
+    stacked_csv.columns = col_list
+
     log_info = []
     sum_index = stacked_csv.shape[1] + 1
     log_info.append((chosen_files[0], 1))
     for file in chosen_files[1:]:
         tmp = pd.read_csv(folder_path + "/" + file, index_col=0, header=0)
+        num_sample = file[:4]
+        col_list = list(tmp.columns)
+        col_list = [str(x)+"__"+num_sample for x in col_list]
+        tmp.columns = col_list
+
         stacked_csv = pd.concat([stacked_csv, tmp], axis=1)
 
         log_info.append((file, sum_index))
@@ -131,3 +141,40 @@ def find_indices_of_gene(folder_path='./raw_csv_data2', gene_to_filter='mt-'):
     return np.array(features_csv[features_csv['geneName'].str.startswith(gene_to_filter)].index)
 
 
+def split_merged_into_M_F(path_stacked_file='./merged_data5/stacked_normalized_filtered_threshold_mtx.csv', mea_samples=
+'./raw_data/MEA_dimorphism_samples.xlsx', out_file_M='./merged_data5/stacked_M.csv', out_file_F=
+'./merged_data5/stacked_F.csv'):
+    print('Status: split_merged_into_M_F: start splitting the merged csv file into females and males csv')
+    df_f_m_index = pd.read_excel(mea_samples)
+    # print(df_f_m_index)
+    f_list, m_list = [], []
+    for index, row in df_f_m_index.iterrows():
+        if row['female'] == 1:
+            f_list.append(row.iloc[0])
+        else:
+            m_list.append(row.iloc[0])
+    # print('Females:', f_list)
+    # print('Males:', m_list)
+
+    df = pd.read_csv(path_stacked_file, index_col=0, header=0)
+
+    stacked_m, stacked_f = None, None
+
+    for curr_col_tmp in df:
+        col = df[curr_col_tmp]
+        curr_num = col.name.split('__')[1]
+        if curr_num in f_list:
+            if stacked_f is None:
+                stacked_f = pd.DataFrame(col)
+            else:
+                stacked_f = pd.concat([stacked_f, col], axis=1)
+        else:
+            if stacked_m is None:
+                stacked_m = pd.DataFrame(col)
+            else:
+                stacked_m = pd.concat([stacked_m, col], axis=1)
+
+    print(f'Status: finish processing. now creating the csv files')
+    stacked_m.to_csv(out_file_M, sep=',')
+    stacked_f.to_csv(out_file_F, sep=',')
+    print(f'Status: finish splitting the merged csv file into females and males csv. new files called {out_file_M}, {out_file_F}')

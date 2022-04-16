@@ -16,7 +16,14 @@ tmp.iloc[3-1, 1-1] = 3  # cell [3][1]
 tmp.iloc[3-1, 3-1] = 33  # cell [3][3]
 tmp.iloc[7-1, 3-1] = 333  # cell [3][3]
 
+col_list = list(tmp.columns)
+col_list = [str(x)+"_T" for x in col_list]
+print(col_list)
+
+tmp.columns = col_list
 print(tmp)
+
+exit()
 
 hist_row_non_zeros = (tmp != 0).sum(axis=1)
 hist_row_non_zeros2 = hist_row_non_zeros
