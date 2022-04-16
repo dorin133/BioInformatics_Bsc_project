@@ -6,7 +6,7 @@ import datetime
 import matplotlib.pyplot as plt
 
 
-def features_to_csv(folder_path='./raw_data', out_folder_path='./raw_csv_data'):
+def features_to_csv(folder_path='./raw_data', out_folder_path='./csv_data2'):
     raw_files = os.listdir(folder_path)  # list all raw files
     file_name = list(filter(lambda x: '_features.tsv' in x, raw_files))[0]
     lst = []
@@ -51,7 +51,7 @@ def raw_mtx_to_csv(file_path, path_out):
     print(f'status: created the file "{path_out}"')
     
 
-def prepare_metadata_single_files(folder_path='./raw_data', out_folder_path='./raw_csv_data'):
+def prepare_metadata_single_files(folder_path='./raw_data', out_folder_path='./csv_data2'):
     raw_files = os.listdir(folder_path)  # list all raw files
     # print(raw_files)
     raw_files = list(filter(lambda x: '_barcodes.tsv' in x, raw_files))  # filter files which are not barcodes files
@@ -122,10 +122,10 @@ def normalize_data(path_in_file, path_out_file, alpha=20000):
     path_out_file = path_out_file[:-13]+'_normalized.csv'
     print(f'status: finish normalizing {path_in_file}. result saved to {path_out_file}')
     df.to_csv(path_out_file, sep=',')
+    # don't forget to write critical info to log
 
-# don't forget to write critical info to log
 
-def calc_and_plot_cv(path_stacked_mtx_file='./merged_data/stacked_normalized_mtx.csv', path_to_features_csv='./raw_csv_data/features.csv'):
+def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_mtx.csv', path_to_features_csv='./csv_data2/features.csv'):
     df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
     
     # calculating cv and mean for each gene
@@ -143,7 +143,7 @@ def calc_and_plot_cv(path_stacked_mtx_file='./merged_data/stacked_normalized_mtx
     mean_res = np.log10(mean_res)
 
     # plot the scatter and the best linear line (named p) to fit it
-    plt.scatter(mean_res, cv_res,c='green', s =0.4, marker="o")
+    plt.scatter(mean_res, cv_res, c='green', s=0.4, marker="o")
     p = np.poly1d(np.polyfit(mean_res, cv_res, 1))
     plt.plot(np.unique(mean_res), p(np.unique(mean_res)))
 
@@ -170,4 +170,14 @@ def calc_and_plot_cv(path_stacked_mtx_file='./merged_data/stacked_normalized_mtx
     f.close()
 
 
+def filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_normalized_mtx.csv', path_out_file=
+'./merged_data/stacked_normalized_filtered_mtx.csv'):
+    df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
+    hist_row_non_zeros = (df != 0).sum(axis=1)
+    df_filtered = df[5 < hist_row_non_zeros]
+    hist_row_non_zeros = (df_filtered != 0).sum(axis=1)
+    df_filtered = df_filtered[hist_row_non_zeros < df.shape[0] / 2]
+    print(f'status: filter_common_and_rare_gens: filtered {df.shape[0]-df_filtered.shape[0]} genes. filtered csv saved '
+          f'as {path_out_file}')
+    df_filtered.to_csv(path_out_file, sep=',')
 

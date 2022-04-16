@@ -6,7 +6,7 @@ import seaborn as sns
 import utils
 
 
-def print_hist_mt_percentage(features_folder_path = './raw_csv_data',folder_path = './filtered_mtx'):
+def print_hist_mt_percentage(features_folder_path='./csv_data2', folder_path='./filtered_data3'):
     gene_indeces = utils.find_indeces_of_gene(features_folder_path)
     raw_files = os.listdir(folder_path)
     raw_files = list(filter(lambda x: 'matrix_filtered.csv' in x, raw_files))
@@ -24,7 +24,7 @@ def print_hist_mt_percentage(features_folder_path = './raw_csv_data',folder_path
     plt.show()
 
 
-def print_hist_mul(folder_path = './filtered_data'):
+def print_hist_mul(folder_path='./filtered_data3'):
     raw_files = os.listdir(folder_path)
     raw_files = list(filter(lambda x: 'matrix_filtered.csv' in x, raw_files))
 

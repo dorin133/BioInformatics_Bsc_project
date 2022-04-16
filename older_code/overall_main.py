@@ -1,4 +1,3 @@
-import data_to_matrix
 import filter_basic_data
 
 if __name__ == '__main__':
