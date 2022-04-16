@@ -28,7 +28,7 @@ def run_func_for_all(func_to_run, folder_in_path, folder_out_path, which_files=d
 def check_files_and_folder_for_complete_run(first_folder="./raw_data"):
     print('status: check_files_and_folder_for_complete_run: check missing default files and folder...')
     not_found = []
-    folders = [first_folder, './csv_data2', './filtered_data3', './normalized_data4', './merged_data5']
+    folders = [first_folder, 'plots_folder1', './csv_data2', './filtered_data3', './normalized_data4', './merged_data5']
     for folder in folders:
         if not os.path.isdir(folder):
             print(f"did not found folder named: {folder}")
@@ -110,6 +110,7 @@ def stack_csv_together(folder_path, out_file_path='./merged_data5/stacked_mtx.cs
     stacked_csv.to_csv(out_file_path)
     print('status: finish stack_csv_together. the new concat file called', out_file_path)
 
+
 def merge_all_metadata(folder_path='./filtered_data3', out_file='./merged_data5/all_samples_metadata.csv'):
     chosen_files = os.listdir(folder_path)  # list all raw files
     chosen_files = list(filter(lambda x: '_metadata_filtered.csv' in x, chosen_files)) 
@@ -123,7 +124,7 @@ def merge_all_metadata(folder_path='./filtered_data3', out_file='./merged_data5/
     print('status: finish merge_all_metadata. the new concat file called', out_file)
 
 
-def find_indeces_of_gene(folder_path='./raw_csv_data2', gene_to_filter='mt-'):
+def find_indices_of_gene(folder_path='./raw_csv_data2', gene_to_filter='mt-'):
     raw_files = os.listdir(folder_path)  # list all raw files
     chosen_files = list(filter(lambda x: 'features.csv' in x, raw_files))
     features_csv = pd.read_csv(folder_path + "/" + chosen_files[0], index_col=0, header=0)

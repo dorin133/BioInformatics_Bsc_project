@@ -5,7 +5,6 @@ import os
 import datetime
 import matplotlib.pyplot as plt
 
-
 def features_to_csv(folder_path='./raw_data', out_folder_path='./csv_data2'):
     raw_files = os.listdir(folder_path)  # list all raw files
     file_name = list(filter(lambda x: '_features.tsv' in x, raw_files))[0]
@@ -116,6 +115,19 @@ def filter_metadata_rows(folder_mtx_path, folder_to_metadata, out_folder_path):
         df_metadata = df_metadata.loc[results]
         df_metadata.to_csv(path_output[:-4]+'_filtered.csv', sep=',')
 
+
+def filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_normalized_mtx.csv', path_out_file=
+'./merged_data/stacked_normalized_filtered_mtx.csv'):
+    df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
+    hist_row_non_zeros = (df != 0).sum(axis=1)
+    df_filtered = df[5 < hist_row_non_zeros]
+    hist_row_non_zeros = (df_filtered != 0).sum(axis=1)
+    df_filtered = df_filtered[hist_row_non_zeros < df.shape[0] / 2]
+    print(f'status: filter_common_and_rare_gens: filtered {df.shape[0]-df_filtered.shape[0]} genes. filtered csv saved '
+          f'as {path_out_file}')
+    df_filtered.to_csv(path_out_file, sep=',')
+
+
 def normalize_data(path_in_file, path_out_file, alpha=20000):
     df = pd.read_csv(path_in_file, index_col=0, header=0)
     df = np.ceil(alpha*df/np.linalg.norm(df, axis=0))
@@ -125,16 +137,17 @@ def normalize_data(path_in_file, path_out_file, alpha=20000):
     # don't forget to write critical info to log
 
 
-def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_mtx.csv', path_to_features_csv='./csv_data2/features.csv'):
+def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_filtered_mtx.csv', path_to_features_csv=
+'./csv_data2/features.csv', path_out='./merged_data5/stacked_normalized_filtered_threshold_mtx.csv', plots_folder='./plots_folder1'):
     df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
     
     # calculating cv and mean for each gene
-    cv_res = df.apply(lambda x: np.std(x, ddof=1) / np.mean(x), axis=1) 
+    cv_res_pd = df.apply(lambda x: np.std(x, ddof=1) / np.mean(x), axis=1)
     mean_res = df.apply(lambda x: np.mean(x), axis=1) 
-    cv_res = cv_res.dropna()
-    mean_res = mean_res[mean_res>0]
-    msg = "cv and mean shape after removing zeros: " + str(cv_res.shape)+"\n"
-    print(msg)
+    cv_res = cv_res_pd.dropna()
+    mean_res = mean_res[mean_res > 0]
+    # msg = "cv and mean shape after removing zeros: " + str(cv_res.shape)+"\n"
+    # print(msg)
     cv_res = cv_res.to_numpy(dtype=np.float32, copy=True)
     mean_res = mean_res.to_numpy(dtype=np.float32, copy=True)
 
@@ -148,12 +161,13 @@ def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_mt
     plt.plot(np.unique(mean_res), p(np.unique(mean_res)))
 
     # find the 100 farthest genes from p
-    dist_idx = np.argsort(cv_res - p(mean_res))[-100:]
+    dist_cv = cv_res - p(mean_res)
+    dist_idx = np.argsort(dist_cv)[-100:]
     df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
     labels = df_features.loc[dist_idx].geneName.unique()
     i = 0
     # add to the plot the names of the farthest genes
-    for x,y in zip(mean_res[dist_idx],cv_res[dist_idx]):
+    for x, y in zip(mean_res[dist_idx], cv_res[dist_idx]):
         plt.annotate(labels[i], # this is the text
                     (x,y), # these are the coordinates to position the label
                     textcoords="offset points", # how to position the text
@@ -163,21 +177,46 @@ def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_mt
     plt.title("log(mean) as function of log(cv) for each gene")
     plt.xlabel("log(mean)")
     plt.ylabel("log(cv)")
+    plt.savefig(f'{plots_folder}/cv_plot{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
     plt.show()
+
     f = open(f'./ml_run_logs.txt', 'a+')
     msg = str(datetime.datetime.now())+" calc_and_plot_cv: finished plotting mean as a function of cv for each gene\n"
     f.write(msg)
     f.close()
 
+    # find knee for threshold filter
+    # dist_cv_absolute = np.absolute(dist_cv)  # TODO option 2
+    # ax = sns.distplot(pd.DataFrame(dist_cv_absolute), hist=True)
+    ax = sns.distplot(pd.DataFrame(dist_cv), hist=True)
+    line = ax.lines[0]
+    knee_val = 100
+    knee_point = None
+    for point in line.get_xydata():
+        tmp_dist = point[0]**2 + point[1]**2
+        if point[0] > 0.01 and tmp_dist < knee_val:  # TODO the 'point[0] > 0.01' is not the best solution...
+            knee_val = tmp_dist
+            knee_point = point
+    print(f'Found knee point (closest to the origin) at {knee_point}')
+    plt.annotate("knee",  # this is the text
+                 knee_point,  # these are the coordinates to position the label
+                 textcoords="offset points",  # how to position the text
+                 xytext=(0, 0),  # distance from text to points (x,y)
+                 ha='center')  # horizontal alignment can be left, right or center
 
-def filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_normalized_mtx.csv', path_out_file=
-'./merged_data/stacked_normalized_filtered_mtx.csv'):
-    df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
-    hist_row_non_zeros = (df != 0).sum(axis=1)
-    df_filtered = df[5 < hist_row_non_zeros]
-    hist_row_non_zeros = (df_filtered != 0).sum(axis=1)
-    df_filtered = df_filtered[hist_row_non_zeros < df.shape[0] / 2]
-    print(f'status: filter_common_and_rare_gens: filtered {df.shape[0]-df_filtered.shape[0]} genes. filtered csv saved '
-          f'as {path_out_file}')
-    df_filtered.to_csv(path_out_file, sep=',')
+
+    plt.axhline(y=knee_point[1], color='r', linestyle='-')
+    plt.title(f'CV distance (absolute) density. recommend threshold={round(knee_point[1], 4)}')
+    plt.savefig(f'{plots_folder}/cv_knee_threshold{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    plt.show()
+
+    # df_threshold = df[dist_cv_absolute <= knee_point[1]]  # TODO double check this
+    df_threshold = df[dist_cv <= knee_point[1]]  # TODO double check this
+    print(f'Status: removing rows (gens) which their distance from their CV point to the fit-line is greater then the '
+          f'threshold={round(knee_point[1], 4)}')
+    print(f'That removes {df.shape[0]-df_threshold.shape[0]} genes. The new csv file saved as {path_out}')
+    df_threshold.to_csv(path_out, sep=',')
+
+
+
 
