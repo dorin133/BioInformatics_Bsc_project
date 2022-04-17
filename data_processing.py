@@ -182,7 +182,7 @@ def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_fi
 
     f = open(f'./ml_run_logs.txt', 'a+')
     msg = str(datetime.datetime.now()) + f" calc_and_plot_cv: finished plotting mean as a function of cv for each gene" \
-                                         f"\n The 100 genes we cleaned are {labels}"
+                                         f"\n The 100 genes we cleaned are {labels}\n"
     f.write(msg)
     f.close()
 
