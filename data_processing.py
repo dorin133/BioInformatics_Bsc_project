@@ -164,7 +164,7 @@ def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_fi
     dist_cv = cv_res - p(mean_res)
     dist_idx = np.argsort(dist_cv)[-100:]
     df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
-    labels = df_features.loc[dist_idx].geneName.unique()  # TODO check starting from index 0 vs. index 1
+    labels = df_features.loc[dist_idx+1].geneName.unique()  # notice the "+1" to fix the diff between the two
     i = 0
     # add to the plot the names of the farthest genes
     for x, y in zip(mean_res[dist_idx], cv_res[dist_idx]):
@@ -190,6 +190,7 @@ def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_fi
     # dist_cv_absolute = np.absolute(dist_cv)  # TODO option 2
     # ax = sns.distplot(pd.DataFrame(dist_cv_absolute), hist=True)
     ax = sns.distplot(pd.DataFrame(dist_cv), hist=True)
+    # ax = sns.distplot(pd.DataFrame(dist_cv[dist_cv>0]), hist=True)
     line = ax.lines[0]
     knee_val = 100
     knee_point = None

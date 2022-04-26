@@ -53,7 +53,10 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv='./c
 
     # mean_f = pd.DataFrame(df_f.mean(axis=1))
     mean_f = df_f.mean(axis=1)
+    print("mean f\n", mean_f)
     mean_m = df_m.mean(axis=1)
+    print("mean m\n", mean_m)
+
 
     # print(mean_f)
 
@@ -69,10 +72,12 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv='./c
     mean_m_np = mean_m.to_numpy()
 
     # find the 20 farthest genes from p
-    dist_f = abs(mean_f_np - (a*mean_m_np+b))
+    dist_f = abs(mean_m_np - (a*mean_f_np+b))
+    # print("dist_f", dist_f)
     dist_idx = np.argsort(dist_f)[-20:]
+    print("dist_idx", dist_idx)
     df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
-    labels = df_features.loc[dist_idx].geneName.unique()  # TODO check starting from index 0 vs. index 1
+    labels = df_features.loc[dist_idx+1].geneName.unique()  # notice the "+1" to fix the diff between the two
     i = 0
 
     # add to the plot the names of the farthest genes
@@ -84,8 +89,8 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv='./c
                      ha='center')  # horizontal alignment can be left, right or center
         i += 1
     plt.title("Females vs Males genes mean")
-    plt.xlabel("Males")  # TODO double check this
-    plt.ylabel("Females")
+    plt.ylabel("Males")  # TODO double check this
+    plt.xlabel("Females")
     plt.savefig(f'{plots_folder}/female_vs_male_mean{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
     plt.show()
 
