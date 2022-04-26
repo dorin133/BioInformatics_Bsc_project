@@ -137,14 +137,14 @@ def normalize_data(path_in_file, path_out_file, alpha=20000):
     # don't forget to write critical info to log
 
 
-def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_filtered_mtx.csv', path_to_features_csv=
-'./csv_data2/features.csv', path_out='./merged_data5/stacked_normalized_filtered_threshold_mtx.csv', plots_folder='./plots_folder1'):
+def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plots_folder='./plots_folder1'):
     df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
     
     # calculating cv and mean for each gene
     cv_res_pd = df.apply(lambda x: np.std(x, ddof=1) / np.mean(x), axis=1)
     mean_res = df.apply(lambda x: np.mean(x), axis=1) 
-    cv_res = cv_res_pd.dropna()
+    cv_res_pd = cv_res_pd.dropna()
+    cv_res = cv_res_pd
     mean_res = mean_res[mean_res > 0]
     # msg = "cv and mean shape after removing zeros: " + str(cv_res.shape)+"\n"
     # print(msg)
@@ -164,7 +164,14 @@ def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_fi
     dist_cv = cv_res - p(mean_res)
     dist_idx = np.argsort(dist_cv)[-100:]
     df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
-    labels = df_features.loc[dist_idx+1].geneName.unique()  # notice the "+1" to fix the diff between the two
+
+    real_idx = []
+    # print("dist_idx", dist_idx)
+    # print("cv_res_pd.index:", cv_res_pd.index)
+    for index, j in enumerate(cv_res_pd.index):
+        if index in dist_idx:
+            real_idx.append(j)
+    labels = df_features.loc[real_idx].geneName.unique()
     i = 0
     # add to the plot the names of the farthest genes
     for x, y in zip(mean_res[dist_idx], cv_res[dist_idx]):
@@ -206,7 +213,6 @@ def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_fi
                  xytext=(0, 0),  # distance from text to points (x,y)
                  ha='center')  # horizontal alignment can be left, right or center
 
-
     plt.axhline(y=knee_point[1], color='r', linestyle='-')
     plt.title(f'CV distance (absolute) density. recommend threshold={round(knee_point[1], 4)}')
     plt.savefig(f'{plots_folder}/cv_knee_threshold{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
@@ -227,5 +233,4 @@ def calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_fi
 
     df_threshold.to_csv(path_out, sep=',')
     print(f'That removes {df.shape[0]-df_threshold.shape[0]} genes. The new csv file saved as {path_out}')
-
 

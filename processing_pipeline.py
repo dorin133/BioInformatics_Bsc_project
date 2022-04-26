@@ -54,27 +54,30 @@ def main():
         hope this order makes sense...if not, feel free to correct me"""
 
     # step 6: after filtering and normalizing separately, merge all files together
-    utils.stack_csv_together(folder_path='./normalized_data4', out_file_path='./merged_data5/stacked_normalized_mtx.csv')
+    utils.stack_csv_together(folder_path='./normalized_data4', out_file_path='./merged_data5/stacked_1.csv')
     utils.merge_all_metadata(folder_path='./filtered_data3', out_file='./merged_data5/all_samples_metadata.csv')
 
     """ final stacked versions of both the metadata and the matrices are in the 'merged_data' file"""
-
-    # step 7: filter the whole stacked mtx from very common gens and very rare ones
-    data_processing.filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_normalized_mtx.csv',
-                                                path_out_file='./merged_data5/stacked_normalized_filtered_mtx.csv')
-
-    # step 8: plot and calculate the mean w.r.t. the coe. of variance for each gene
-    data_processing.calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_normalized_filtered_mtx.csv',
-                                     path_out='./merged_data5/stacked_normalized_filtered_threshold_mtx.csv',
-                                     path_to_features_csv='./csv_data2/features.csv')
-
-    # step 9: creating separate csv files for males and females
-    utils.split_merged_into_M_F(path_stacked_file='./merged_data5/stacked_normalized_filtered_threshold_mtx.csv',
+    # step 7: creating separate csv files for males and females
+    utils.split_merged_into_M_F(path_stacked_file='./merged_data5/stacked_1.csv',
                                 mea_samples='./raw_data/MEA_dimorphism_samples.xlsx', out_file_M=
                                 './merged_data5/stacked_M.csv', out_file_F='./merged_data5/stacked_F.csv')
 
-    # step 10: plotting and pointing the most diff genes for males vs. females
-    data_plot_utils.plot_female_vs_male_mean(females_path='./merged_data5/stacked_F.csv', males_path='./merged_data5/stacked_M.csv')
+    # step 8: plotting and pointing the most diff genes for males vs. females
+    data_plot_utils.plot_female_vs_male_mean(females_path='./merged_data5/stacked_F.csv',
+                                             males_path='./merged_data5/stacked_M.csv',
+                                             path_to_features_csv='./csv_data2/features.csv',
+                                             path_stacked_mtx_file='?????Not yet imp?????',  # TODO
+                                             path_out='????Not yet imp?????')
+
+    # step 9: filter the whole stacked mtx from very common gens and very rare ones
+    data_processing.filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_1.csv',
+                                                path_out_file='./merged_data5/stacked_2.csv')
+
+    # step 10: plot and calculate the mean w.r.t. the coe. of variance for each gene
+    data_processing.calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_2.csv',
+                                     path_out='./merged_data5/stacked_3.csv',
+                                     path_to_features_csv='./csv_data2/features.csv')
 
 
 if __name__ == '__main__':
