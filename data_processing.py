@@ -86,7 +86,7 @@ def filter_cols(path_in_file, path_out_file, min_sum_for_col=3000, min_diff_for_
     df = pd.read_csv(path_in_file, index_col=0, header=0, dtype=np.int32)
     num_col_start = df.shape[1]
     df = df.loc[:, (df.sum(numeric_only=True) >= min_sum_for_col)]  # filter cols with sum less than 3000
-    df = df.loc[:, ((df != 0).sum() > min_diff_for_col)]  # filter cols with less than 2500 different gens
+    df = df.loc[:, ((df != 0).sum() > min_diff_for_col)]  # filter cols with less than 2500 different genes
     df.to_csv(path_out_file, sep=',')
     num_col_end = df.shape[1]
     msg = f'Note: started with {num_col_start} cols, after filtering left with {num_col_end} (filtered ' \
@@ -152,8 +152,8 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     mean_res = mean_res.to_numpy(dtype=np.float32, copy=True)
 
     # apply log to the mean and cv
-    cv_res = np.log10(cv_res)
-    mean_res = np.log10(mean_res)
+    cv_res = np.log2(cv_res)
+    mean_res = np.log2(mean_res)
 
     # plot the scatter and the best linear line (named p) to fit it
     plt.scatter(mean_res, cv_res, c='green', s=0.4, marker="o")
@@ -161,8 +161,17 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     plt.plot(np.unique(mean_res), p(np.unique(mean_res)))
 
     # find the 100 farthest genes from p
-    dist_cv = cv_res - p(mean_res)
-    dist_idx = np.argsort(dist_cv)[-100:]
+    # zipped_points = [(x,y) for x,y in zip(mean_res, cv_res)]
+    # p1 = np.asarray((np.amin(mean_res),p(np.amin(mean_res))))
+    # p2 = np.asarray((np.amax(mean_res),p(np.amax(mean_res))))
+    # p3 = [np.asarray(x) for x in zipped_points]
+    # # print(p1)
+    # # print(p2)
+    # # print(p3)
+    
+    # dist_cv = [np.linalg.norm(np.cross(p2-p1, p1-[x,y]))/np.linalg.norm(p2-p1) for (x,y) in p3]
+    dist_cv = abs(cv_res - p(mean_res))
+    dist_idx = np.argsort(dist_cv)[-100:] 
     df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
 
     real_idx = []
@@ -170,9 +179,13 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     # print("cv_res_pd.index:", cv_res_pd.index)
     for index, j in enumerate(cv_res_pd.index):
         if index in dist_idx:
-            real_idx.append(j)
+            # print("dist_idx: "+ str(index)+" matches the real idx: "+ str(j-2))
+            real_idx.append(j-2)
+    # print("real_index:", real_idx)
     labels = df_features.loc[real_idx].geneName.unique()
     i = 0
+    print("the 100 farthest genes in the cv plot are: ")
+    print(labels)
     # add to the plot the names of the farthest genes
     for x, y in zip(mean_res[dist_idx], cv_res[dist_idx]):
         plt.annotate(labels[i],  # this is the text
@@ -193,44 +206,48 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     f.write(msg)
     f.close()
 
-    # find knee for threshold filter
-    # dist_cv_absolute = np.absolute(dist_cv)  # TODO option 2
-    # ax = sns.distplot(pd.DataFrame(dist_cv_absolute), hist=True)
-    ax = sns.distplot(pd.DataFrame(dist_cv), hist=True)
-    # ax = sns.distplot(pd.DataFrame(dist_cv[dist_cv>0]), hist=True)
-    line = ax.lines[0]
-    knee_val = 100
-    knee_point = None
-    for point in line.get_xydata():
-        tmp_dist = point[0]**2 + point[1]**2
-        if point[0] > 0.01 and tmp_dist < knee_val:  # TODO the 'point[0] > 0.01' is not the best solution...
-            knee_val = tmp_dist
-            knee_point = point
-    print(f'Found knee point (closest to the origin) at {knee_point}')
-    plt.annotate("knee",  # this is the text
-                 knee_point,  # these are the coordinates to position the label
-                 textcoords="offset points",  # how to position the text
-                 xytext=(0, 0),  # distance from text to points (x,y)
-                 ha='center')  # horizontal alignment can be left, right or center
+    # # find knee for threshold filter
+    # # dist_cv_absolute = np.absolute(dist_cv)  # TODO option 2
+    # sorted_dict_cv = np.flip(np.sort(dist_cv))
+    # ax_demo = plt.plot(np.arange(1/sorted_dict_cv.size, 1+1/sorted_dict_cv.size, 1/sorted_dict_cv.size), (sorted_dict_cv-np.amin(sorted_dict_cv))/np.amax(sorted_dict_cv))
+    # ax_demo = plt.gca()
+    # line = ax_demo.lines[0]
+    # # ax = sns.distplot(pd.DataFrame(dist_cv), hist=True)
+    # # # ax = sns.distplot(pd.DataFrame(dist_cv[dist_cv>0]), hist=True)
+    # # line = ax.lines[0]
+    # knee_val = 100
+    # knee_point = None
+    # for point in line.get_xydata():
+    #     tmp_dist = point[0]**2 + point[1]**2
+    #     if point[0] > 0.01 and tmp_dist < knee_val:  # TODO the 'point[0] > 0.01' is not the best solution...
+    #         knee_val = tmp_dist
+    #         knee_point = point
+    # print(f'Found knee point (closest to the origin) at {knee_point}')
+    # plt.annotate("knee",  # this is the text
+    #              knee_point,  # these are the coordinates to position the label
+    #              textcoords="offset points",  # how to position the text
+    #              xytext=(0, 0),  # distance from text to points (x,y)
+    #              ha='center')  # horizontal alignment can be left, right or center
 
-    plt.axhline(y=knee_point[1], color='r', linestyle='-')
-    plt.title(f'CV distance (absolute) density. recommend threshold={round(knee_point[1], 4)}')
-    plt.savefig(f'{plots_folder}/cv_knee_threshold{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
-    plt.show()
+    # plt.axhline(y=knee_point[1], color='r', linestyle='-')
+    # plt.title(f'CV distance (absolute) density. recommend threshold={round(knee_point[1], 4)}')
+    # plt.savefig(f'{plots_folder}/cv_knee_threshold{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    # plt.show()
 
-    # df_threshold = df[dist_cv_absolute <= knee_point[1]]  # TODO double check this
-    df_threshold = df[dist_cv <= knee_point[1]]  # TODO double check this
-    print(f'Status: removing rows (gens) which their distance from their CV point to the fit-line is greater then the '
-          f'threshold={round(knee_point[1], 4)}')
+    # # df_threshold = df[dist_cv_absolute <= knee_point[1]]  # TODO double check this
+    # df_threshold = df[dist_cv <= knee_point[1]]  # TODO double check this
+    # print(f'Status: removing rows (gens) which their distance from their CV point to the fit-line is greater then the '
+    #       f'threshold={round(knee_point[1], 4)}')
 
-    manually_remove = ['Xist', 'Tsix', 'Eif2s3y', 'Ddx3y', 'Uty', 'Kdm5d']
-    print(f'Also manually removing {manually_remove}')
-    drop_idx = []
-    for index, row in df_features.iterrows():  # index start from 1
-        if row['geneName'] in manually_remove and index in df_threshold.index:
-            drop_idx.append(index)
-    df_threshold = df_threshold.drop(drop_idx)
+    # manually_remove = ['Xist', 'Tsix', 'Eif2s3y', 'Ddx3y', 'Uty', 'Kdm5d']
+    # print(f'Also manually removing {manually_remove}')
+    # drop_idx = []
+    # for index, row in df_features.iterrows():  # index start from 1
+    #     if row['geneName'] in manually_remove and index in df_threshold.index:
+    #         drop_idx.append(index)
+    # df_threshold = df_threshold.drop(drop_idx)
 
-    df_threshold.to_csv(path_out, sep=',')
-    print(f'That removes {df.shape[0]-df_threshold.shape[0]} genes. The new csv file saved as {path_out}')
+    # df_threshold.to_csv(path_out, sep=',')
+    # print(f'That removes {df.shape[0]-df_threshold.shape[0]} genes. The new csv file saved as {path_out}')
+    # print(f'We were left with {df_threshold.shape[0]} genes.')
 

@@ -175,7 +175,7 @@ def split_merged_into_M_F(path_stacked_file='./merged_data5/stacked_normalized_f
         return indices
 
     df = pd.read_csv(path_stacked_file, index_col=0,
-                     header=0, low_memory=False)
+                     header=0, low_memory=False) #why not using the metadata
     merged_col_num = df.shape[1]
     print(
         f'Status: finish loading data (its shape: {df.shape}). now filtering only males')
