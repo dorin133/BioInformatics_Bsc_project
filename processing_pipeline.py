@@ -65,21 +65,27 @@ def main():
     #                             './merged_data5/stacked_M.csv', out_file_F='./merged_data5/stacked_F.csv')
     
 
-    # # step 8: plotting and pointing the most diff genes for males vs. females
-    # data_plot_utils.plot_female_vs_male_mean(females_path='./merged_data5/stacked_F.csv',
-    #                                          males_path='./merged_data5/stacked_M.csv',
-    #                                          path_to_features_csv='./csv_data2/features.csv',
-    #                                          path_stacked_mtx_file='?????Not yet imp?????',  # TODO
-    #                                          path_out='????Not yet imp?????')
+    # step 8: plotting and pointing the most diff genes for males vs. females
+    data_plot_utils.plot_female_vs_male_mean(females_path='./merged_data5/stacked_F.csv',
+                                             males_path='./merged_data5/stacked_M.csv',
+                                             path_to_features_csv='./csv_data2/features.csv',
+                                             path_stacked_mtx_file='?????Not yet imp?????',  # TODO
+                                             path_out='????Not yet imp?????')
+
+    data_plot_utils.plot_female_vs_male_fraction_expression(females_path='./merged_data5/stacked_F.csv',
+                                             males_path='./merged_data5/stacked_M.csv',
+                                             path_to_features_csv='./csv_data2/features.csv',
+                                             path_stacked_mtx_file='?????Not yet imp?????',  # TODO
+                                             path_out='????Not yet imp?????')
 
     # # step 9: filter the whole stacked mtx's very common genes and very rare ones (now for the first time in the code, we filter rows and not columns + no need to adjust metadata)
     # data_processing.filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_1.csv',
     #                                             path_out_file='./merged_data5/stacked_2.csv')
 
-    # step 10: plot and calculate the mean w.r.t. the coe. of variance for each gene
-    data_processing.calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_2.csv',
-                                     path_out='./merged_data5/stacked_3.csv',
-                                     path_to_features_csv='./csv_data2/features.csv')
+    # # step 10: plot and calculate the mean w.r.t. the coe. of variance for each gene
+    # data_processing.calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_2.csv',
+    #                                  path_out='./merged_data5/stacked_3.csv',
+    #                                  path_to_features_csv='./csv_data2/features.csv')
 
 
 if __name__ == '__main__':

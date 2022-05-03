@@ -70,15 +70,16 @@ def print_hist_genes(folder_path='./csv_data2', plots_folder='./plots_folder1'):
 
 
 
-def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, path_stacked_mtx_file, path_out,
+def plot_female_vs_male_fraction_expression(females_path, males_path, path_to_features_csv, path_stacked_mtx_file, path_out,
                              plots_folder='./plots_folder1'):
     df_f = pd.read_csv(females_path, index_col=0, header=0)
     df_m = pd.read_csv(males_path, index_col=0, header=0)
 
     # mean_f = pd.DataFrame(df_f.mean(axis=1))
-    mean_f = np.log2(df_f.mean(axis=1)+1)
+    
+    mean_f = df_f.astype(bool).sum(axis=1)/df_f.shape[1]
     # print("mean f\n", mean_f)
-    mean_m = np.log2(df_m.mean(axis=1)+1)
+    mean_m = df_m.astype(bool).sum(axis=1)/df_m.shape[1]
     # print("mean m\n", mean_m)
 
     del df_f
@@ -88,11 +89,10 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, pat
     ax1 = fig.add_subplot(111)
     ax1.scatter(mean_f, mean_m, s=5, c='b', marker="s")
     # plt.ax
-    mean_f_np = mean_f.to_numpy()
-    mean_m_np = mean_m.to_numpy()
-    p = np.polyfit(mean_f_np, mean_m_np, 1)
-    a, b = p
-    plt.plot(mean_f_np, a*mean_f_np+b, c='r')
+    # mean_f_np = mean_f.to_numpy()
+    # mean_m_np = mean_m.to_numpy()
+    p = np.poly1d(np.polyfit(mean_f, mean_m, 1))
+    plt.plot(np.unique(mean_f), p(np.unique(mean_f)))
 
 
     # n_zeros_f = np.count_nonzero(mean_f_np==0)
@@ -102,12 +102,15 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, pat
 
 
     # find the 20 farthest genes from p
-    # think of changing this to squared distance
-    dist_f = abs(mean_m_np - (a*mean_f_np+b))
+    dist_f = abs(mean_m - p(mean_f))
+    # dist_cv.index contains the real indeces of the genes (by the features table)
+    dist_f_dict = dict(zip(dist_f.index, dist_f.values))
+    # the next line returns the real indeces (by the features table) of the 100 genes with the highest cv
+    dist_f_20 = sorted(dist_f_dict, key=dist_f_dict.get, reverse=True)[:20]
     # print("dist_f", dist_f)
-    dist_idx = np.argsort(dist_f)[-20:]
+    # dist_idx = np.argsort(dist_f)[-20:]
 
-    print("dist_idx", dist_idx)
+    # print("dist_idx", dist_idx)
     df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
     # real_idx = []
     # # print(mean_f.index)
@@ -115,19 +118,99 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, pat
     #     if index in dist_idx:
     #         real_idx.append(j)
 
-    labels = df_features.iloc[dist_idx].geneName.unique()
+    labels = df_features.loc[dist_f_20].geneName.unique()
     i = 0
     # add to the plot the names of the farthest genes
-    for x, y in zip(mean_f_np[dist_idx], mean_m_np[dist_idx]):
+    for x, y in zip(mean_f.loc[dist_f_20], mean_m.loc[dist_f_20]):
         plt.annotate(labels[i],  # this is the text
                      (x, y),  # these are the coordinates to position the label
                      textcoords="offset points",  # how to position the text
                      xytext=(0, 2),  # distance from text to points (x,y)
                      ha='center')  # horizontal alignment can be left, right or center
         i += 1
+    plt.title("Females vs Males genes expression ratio")
+    plt.ylabel("Males ratio of expression")  # TODO double check this
+    plt.xlabel("Females ratio of expression")
+    plt.savefig(f'{plots_folder}/female_vs_male_expression_ratio{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    plt.show()
+
+    # df_all = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)  # TODO add this if needed
+    # drop_idx = []
+    # for index, row in df_features.iterrows():  # index start from 1
+    #     if row['geneName'] in labels and index in df_all.index:
+    #         drop_idx.append(index)
+    # df_all = df_all.drop(drop_idx)
+    # df_all.to_csv(path_out, sep=',')
+
+    msg = f' plot_female_vs_male_expression_fraction: the 20 genes we found in this function are: {labels}'
+    print(f'Status:{msg}')
+    f = open(f'./ml_run_logs.txt', 'a+')
+    f.write(str(datetime.datetime.now()) + msg + '\n')
+    f.close()
+
+
+def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, path_stacked_mtx_file, path_out,
+                             plots_folder='./plots_folder1'):
+    df_f = pd.read_csv(females_path, index_col=0, header=0)
+    df_m = pd.read_csv(males_path, index_col=0, header=0)
+
+    # mean_f = pd.DataFrame(df_f.mean(axis=1))
+    
+    mean_f = np.log2(df_f + 1).mean(axis=1)
+    # print("mean f\n", mean_f)
+    mean_m = np.log2(df_m + 1).mean(axis=1)
+    # print("mean m\n", mean_m)
+
+    del df_f
+    del df_m
+
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    ax1.scatter(mean_f, mean_m, s=5, c='b', marker="s")
+    # plt.ax
+    # mean_f_np = mean_f.to_numpy()
+    # mean_m_np = mean_m.to_numpy()
+    p = np.poly1d(np.polyfit(mean_f, mean_m, 1))
+    plt.plot(np.unique(mean_f), p(np.unique(mean_f)))
+
+
+    # n_zeros_f = np.count_nonzero(mean_f_np==0)
+    # non_zeros_f = np.count_nonzero(mean_f_np!=0)
+
+    # print("There are "+ str(n_zeros_f)+" genes not expressed in females and "+str(non_zeros_f)+" genes expressed in females")
+
+
+    # find the 20 farthest genes from p
+    dist_f = abs(mean_m - p(mean_f))
+    # dist_cv.index contains the real indeces of the genes (by the features table)
+    dist_f_dict = dict(zip(dist_f.index, dist_f.values))
+    # the next line returns the real indeces (by the features table) of the 100 genes with the highest cv
+    dist_f_20 = sorted(dist_f_dict, key=dist_f_dict.get, reverse=True)[:20]
+    # print("dist_f", dist_f)
+    # dist_idx = np.argsort(dist_f)[-20:]
+
+    # print("dist_idx", dist_idx)
+    df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
+    # real_idx = []
+    # # print(mean_f.index)
+    # for index, j in enumerate(mean_f.index):
+    #     if index in dist_idx:
+    #         real_idx.append(j)
+
+    labels = df_features.loc[dist_f_20].geneName.unique()
+    i = 0
+    # add to the plot the names of the farthest genes
+    for x, y in zip(mean_f.loc[dist_f_20], mean_m.loc[dist_f_20]):
+        plt.annotate(labels[i],  # this is the text
+                     (x, y),  # these are the coordinates to position the label
+                     textcoords="offset points",  # how to position the text
+                     xytext=(0, 2),  # distance from text to points (x,y)
+                     ha='center')  # horizontal alignment can be left, right or center
+        i += 1
+
     plt.title("Females vs Males genes mean")
-    plt.ylabel("Males")  # TODO double check this
-    plt.xlabel("Females")
+    plt.ylabel("mean(Males)")  # TODO double check this
+    plt.xlabel("mean(Females)")
     plt.savefig(f'{plots_folder}/female_vs_male_mean{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
     plt.show()
 
