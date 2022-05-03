@@ -4,6 +4,8 @@ import seaborn as sns
 import os
 import datetime
 import matplotlib.pyplot as plt
+from typing import Dict
+from itertools import islice
 
 def features_to_csv(folder_path='./raw_data', out_folder_path='./csv_data2'):
     raw_files = os.listdir(folder_path)  # list all raw files
@@ -130,7 +132,9 @@ def filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_no
 
 def normalize_data(path_in_file, path_out_file, alpha=20000):
     df = pd.read_csv(path_in_file, index_col=0, header=0)
-    df = np.ceil(alpha*df/np.linalg.norm(df, axis=0))
+    df = np.ceil(alpha*(df/df.sum()))
+    # df = np.ceil(alpha*df/np.linalg.norm(df, axis=0))
+    # print("problem there's a problem with the normalization function!!!")
     path_out_file = path_out_file[:-13]+'_normalized.csv'
     print(f'status: finish normalizing {path_in_file}. result saved to {path_out_file}')
     df.to_csv(path_out_file, sep=',')
@@ -141,15 +145,15 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
     
     # calculating cv and mean for each gene
-    cv_res_pd = df.apply(lambda x: np.std(x, ddof=1) / np.mean(x), axis=1)
+    cv_res = df.apply(lambda x: np.std(x, ddof=1) / np.mean(x), axis=1)
     mean_res = df.apply(lambda x: np.mean(x), axis=1) 
-    cv_res_pd = cv_res_pd.dropna()
-    cv_res = cv_res_pd
-    mean_res = mean_res[mean_res > 0]
+    # cv_res_pd = cv_res_pd.dropna()
+    # cv_res = cv_res_pd
+    # mean_res = mean_res[mean_res > 0]
     # msg = "cv and mean shape after removing zeros: " + str(cv_res.shape)+"\n"
     # print(msg)
-    cv_res = cv_res.to_numpy(dtype=np.float32, copy=True)
-    mean_res = mean_res.to_numpy(dtype=np.float32, copy=True)
+    # cv_res = cv_res.to_numpy(dtype=np.float32, copy=True)
+    # mean_res = mean_res.to_numpy(dtype=np.float32, copy=True)
 
     # apply log to the mean and cv
     cv_res = np.log2(cv_res)
@@ -158,36 +162,34 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     # plot the scatter and the best linear line (named p) to fit it
     plt.scatter(mean_res, cv_res, c='green', s=0.4, marker="o")
     p = np.poly1d(np.polyfit(mean_res, cv_res, 1))
+    # should be around [-0.5, 0.5]
+    # now it is: [-0.5, 0.75]
     plt.plot(np.unique(mean_res), p(np.unique(mean_res)))
 
     # find the 100 farthest genes from p
-    # zipped_points = [(x,y) for x,y in zip(mean_res, cv_res)]
-    # p1 = np.asarray((np.amin(mean_res),p(np.amin(mean_res))))
-    # p2 = np.asarray((np.amax(mean_res),p(np.amax(mean_res))))
-    # p3 = [np.asarray(x) for x in zipped_points]
-    # # print(p1)
-    # # print(p2)
-    # # print(p3)
-    
-    # dist_cv = [np.linalg.norm(np.cross(p2-p1, p1-[x,y]))/np.linalg.norm(p2-p1) for (x,y) in p3]
-    dist_cv = abs(cv_res - p(mean_res))
-    dist_idx = np.argsort(dist_cv)[-100:] 
+    dist_cv = (cv_res - p(mean_res))
+    # dist_cv.index contains the real indeces of the genes (by the features table)
+    dist_cv_dict = dict(zip(dist_cv.index, dist_cv.values))
+    # the next line returns the real indeces (by the features table) of the 100 genes with the highest cv
+    dist_cv_dict_100 = sorted(dist_cv_dict, key=dist_cv_dict.get, reverse=True)[:100]
     df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
 
-    real_idx = []
+    # dist_idx = np.argsort(dist_cv)[-100:] 
+    # real_idx = []
+    # TODO: make the new indeces the index of this stacked table!!!
     # print("dist_idx", dist_idx)
     # print("cv_res_pd.index:", cv_res_pd.index)
-    for index, j in enumerate(cv_res_pd.index):
-        if index in dist_idx:
-            # print("dist_idx: "+ str(index)+" matches the real idx: "+ str(j-2))
-            real_idx.append(j-2)
+    # for index, j in enumerate(df.index):
+    #     if index in dist_idx:
+    #         # print("dist_idx: "+ str(index)+" matches the real idx: "+ str(j-2))
+    #         real_idx.append(j-2)
     # print("real_index:", real_idx)
-    labels = df_features.loc[real_idx].geneName.unique()
+    labels = df_features.loc[dist_cv_dict_100].geneName.unique()
     i = 0
     print("the 100 farthest genes in the cv plot are: ")
     print(labels)
     # add to the plot the names of the farthest genes
-    for x, y in zip(mean_res[dist_idx], cv_res[dist_idx]):
+    for x, y in zip(mean_res.loc[dist_cv_dict_100], cv_res.loc[dist_cv_dict_100]):
         plt.annotate(labels[i],  # this is the text
                     (x, y),  # these are the coordinates to position the label
                     textcoords="offset points",  # how to position the text
@@ -205,49 +207,52 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
                                          f"\n The 100 genes we cleaned are {labels}\n"
     f.write(msg)
     f.close()
+    
+    # find knee for threshold filter
+    sorted_dict_cv = {k: v for (k, v) in dist_cv.items() if v >= 0}
+    sorted_dict_cv = dict(sorted(sorted_dict_cv.items(), key=lambda item: item[1], reverse = True))
 
-    # # find knee for threshold filter
-    # # dist_cv_absolute = np.absolute(dist_cv)  # TODO option 2
-    # sorted_dict_cv = np.flip(np.sort(dist_cv))
-    # ax_demo = plt.plot(np.arange(1/sorted_dict_cv.size, 1+1/sorted_dict_cv.size, 1/sorted_dict_cv.size), (sorted_dict_cv-np.amin(sorted_dict_cv))/np.amax(sorted_dict_cv))
-    # ax_demo = plt.gca()
-    # line = ax_demo.lines[0]
-    # # ax = sns.distplot(pd.DataFrame(dist_cv), hist=True)
-    # # # ax = sns.distplot(pd.DataFrame(dist_cv[dist_cv>0]), hist=True)
-    # # line = ax.lines[0]
-    # knee_val = 100
-    # knee_point = None
-    # for point in line.get_xydata():
-    #     tmp_dist = point[0]**2 + point[1]**2
-    #     if point[0] > 0.01 and tmp_dist < knee_val:  # TODO the 'point[0] > 0.01' is not the best solution...
-    #         knee_val = tmp_dist
-    #         knee_point = point
-    # print(f'Found knee point (closest to the origin) at {knee_point}')
-    # plt.annotate("knee",  # this is the text
-    #              knee_point,  # these are the coordinates to position the label
-    #              textcoords="offset points",  # how to position the text
-    #              xytext=(0, 0),  # distance from text to points (x,y)
-    #              ha='center')  # horizontal alignment can be left, right or center
+    # sorted_dict_cv = np.flip(np.sort(dist_cv[dist_cv>0]))
+    y_values = (list(sorted_dict_cv.values())-np.amin(list(sorted_dict_cv.values())))/np.amax(list(sorted_dict_cv.values()))
+    x_values = np.arange(1/len(sorted_dict_cv), 1+1/len(sorted_dict_cv), 1/len(sorted_dict_cv))
+    plt.plot(x_values, y_values)
+    knee_val = 100
+    knee_point = None
+    genes_threshold = -1
+    for i,point in enumerate(zip(x_values, y_values)):
+        tmp_dist = np.sqrt(point[0]**2 + point[1]**2)
+        if tmp_dist < knee_val:  
+            knee_val = tmp_dist
+            knee_point = point
+            genes_threshold = i
+    print(f'Found knee point (closest to the origin) at {knee_point}')
+    plt.annotate("knee",  # this is the text
+                 knee_point,  # these are the coordinates to position the label
+                 textcoords="offset points",  # how to position the text
+                 xytext=(0, 0),  # distance from text to points (x,y)
+                 ha='center')  # horizontal alignment can be left, right or center
 
-    # plt.axhline(y=knee_point[1], color='r', linestyle='-')
-    # plt.title(f'CV distance (absolute) density. recommend threshold={round(knee_point[1], 4)}')
-    # plt.savefig(f'{plots_folder}/cv_knee_threshold{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
-    # plt.show()
+    plt.axhline(y=knee_point[1], color='r', linestyle='-')
+    plt.title(f'CV distance (absolute) density. recommend threshold={round(knee_point[1], 4)}')
+    plt.savefig(f'{plots_folder}/cv_knee_threshold{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    plt.show()
 
-    # # df_threshold = df[dist_cv_absolute <= knee_point[1]]  # TODO double check this
-    # df_threshold = df[dist_cv <= knee_point[1]]  # TODO double check this
-    # print(f'Status: removing rows (gens) which their distance from their CV point to the fit-line is greater then the '
-    #       f'threshold={round(knee_point[1], 4)}')
+    # df_threshold = df[dist_cv_absolute <= knee_point[1]]  # TODO double check this
+    genes_survived = dict(islice(sorted_dict_cv.items(), genes_threshold))
+    df_threshold = df.loc[genes_survived.keys()]  # TODO double check this
+    print(f'Status: removing rows (gens) which their distance from their CV point to the fit-line is greater then the '
+          f'threshold={round(knee_point[1], 4)}')
 
-    # manually_remove = ['Xist', 'Tsix', 'Eif2s3y', 'Ddx3y', 'Uty', 'Kdm5d']
-    # print(f'Also manually removing {manually_remove}')
-    # drop_idx = []
-    # for index, row in df_features.iterrows():  # index start from 1
-    #     if row['geneName'] in manually_remove and index in df_threshold.index:
-    #         drop_idx.append(index)
-    # df_threshold = df_threshold.drop(drop_idx)
+    manually_remove = ['Xist', 'Tsix', 'Eif2s3y', 'Ddx3y', 'Uty', 'Kdm5d']
+    print(f'Also manually removing {manually_remove}')
+    drop_idx = []
+    for index, row in df_features.iterrows():  # index start from 1
+        if row['geneName'] in manually_remove and index in df_threshold.index:
+            drop_idx.append(index)
+    df_threshold = df_threshold.drop(drop_idx)
 
-    # df_threshold.to_csv(path_out, sep=',')
-    # print(f'That removes {df.shape[0]-df_threshold.shape[0]} genes. The new csv file saved as {path_out}')
-    # print(f'We were left with {df_threshold.shape[0]} genes.')
+    df_threshold.to_csv(path_out, sep=',')
+    print(f'That removed {df.shape[0]-df_threshold.shape[0]} genes. The new csv file saved as {path_out}')
+    print(f'We were left with {df_threshold.shape[0]} genes.')
+    # print(f' which are: {df_features.loc[genes_survived.keys()].geneName.unique()}')
 

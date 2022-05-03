@@ -37,8 +37,8 @@ def main():
     # """ now, our most relevant matrix files and metadata files are in the 'filtered_data.csv' folder"""
     # # plots for step 4
     # data_plot_utils.print_hist_genes(folder_path='./csv_data2' , plots_folder='./plots_folder1')
-    # # data_plot_utils.print_pdf_mul("./filtered_data3")
-    # # data_plot_utils.print_hist_mt_percentage(features_folder_path='./csv_data2', folder_path='./filtered_data3')
+    # data_plot_utils.print_pdf_mul("./filtered_data3")
+    # data_plot_utils.print_hist_mt_percentage(features_folder_path='./csv_data2', folder_path='./filtered_data3')
 
     # # step 5: normalize the data to make the samples' euclidian distance 20,000
     # utils.run_func_for_all(
@@ -65,7 +65,7 @@ def main():
     #                             './merged_data5/stacked_M.csv', out_file_F='./merged_data5/stacked_F.csv')
     
 
-    # step 8: plotting and pointing the most diff genes for males vs. females
+    # # step 8: plotting and pointing the most diff genes for males vs. females
     # data_plot_utils.plot_female_vs_male_mean(females_path='./merged_data5/stacked_F.csv',
     #                                          males_path='./merged_data5/stacked_M.csv',
     #                                          path_to_features_csv='./csv_data2/features.csv',
@@ -76,7 +76,7 @@ def main():
     # data_processing.filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_1.csv',
     #                                             path_out_file='./merged_data5/stacked_2.csv')
 
-    # # step 10: plot and calculate the mean w.r.t. the coe. of variance for each gene
+    # step 10: plot and calculate the mean w.r.t. the coe. of variance for each gene
     data_processing.calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_2.csv',
                                      path_out='./merged_data5/stacked_3.csv',
                                      path_to_features_csv='./csv_data2/features.csv')
