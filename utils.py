@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import datetime
 
+import matplotlib.pyplot as plt
 
 def do_not_change_name(name):
     return name
@@ -201,3 +202,4 @@ def split_merged_into_M_F(path_stacked_file='./merged_data5/stacked_normalized_f
             f"Warning: part of the cols could not be belong to any gender. for that reason, {merged_col_num - female_col_num - male_col_num} cols did not used neither of the male nor female new created csv files", file=sys.stderr)
         print(
             "Warning: we are suggesting check this out before continuing", file=sys.stderr)
+

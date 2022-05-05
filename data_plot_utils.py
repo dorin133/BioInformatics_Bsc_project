@@ -7,6 +7,12 @@ import seaborn as sns
 import utils
 
 
+def save_plots(plot, plot_name):
+    plot.savefig(f'{plot_name}.eps', format='eps')
+    plot.savefig(f'{plot_name}.svg', format='svg', dpi=888)
+    plot.savefig(f'{plot_name}.png', format='png', dpi=888)
+
+
 def print_hist_mt_percentage(features_folder_path='./csv_data2', folder_path='./filtered_data3', plots_folder='./plots_folder1'):
     gene_indeces = utils.find_indices_of_gene(features_folder_path)
     raw_files = os.listdir(folder_path)
@@ -22,7 +28,8 @@ def print_hist_mt_percentage(features_folder_path='./csv_data2', folder_path='./
     plt.title("PDF of mitochondrial genes expression ratio per sample")
     plt.xlabel("mitochondrial genes ratio")
     plt.ylabel("probability")
-    plt.savefig(f'{plots_folder}/hist_mt_percentage{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    # plt.savefig(f'{plots_folder}/hist_mt_percentage{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    save_plots(plt, f'{plots_folder}/hist_mt_percentage{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
     plt.show()
 
 
@@ -42,7 +49,8 @@ def print_pdf_mul(folder_path='./filtered_data3', plots_folder='./plots_folder1'
     plt.title("PDF of molecules per sample")
     plt.xlabel("molecules number")
     plt.ylabel("probability")
-    plt.savefig(f'{plots_folder}/hist_mul{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    # plt.savefig(f'{plots_folder}/hist_mul{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    save_plots(plt, f'{plots_folder}/hist_mul{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
     plt.show()
 
 def print_hist_genes(folder_path='./csv_data2', plots_folder='./plots_folder1'):
@@ -65,7 +73,8 @@ def print_hist_genes(folder_path='./csv_data2', plots_folder='./plots_folder1'):
     plt.title("Histogram of gene expression")
     plt.xlabel("Genes' Index in features.csv")
     plt.ylabel("Number of cells with the gene's expression")
-    plt.savefig(f'{plots_folder}/hist_genes{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    # plt.savefig(f'{plots_folder}/hist_genes{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    save_plots(plt, f'{plots_folder}/hist_genes{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
     plt.show()
 
 
@@ -84,6 +93,7 @@ def plot_female_vs_male_fraction_expression(females_path, males_path, path_to_fe
 
     del df_f
     del df_m
+    # TODO add log (log_2(mean+1))) <-- here
 
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
@@ -131,7 +141,8 @@ def plot_female_vs_male_fraction_expression(females_path, males_path, path_to_fe
     plt.title("Females vs Males genes expression ratio")
     plt.ylabel("Males ratio of expression")  # TODO double check this
     plt.xlabel("Females ratio of expression")
-    plt.savefig(f'{plots_folder}/female_vs_male_expression_ratio{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    # plt.savefig(f'{plots_folder}/female_vs_male_expression_ratio{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    save_plots(plt, f'{plots_folder}/female_vs_male_expression_ratio{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
     plt.show()
 
     # df_all = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)  # TODO add this if needed
@@ -211,7 +222,8 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, pat
     plt.title("Females vs Males genes mean")
     plt.ylabel("mean(Males)")  # TODO double check this
     plt.xlabel("mean(Females)")
-    plt.savefig(f'{plots_folder}/female_vs_male_mean{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    # plt.savefig(f'{plots_folder}/female_vs_male_mean{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    save_plots(plt, f'{plots_folder}/female_vs_male_mean{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
     plt.show()
 
     # df_all = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)  # TODO add this if needed

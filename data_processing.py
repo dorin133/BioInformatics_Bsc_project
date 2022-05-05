@@ -4,8 +4,10 @@ import seaborn as sns
 import os
 import datetime
 import matplotlib.pyplot as plt
-from typing import Dict
 from itertools import islice
+from sklearn import decomposition
+import data_plot_utils
+
 
 def features_to_csv(folder_path='./raw_data', out_folder_path='./csv_data2'):
     raw_files = os.listdir(folder_path)  # list all raw files
@@ -199,7 +201,7 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     plt.title("log(mean) as function of log(cv) for each gene")
     plt.xlabel("log(mean)")
     plt.ylabel("log(cv)")
-    plt.savefig(f'{plots_folder}/cv_plot{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    data_plot_utils.save_plots(plt, f'{plots_folder}/cv_plot{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
     plt.show()
 
     f = open(f'./ml_run_logs.txt', 'a+')
@@ -234,7 +236,7 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
 
     plt.axhline(y=knee_point[1], color='r', linestyle='-')
     plt.title(f'CV distance (absolute) density. recommend threshold={round(knee_point[1], 4)}')
-    plt.savefig(f'{plots_folder}/cv_knee_threshold{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+    data_plot_utils.save_plots(plt, f'{plots_folder}/cv_knee_threshold{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
     plt.show()
 
     # df_threshold = df[dist_cv_absolute <= knee_point[1]]  # TODO double check this
@@ -255,4 +257,12 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     print(f'That removed {df.shape[0]-df_threshold.shape[0]} genes. The new csv file saved as {path_out}')
     print(f'We were left with {df_threshold.shape[0]} genes.')
     # print(f' which are: {df_features.loc[genes_survived.keys()].geneName.unique()}')
+
+
+def pca(path_in, path_out):
+    df = pd.read_csv(path_in, index_col=0, header=0)
+    p = decomposition.PCA(n_components=20)
+    p.fit(df)
+
+
 
