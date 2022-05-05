@@ -221,7 +221,7 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     knee_val = 100
     knee_point = None
     genes_threshold = -1
-    for i,point in enumerate(zip(x_values, y_values)):
+    for i, point in enumerate(zip(x_values, y_values)):
         tmp_dist = np.sqrt(point[0]**2 + point[1]**2)
         if tmp_dist < knee_val:  
             knee_val = tmp_dist
@@ -259,10 +259,56 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     # print(f' which are: {df_features.loc[genes_survived.keys()].geneName.unique()}')
 
 
-def pca(path_in, path_out):
+def pca_option1(path_in, path_out, n_features=18):
     df = pd.read_csv(path_in, index_col=0, header=0)
-    p = decomposition.PCA(n_components=20)
-    p.fit(df)
+    df_t = df.T
+    p = decomposition.PCA(n_components=n_features)
+    principal_components = p.fit_transform(df_t)
+    new_cols = [f'pca_feature_{i}' for i in range(1, n_features + 1)]
+    principal_df = pd.DataFrame(data=principal_components, columns=new_cols, index=df_t.index)
+    principal_df.T.to_csv(path_out, sep=',')
 
 
+def pca_option2(path_in, path_out, plots_folder='./plots_folder1'):
+    df = pd.read_csv(path_in, index_col=0, header=0)
+    df_t = df.T
+    A = df_t.to_numpy()
+    M = np.mean(A.T, axis=1)
+    C = A - M
+    V = np.cov(C.T)
+    eigen_val, eigen_vect = np.linalg.eig(V)
+    print('status: len(eigen_val):', len(eigen_val))
+    print(eigen_val)
+
+    knee_val = 1000
+    knee_point = 0
+    knee_x = 0
+    number_of_eigen_bigger_than_knee = 0
+    for index, (x, y_eigen) in enumerate(zip([t for t in range(len(eigen_val))], eigen_val)):
+        tmp_dist = np.sqrt(x ** 2 + y_eigen ** 2)
+        if tmp_dist < knee_val:
+            knee_val = tmp_dist
+            number_of_eigen_bigger_than_knee = index+1
+            knee_point = y_eigen
+            knee_x = x
+    print('knee_point:', knee_point)
+    print('knee_x:', knee_x)
+    plt.plot([t for t in range(len(eigen_val))], eigen_val)
+    plt.axhline(y=knee_point, color='r', linestyle='-')
+    plt.title(f'Eigen values of current matrix. knee={round(knee_point, 2)}\nonly '
+              f'{number_of_eigen_bigger_than_knee} eigen values are bigger than the knee value')
+    plt.xlabel('feature')
+    plt.ylabel('eigen val')
+    data_plot_utils.save_plots(plt, f'{plots_folder}/eigen_vals_knee{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
+    plt.show()
+
+    pca_option1(path_in, path_out, n_features=number_of_eigen_bigger_than_knee)
+
+    # # TODO another option:
+    # from sklearn.feature_selection import VarianceThreshold
+    # sel = VarianceThreshold(threshold=number_of_eigen_bigger_than_knee)  # TODO this is not quite right since variance and covariance are different
+    # tmp = sel.fit_transform(df_t)
+    # new_cols = [f'feature_{i}' for i in range(1, tmp.shape[1] + 1)]
+    # principal_df = pd.DataFrame(data=tmp, columns=new_cols, index=df_t.index)
+    # principal_df.T.to_csv(path_out, sep=',')
 

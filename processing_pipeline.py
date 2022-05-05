@@ -81,11 +81,15 @@ def main():
     # # step 9: filter the whole stacked mtx's very common genes and very rare ones (now for the first time in the code, we filter rows and not columns + no need to adjust metadata)
     # data_processing.filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_1.csv',
     #                                             path_out_file='./merged_data5/stacked_2.csv')
+    #
+    # # step 10: plot and calculate the mean w.r.t. the coe. of variance for each gene
+    # data_processing.calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_2.csv',
+    #                                  path_out='./merged_data5/stacked_3.csv',
+    #                                  path_to_features_csv='./csv_data2/features.csv')
 
-    # step 10: plot and calculate the mean w.r.t. the coe. of variance for each gene
-    data_processing.calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_2.csv',
-                                     path_out='./merged_data5/stacked_3.csv',
-                                     path_to_features_csv='./csv_data2/features.csv')
+    # step11: PCA
+    data_processing.pca_option1(path_in='./merged_data5/stacked_3.csv', path_out='./merged_data5/pca1.csv')  # TODO which one??
+    data_processing.pca_option2(path_in='./merged_data5/stacked_3.csv', path_out='./merged_data5/pca2.csv')
 
 
 
