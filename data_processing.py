@@ -201,7 +201,7 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     plt.title("log(mean) as function of log(cv) for each gene")
     plt.xlabel("log(mean)")
     plt.ylabel("log(cv)")
-    data_plot_utils.save_plots(plt, f'{plots_folder}/cv_plot{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
+    data_plot_utils.save_plots(plt, f'{plots_folder}/cv_plot')
     plt.show()
 
     f = open(f'./ml_run_logs.txt', 'a+')
@@ -236,7 +236,7 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
 
     plt.axhline(y=knee_point[1], color='r', linestyle='-')
     plt.title(f'CV distance (absolute) density. recommend threshold={round(knee_point[1], 4)}')
-    data_plot_utils.save_plots(plt, f'{plots_folder}/cv_knee_threshold{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
+    data_plot_utils.save_plots(plt, f'{plots_folder}/cv_knee_threshold')
     plt.show()
 
     # df_threshold = df[dist_cv_absolute <= knee_point[1]]  # TODO double check this
@@ -259,7 +259,7 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     # print(f' which are: {df_features.loc[genes_survived.keys()].geneName.unique()}')
 
 
-def pca_option1(path_in, path_out, n_features=18):
+def pca_option_op1(path_in, path_out, n_features=18):
     df = pd.read_csv(path_in, index_col=0, header=0)
     df_t = df.T
     p = decomposition.PCA(n_components=n_features)
@@ -269,7 +269,7 @@ def pca_option1(path_in, path_out, n_features=18):
     principal_df.T.to_csv(path_out, sep=',')
 
 
-def pca_option2(path_in, path_out, plots_folder='./plots_folder1'):
+def pca_option_op2(path_in, path_out, plots_folder='./plots_folder1'):
     df = pd.read_csv(path_in, index_col=0, header=0)
     df_t = df.T
     A = df_t.to_numpy()
@@ -299,10 +299,10 @@ def pca_option2(path_in, path_out, plots_folder='./plots_folder1'):
               f'{number_of_eigen_bigger_than_knee} eigen values are bigger than the knee value')
     plt.xlabel('feature')
     plt.ylabel('eigen val')
-    data_plot_utils.save_plots(plt, f'{plots_folder}/eigen_vals_knee{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
+    data_plot_utils.save_plots(plt, f'{plots_folder}/eigen_vals_knee')
     plt.show()
 
-    pca_option1(path_in, path_out, n_features=number_of_eigen_bigger_than_knee)
+    pca_option_op1(path_in, path_out, n_features=number_of_eigen_bigger_than_knee)
 
     # # TODO another option:
     # from sklearn.feature_selection import VarianceThreshold
@@ -311,4 +311,48 @@ def pca_option2(path_in, path_out, plots_folder='./plots_folder1'):
     # new_cols = [f'feature_{i}' for i in range(1, tmp.shape[1] + 1)]
     # principal_df = pd.DataFrame(data=tmp, columns=new_cols, index=df_t.index)
     # principal_df.T.to_csv(path_out, sep=',')
+
+
+def pca_option(path_in, path_out, plots_folder='./plots_folder1'):
+    df = pd.read_csv(path_in, index_col=0, header=0)
+    df_t = df.T
+    curr_n = df_t.shape[1]  # all features
+    pca = decomposition.PCA(n_components=curr_n)
+    principal_components = pca.fit_transform(df_t)
+    # new_cols = [f'pca_feature_{i}' for i in range(1, curr_n + 1)]
+    # principalDf = pd.DataFrame(data=principal_components, columns=new_cols, index=df_t.index)
+
+    knee_val = 1000
+    knee_point = 0
+    knee_x = 0
+    number_of_values_bigger_than_knee = 0
+    # explain = pca.explained_variance_ratio_  # TODO this does not really work as we want
+    explain = pca.explained_variance_  # TODO but that does work
+    print("explain:\n", explain)
+    for index, (x, y_val) in enumerate(zip([t for t in range(len(explain))], explain)):
+        # tmp_dist = np.sqrt((x+1) ** 2 + y_val ** 2)  # a workaround i thought may help but does not... del later
+        tmp_dist = np.sqrt(x ** 2 + y_val ** 2)
+        if tmp_dist < knee_val:
+            knee_val = tmp_dist
+            number_of_values_bigger_than_knee = index+1
+            knee_point = y_val
+            knee_x = x
+    print('knee_point:', knee_point, f". coordinates: ({knee_x}, {knee_point})")
+    plt.plot(explain)
+    plt.title(f'PCA Explained Variance. knee={round(knee_point, 2)}\nonly {number_of_values_bigger_than_knee} '
+              f'values are bigger than the knee value')
+    plt.ylabel('Explained Variance')
+    plt.xlabel('Components')
+    plt.axhline(y=knee_point, color='r', linestyle='-')
+    data_plot_utils.save_plots(plt, f'{plots_folder}/pca_explain')
+    plt.show()
+
+    # now take only the top PCA features
+    pca = decomposition.PCA(n_components=number_of_values_bigger_than_knee)
+    principal_components = pca.fit_transform(df_t)
+    new_cols = [f'pca_feature_{i}' for i in range(1, number_of_values_bigger_than_knee + 1)]
+    principal_df = pd.DataFrame(data=principal_components, columns=new_cols, index=df_t.index)
+    print(f'Now PCA with {number_of_values_bigger_than_knee}. explain now is:\n', pca.explained_variance_)
+    print(f"notice those are just the top {number_of_values_bigger_than_knee} for the prev PCA explain we plot")
+    principal_df.T.to_csv(path_out, sep=',')
 

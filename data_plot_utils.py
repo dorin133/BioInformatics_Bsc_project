@@ -7,7 +7,8 @@ import seaborn as sns
 import utils
 
 
-def save_plots(plot, plot_name):
+def save_plots(plot, plot_name, append_time=str(datetime.datetime.now().time())[:8].replace(":", "_")):
+    plot_name += append_time
     plot.savefig(f'{plot_name}.eps', format='eps')
     plot.savefig(f'{plot_name}.svg', format='svg', dpi=888)
     plot.savefig(f'{plot_name}.png', format='png', dpi=888)
@@ -29,7 +30,7 @@ def print_hist_mt_percentage(features_folder_path='./csv_data2', folder_path='./
     plt.xlabel("mitochondrial genes ratio")
     plt.ylabel("probability")
     # plt.savefig(f'{plots_folder}/hist_mt_percentage{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
-    save_plots(plt, f'{plots_folder}/hist_mt_percentage{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
+    save_plots(plt, f'{plots_folder}/hist_mt_percentage')
     plt.show()
 
 
@@ -50,7 +51,7 @@ def print_pdf_mul(folder_path='./filtered_data3', plots_folder='./plots_folder1'
     plt.xlabel("molecules number")
     plt.ylabel("probability")
     # plt.savefig(f'{plots_folder}/hist_mul{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
-    save_plots(plt, f'{plots_folder}/hist_mul{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
+    save_plots(plt, f'{plots_folder}/hist_mul')
     plt.show()
 
 def print_hist_genes(folder_path='./csv_data2', plots_folder='./plots_folder1'):
@@ -74,7 +75,7 @@ def print_hist_genes(folder_path='./csv_data2', plots_folder='./plots_folder1'):
     plt.xlabel("Genes' Index in features.csv")
     plt.ylabel("Number of cells with the gene's expression")
     # plt.savefig(f'{plots_folder}/hist_genes{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
-    save_plots(plt, f'{plots_folder}/hist_genes{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
+    save_plots(plt, f'{plots_folder}/hist_genes')
     plt.show()
 
 
@@ -142,7 +143,7 @@ def plot_female_vs_male_fraction_expression(females_path, males_path, path_to_fe
     plt.ylabel("Males ratio of expression")  # TODO double check this
     plt.xlabel("Females ratio of expression")
     # plt.savefig(f'{plots_folder}/female_vs_male_expression_ratio{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
-    save_plots(plt, f'{plots_folder}/female_vs_male_expression_ratio{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
+    save_plots(plt, f'{plots_folder}/female_vs_male_expression_ratio')
     plt.show()
 
     # df_all = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)  # TODO add this if needed
@@ -223,7 +224,7 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, pat
     plt.ylabel("mean(Males)")  # TODO double check this
     plt.xlabel("mean(Females)")
     # plt.savefig(f'{plots_folder}/female_vs_male_mean{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
-    save_plots(plt, f'{plots_folder}/female_vs_male_mean{str(datetime.datetime.now().time())[:8].replace(":", "_")}')
+    save_plots(plt, f'{plots_folder}/female_vs_male_mean')
     plt.show()
 
     # df_all = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)  # TODO add this if needed
