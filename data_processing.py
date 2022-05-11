@@ -259,78 +259,28 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     # print(f' which are: {df_features.loc[genes_survived.keys()].geneName.unique()}')
 
 
-def pca_option_op1(path_in, path_out, n_features=18):
-    df = pd.read_csv(path_in, index_col=0, header=0)
-    df_t = df.T
-    p = decomposition.PCA(n_components=n_features)
-    principal_components = p.fit_transform(df_t)
-    new_cols = [f'pca_feature_{i}' for i in range(1, n_features + 1)]
-    principal_df = pd.DataFrame(data=principal_components, columns=new_cols, index=df_t.index)
-    principal_df.T.to_csv(path_out, sep=',')
+def normalize_list_numpy(list_np, scale=1):
+  min_t = np.min(list_np)
+  max_t = np.max(list_np)
+  return scale * (list_np - min_t) / (max_t - min_t)
 
 
-def pca_option_op2(path_in, path_out, plots_folder='./plots_folder1'):
-    df = pd.read_csv(path_in, index_col=0, header=0)
-    df_t = df.T
-    A = df_t.to_numpy()
-    M = np.mean(A.T, axis=1)
-    C = A - M
-    V = np.cov(C.T)
-    eigen_val, eigen_vect = np.linalg.eig(V)
-    print('status: len(eigen_val):', len(eigen_val))
-    print(eigen_val)
-
-    knee_val = 1000
-    knee_point = 0
-    knee_x = 0
-    number_of_eigen_bigger_than_knee = 0
-    for index, (x, y_eigen) in enumerate(zip([t for t in range(len(eigen_val))], eigen_val)):
-        tmp_dist = np.sqrt(x ** 2 + y_eigen ** 2)
-        if tmp_dist < knee_val:
-            knee_val = tmp_dist
-            number_of_eigen_bigger_than_knee = index+1
-            knee_point = y_eigen
-            knee_x = x
-    print('knee_point:', knee_point)
-    print('knee_x:', knee_x)
-    plt.plot([t for t in range(len(eigen_val))], eigen_val)
-    plt.axhline(y=knee_point, color='r', linestyle='-')
-    plt.title(f'Eigen values of current matrix. knee={round(knee_point, 2)}\nonly '
-              f'{number_of_eigen_bigger_than_knee} eigen values are bigger than the knee value')
-    plt.xlabel('feature')
-    plt.ylabel('eigen val')
-    data_plot_utils.save_plots(plt, f'{plots_folder}/eigen_vals_knee')
-    plt.show()
-
-    pca_option_op1(path_in, path_out, n_features=number_of_eigen_bigger_than_knee)
-
-    # # TODO another option:
-    # from sklearn.feature_selection import VarianceThreshold
-    # sel = VarianceThreshold(threshold=number_of_eigen_bigger_than_knee)  # TODO this is not quite right since variance and covariance are different
-    # tmp = sel.fit_transform(df_t)
-    # new_cols = [f'feature_{i}' for i in range(1, tmp.shape[1] + 1)]
-    # principal_df = pd.DataFrame(data=tmp, columns=new_cols, index=df_t.index)
-    # principal_df.T.to_csv(path_out, sep=',')
-
-
-def pca_option(path_in, path_out, plots_folder='./plots_folder1'):
+def pca_norm_knee(path_in, path_out, plots_folder='./plots_folder1'):
     df = pd.read_csv(path_in, index_col=0, header=0)
     df_t = df.T
     curr_n = df_t.shape[1]  # all features
     pca = decomposition.PCA(n_components=curr_n)
-    principal_components = pca.fit_transform(df_t)
-    # new_cols = [f'pca_feature_{i}' for i in range(1, curr_n + 1)]
-    # principalDf = pd.DataFrame(data=principal_components, columns=new_cols, index=df_t.index)
+    _ = pca.fit_transform(df_t)
+    explain = pca.explained_variance_
 
+    explain = normalize_list_numpy(explain)
+    explainx_axe_norm = normalize_list_numpy([t for t in range(len(explain))])
     knee_val = 1000
     knee_point = 0
     knee_x = 0
     number_of_values_bigger_than_knee = 0
-    # explain = pca.explained_variance_ratio_  # TODO this does not really work as we want
-    explain = pca.explained_variance_  # TODO but that does work
     print("explain:\n", explain)
-    for index, (x, y_val) in enumerate(zip([t for t in range(len(explain))], explain)):
-        # tmp_dist = np.sqrt((x+1) ** 2 + y_val ** 2)  # a workaround i thought may help but does not... del later
+    for index, (x, y_val) in enumerate(zip(explainx_axe_norm, explain)):
         tmp_dist = np.sqrt(x ** 2 + y_val ** 2)
         if tmp_dist < knee_val:
             knee_val = tmp_dist
@@ -338,8 +288,8 @@ def pca_option(path_in, path_out, plots_folder='./plots_folder1'):
             knee_point = y_val
             knee_x = x
     print('knee_point:', knee_point, f". coordinates: ({knee_x}, {knee_point})")
-    plt.plot(explain)
-    plt.title(f'PCA Explained Variance. knee={round(knee_point, 2)}\nonly {number_of_values_bigger_than_knee} '
+    plt.plot(explainx_axe_norm, explain)
+    plt.title(f'PCA Explained Variance. knee={round(knee_point, 4)}\nonly {number_of_values_bigger_than_knee} '
               f'values are bigger than the knee value')
     plt.ylabel('Explained Variance')
     plt.xlabel('Components')
