@@ -47,7 +47,7 @@ def tSNE(path_in, path_to_MEA = './raw_data/MEA_dimorphism_samples.xlsx', path_o
     tsne_pca_results = tsne.fit_transform(df_subset)
     # print some info regarding the tSNE
     f = open(f'./ml_run_logs.txt', 'a+')
-    msg = str(datetime.datetime.now()) + f't-SNE done! Time elapsed: {time.time()-time_start} seconds'
+    msg = str(datetime.datetime.now()) + f't-SNE done! Time elapsed: {time.time()-time_start} seconds\n'
     f.write(msg)
     f.close()
     print(f't-SNE done! Time elapsed: {time.time()-time_start} seconds')
@@ -66,8 +66,8 @@ def tSNE(path_in, path_to_MEA = './raw_data/MEA_dimorphism_samples.xlsx', path_o
         alpha=0.3
     )
     plt.title(f't-SNE in 2d')
-    plt.show()
     data_plot_utils.save_plots(plt, f'{plots_folder}/tSNE_2d')
+    plt.show()
 
     df_subset3 = df.copy()
     time_start = time.time()
@@ -75,7 +75,7 @@ def tSNE(path_in, path_to_MEA = './raw_data/MEA_dimorphism_samples.xlsx', path_o
     tsne_pca_results3 = tsne_3d.fit_transform(df_subset3)
     # print some info regarding the tSNE in 3d
     f = open(f'./ml_run_logs.txt', 'a+')
-    msg = str(datetime.datetime.now()) + f't-SNE in 3d done! Time elapsed: {time.time()-time_start} seconds'
+    msg = str(datetime.datetime.now()) + f't-SNE in 3d done! Time elapsed: {time.time()-time_start} seconds\n'
     f.write(msg)
     f.close()
     print(f't-SNE in 3d done! Time elapsed: {time.time()-time_start} seconds')
@@ -92,10 +92,10 @@ def tSNE(path_in, path_to_MEA = './raw_data/MEA_dimorphism_samples.xlsx', path_o
         c=df_subset3["category_female_parent"], 
         cmap='Spectral',
     )
-    ax.view_init(elev=20, azim=180)
-    ax.set_xlabel('pca-one')
-    ax.set_ylabel('pca-two')
-    ax.set_zlabel('pca-three')
+    ax.view_init(elev=20, azim=150)
+    ax.set_xlabel('tsne-3d-one')
+    ax.set_ylabel('tsne-3d-two')
+    ax.set_zlabel('tsne-3d-three')
     plt.title(f't-SNE in 3d')
-    plt.show()
     data_plot_utils.save_plots(plt, f'{plots_folder}/tSNE_3d')
+    plt.show()
