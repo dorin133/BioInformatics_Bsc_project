@@ -1,6 +1,7 @@
 import utils
 import data_processing
 import data_plot_utils
+import ml_processing
 import pandas as pd
 
 
@@ -87,9 +88,12 @@ def main():
     # data_processing.calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_2.csv',
     #                                  path_out='./merged_data5/stacked_3.csv',
     #                                  path_to_features_csv='./csv_data2/features.csv')
+    #
+    # # step11: PCA
+    # data_processing.pca_norm_knee(path_in='./merged_data5/stacked_3.csv', path_out='./merged_data5/pca4.csv')
 
-    # step11: PCA
-    data_processing.pca_norm_knee(path_in='./merged_data5/stacked_3.csv', path_out='./merged_data5/pca4.csv')
+    # step12: tSNE
+    ml_processing.tSNE(path_in='./merged_data5/pca4.csv', path_out='./merged_data5/tsne.csv')
 
 
 if __name__ == '__main__':
