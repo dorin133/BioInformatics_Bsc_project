@@ -93,7 +93,7 @@ def main():
     # data_processing.pca_norm_knee(path_in='./merged_data5/stacked_3.csv', path_out='./merged_data5/pca4.csv')
 
     # step12: tSNE
-    ml_processing.tSNE(path_in='./merged_data5/pca4.csv', path_out='./merged_data5/tsne.csv')
+    ml_processing.tSNE(path_in='./merged_data5/pca4.csv',path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx', path_out='./merged_data5/tsne.csv')
 
 
 if __name__ == '__main__':
