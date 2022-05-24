@@ -272,13 +272,13 @@ def pca_norm_knee(path_in, path_out, plots_folder='./plots_folder1'):
     df = pd.read_csv(path_in, index_col=0, header=0)
 
     # TODO holy bug or coesintance ??
-    # df_t = df.T
-    # df_t = np.log2(df_t+1)
-    # df_t = (df_t - df_t.mean() / df_t.std())
+    df_t = df.T  # TODO this way PCA is 14. according to the last call with Amit this is the right way
+    df_t = np.log2(df_t+1)
+    df_t = (df_t - df_t.mean() / df_t.std())
 
-    df = np.log2(df + 1)  # TODO we are not sure if the log and norm should be on rows or on columns
-    df = (df - df.mean() / df.std())
-    df_t = df.T
+    # df = np.log2(df + 1)  # TODO we are not sure if the log and norm should be on rows or on columns. this way PCA is 18
+    # df = (df - df.mean() / df.std())
+    # df_t = df.T
 
 
     curr_n = df_t.shape[1]  # all features
