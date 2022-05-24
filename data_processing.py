@@ -164,11 +164,13 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     # plot the scatter and the best linear line (named p) to fit it
     plt.scatter(mean_res, cv_res, c='green', s=0.4, marker="o")
     p = np.poly1d(np.polyfit(mean_res, cv_res, 1))
+    print(p)
     # should be around [-0.5, 0.5]
     # now it is: [-0.5, 0.75]
     plt.plot(np.unique(mean_res), p(np.unique(mean_res)))
 
     # find the 100 farthest genes from p
+    dist_cv = (cv_res - p(mean_res))
     dist_cv = (cv_res - p(mean_res))
     # dist_cv.index contains the real indeces of the genes (by the features table)
     dist_cv_dict = dict(zip(dist_cv.index, dist_cv.values))
@@ -212,6 +214,7 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     
     # find knee for threshold filter
     sorted_dict_cv = {k: v for (k, v) in dist_cv.items() if v >= 0}
+    # sorted_dict_cv = {k: v for (k, v) in dist_cv.items()}  # TODO <--- check this without "v>=0"
     sorted_dict_cv = dict(sorted(sorted_dict_cv.items(), key=lambda item: item[1], reverse = True))
 
     # sorted_dict_cv = np.flip(np.sort(dist_cv[dist_cv>0]))
@@ -267,7 +270,17 @@ def normalize_list_numpy(list_np, scale=1):
 
 def pca_norm_knee(path_in, path_out, plots_folder='./plots_folder1'):
     df = pd.read_csv(path_in, index_col=0, header=0)
+
+    # TODO holy bug or coesintance ??
+    # df_t = df.T
+    # df_t = np.log2(df_t+1)
+    # df_t = (df_t - df_t.mean() / df_t.std())
+
+    df = np.log2(df + 1)  # TODO we are not sure if the log and norm should be on rows or on columns
+    df = (df - df.mean() / df.std())
     df_t = df.T
+
+
     curr_n = df_t.shape[1]  # all features
     pca = decomposition.PCA(n_components=curr_n)
     _ = pca.fit_transform(df_t)

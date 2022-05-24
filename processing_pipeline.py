@@ -19,6 +19,7 @@ def main():
     #     which_files=lambda x: '.mtx' in x,
     #     rename_out_files=lambda x: x[:-4] + '.csv'
     # )
+    # features_file = pd.read_csv('./csv_data2/features.csv')
     #
     # # step 3: create the metadata files for each matrix .csv file
     # data_processing.prepare_metadata_single_files(folder_path='./raw_data', out_folder_path='./csv_data2')  # TODO
@@ -86,14 +87,14 @@ def main():
     #
     # # step 10: plot and calculate the mean w.r.t. the coe. of variance for each gene
     # data_processing.calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_2.csv',
-    #                                  path_out='./merged_data5/stacked_3.csv',
+    #                                  path_out='./merged_data5/stacked_3_v2.csv',
     #                                  path_to_features_csv='./csv_data2/features.csv')
     #
-    # # step11: PCA
-    # data_processing.pca_norm_knee(path_in='./merged_data5/stacked_3.csv', path_out='./merged_data5/pca4.csv')
+    # step11: PCA
+    data_processing.pca_norm_knee(path_in='./merged_data5/stacked_3.csv', path_out='./merged_data5/pca4.csv')
 
     # step12: tSNE
-    ml_processing.tSNE(path_in='./merged_data5/pca4.csv',path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx', path_out='./merged_data5/tsne.csv')
+    ml_processing.tSNE(path_in='./merged_data5/pca4.csv', path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx', path_out='./merged_data5/tsne.csv')
 
 
 if __name__ == '__main__':
