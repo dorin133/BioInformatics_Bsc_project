@@ -145,6 +145,7 @@ def normalize_data(path_in_file, path_out_file, alpha=20000):
 
 def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plots_folder='./plots_folder1'):
     df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
+    print(f'status: start calc_and_plot_cv. df original shape is {df.shape}')
     
     # calculating cv and mean for each gene
     cv_res = df.apply(lambda x: np.std(x, ddof=1) / np.mean(x), axis=1)
@@ -259,6 +260,7 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     df_threshold.to_csv(path_out, sep=',')
     print(f'That removed {df.shape[0]-df_threshold.shape[0]} genes. The new csv file saved as {path_out}')
     print(f'We were left with {df_threshold.shape[0]} genes.')
+    print(f'status: finish calc_and_plot_cv. the new df shape is {df_threshold.shape}')
     # print(f' which are: {df_features.loc[genes_survived.keys()].geneName.unique()}')
 
 
