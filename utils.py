@@ -203,3 +203,11 @@ def split_merged_into_M_F(path_stacked_file='./merged_data5/stacked_normalized_f
         print(
             "Warning: we are suggesting check this out before continuing", file=sys.stderr)
 
+
+def write_log(msg, print_std=True):
+    f = open(f'./ml_run_logs.txt', 'a+')
+    msg = str(datetime.datetime.now())[:-4] + ": " + msg
+    if print_std:
+        print(msg)
+    f.write(msg + "\n")
+    f.close()

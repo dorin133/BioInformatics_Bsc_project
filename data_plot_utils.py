@@ -154,11 +154,7 @@ def plot_female_vs_male_fraction_expression(females_path, males_path, path_to_fe
     # df_all = df_all.drop(drop_idx)
     # df_all.to_csv(path_out, sep=',')
 
-    msg = f' plot_female_vs_male_expression_fraction: the 20 genes we found in this function are: {labels}'
-    print(f'Status:{msg}')
-    f = open(f'./ml_run_logs.txt', 'a+')
-    f.write(str(datetime.datetime.now()) + msg + '\n')
-    f.close()
+    utils.write_log(f'plot_female_vs_male_expression_fraction: the 20 genes we found in this function are: {labels}')
 
 
 def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, path_stacked_mtx_file, path_out,
@@ -235,8 +231,4 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, pat
     # df_all = df_all.drop(drop_idx)
     # df_all.to_csv(path_out, sep=',')
 
-    msg = f' plot_female_vs_male_mean: the 20 genes we found in this function are: {labels}'
-    print(f'Status:{msg}')
-    f = open(f'./ml_run_logs.txt', 'a+')
-    f.write(str(datetime.datetime.now()) + msg + '\n')
-    f.close()
+    utils.write_log(f'plot_female_vs_male_mean: the 20 genes we found in this function are: {labels}')

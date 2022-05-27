@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from itertools import islice
 from sklearn import decomposition
 import data_plot_utils
+import utils
 
 
 def features_to_csv(folder_path='./raw_data', out_folder_path='./csv_data2'):
@@ -95,10 +96,7 @@ def filter_cols(path_in_file, path_out_file, min_sum_for_col=3000, min_diff_for_
     num_col_end = df.shape[1]
     msg = f'Note: started with {num_col_start} cols, after filtering left with {num_col_end} (filtered ' \
           f'{num_col_start-num_col_end} cols)'
-    print(msg)
-    f = open(f'./ml_run_logs.txt', 'a+')
-    msg = str(datetime.datetime.now()) + " filter_by_min_sum: " + path_in_file + ": " + msg + "\n"
-    f.write(msg)
+    utils.write_log("filter_by_min_sum: " + path_in_file + ": " + msg)
     print(f'status: finish filtering {path_in_file}. result saved to {path_out_file}')
 
 def filter_metadata_rows(folder_mtx_path, folder_to_metadata, out_folder_path):
@@ -207,11 +205,10 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     data_plot_utils.save_plots(plt, f'{plots_folder}/cv_plot')
     plt.show()
 
-    f = open(f'./ml_run_logs.txt', 'a+')
-    msg = str(datetime.datetime.now()) + f" calc_and_plot_cv: finished plotting mean as a function of cv for each gene" \
-                                         f"\n The 100 genes we cleaned are {labels}\n"
-    f.write(msg)
-    f.close()
+    msg = f"calc_and_plot_cv: finished plotting mean as a function of cv for each gene\n The 100 genes we cleaned " \
+          f"are {labels}"
+    utils.write_log(msg)
+
     
     # find knee for threshold filter
     sorted_dict_cv = {k: v for (k, v) in dist_cv.items() if v >= 0}
@@ -272,16 +269,20 @@ def normalize_list_numpy(list_np, scale=1):
 
 def pca_norm_knee(path_in, path_out, plots_folder='./plots_folder1'):
     df = pd.read_csv(path_in, index_col=0, header=0)
+    utils.write_log(f"pca_norm_knee: starting. original data shape is {df.shape} (we Transpose this in a moment)")
 
     # TODO holy bug or coesintance ??
     df_t = df.T  # TODO this way PCA is 14. according to the last call with Amit this is the right way
     df_t = np.log2(df_t+1)
-    df_t = (df_t - df_t.mean() / df_t.std())
+    # print("!", df_t.shape)
+    # print("!!", df_t.mean(), "\n%%", df_t.mean().shape)
+    # print("!!", df_t.mean(axis=0), "\n%%", df_t.mean(axis=0).shape)
+    # print("!!", df_t.std(axis=0), "\n%%", df_t.std(axis=0).shape)
+    df_t = (df_t - df_t.mean(axis=0) / df_t.std(axis=0))  # TODO verify this
 
     # df = np.log2(df + 1)  # TODO we are not sure if the log and norm should be on rows or on columns. this way PCA is 18
     # df = (df - df.mean() / df.std())
     # df_t = df.T
-
 
     curr_n = df_t.shape[1]  # all features
     pca = decomposition.PCA(n_components=curr_n)
@@ -320,4 +321,6 @@ def pca_norm_knee(path_in, path_out, plots_folder='./plots_folder1'):
     print(f'Now PCA with {number_of_values_bigger_than_knee}. explain now is:\n', pca.explained_variance_)
     print(f"notice those are just the top {number_of_values_bigger_than_knee} for the prev PCA explain we plot")
     principal_df.T.to_csv(path_out, sep=',')
+    utils.write_log(f'finish PCA. left with {number_of_values_bigger_than_knee} values. current data shape is '
+                    f'{principal_df.shape} (Transposed). saved to {path_out}')
 
