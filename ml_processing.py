@@ -211,7 +211,7 @@ def tSNE_3d(path_in, path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx', path_
 #     )
 
 def DBScan_exp(path_in, path_out, plots_folder='./plots_folder1'):
-    for eps in [0.001, 0.01, 0.1, 1, 2, 4, 6, 10, 20, 40, 60, 70]:
+    for eps in [0.1, 0.7, 1, 2, 3, 4, 5, 6, 7, 10, 20, 40, 60, 70]:
         DBScan(path_in='./merged_data5/tsne.csv', path_out='./merged_data5/dbscan.csv', eps=eps)
 
 
@@ -233,20 +233,21 @@ def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=7):
     # plt.show()
 
     X = df[['tsne-2d-one', 'tsne-2d-two']]
+    # db = DBSCAN(eps=eps, min_samples=20, metric=).fit(X)  # TODO
     db = DBSCAN(eps=eps, min_samples=20).fit(X)
     core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
     core_samples_mask[db.core_sample_indices_] = True
     print(core_samples_mask)
     labels = db.labels_
-    print(labels)
+    # print(labels)
     # print(labels[100:200])
-    print(sum(labels), len(labels))
+    # print(sum(labels), len(labels))
     df['dbscan_labels'] = labels
 
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
-    print('n_clusters_:', n_clusters_)
     n_noise_ = list(labels).count(-1)
-    print('n_noise_:', n_noise_)
+    utils.write_log(f'n_clusters_: {n_clusters_} and the n_noise_: {n_noise_}')
+
     # labels_true = df['labels']  # TODO we can look for the correct labels/clustering of the data and compare it with our results
     # print("Estimated number of clusters: %d" % n_clusters_)
     # print("Estimated number of noise points: %d" % n_noise_)
@@ -260,13 +261,11 @@ def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=7):
     # )
     # print("Silhouette Coefficient: %0.3f" % metrics.silhouette_score(X, labels))
 
-    print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     plt.figure(figsize=(16, 10))
     sns.scatterplot(
         x="tsne-2d-one",
         y="tsne-2d-two",
         hue="dbscan_labels",
-        # palette=sns.color_palette("gist_heat_r", 4),
         # palette = ['tab:blue', 'tab:green', 'tab:orange', 'tab:red'],
         data=df,
         legend="full",
