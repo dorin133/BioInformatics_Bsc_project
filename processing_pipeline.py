@@ -100,9 +100,6 @@ def main():
     #                    path_out='./merged_data5/tsne.csv')
 
     # # step13: DBScan
-    # ml_processing.DBScan(path_in='./merged_data5/tsne.csv', path_out='./merged_data5/dbscan.csv')
-
-
     ml_processing.DBScan_dynm_eps(eps_prc=70, k_neighbor=20, path_in='./merged_data5/tsne.csv',
                                   path_out='./merged_data5/dbscan.csv')
 
