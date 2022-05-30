@@ -215,7 +215,32 @@ def DBScan_exp(path_in, path_out, plots_folder='./plots_folder1'):
         DBScan(path_in='./merged_data5/tsne.csv', path_out='./merged_data5/dbscan.csv', eps=eps)
 
 
-def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=7):
+def DBScan_dynm_eps(path_in, path_out, eps_prc=70, k_neighbor=20, plots_folder='./plots_folder1'):
+    utils.write_log(f'start DBScan_dynm_eps: finding the best eps with eps_prc={eps_prc} and k_neighbor={k_neighbor}')
+    df = pd.read_csv(path_in, index_col=0, header=0)
+    df = df.T[['tsne-2d-one', 'tsne-2d-two']]
+    from scipy.spatial import distance_matrix
+    dist = distance_matrix(df[['tsne-2d-one', 'tsne-2d-two']], df[['tsne-2d-one', 'tsne-2d-two']])
+    hist = []
+    for row in dist:
+        row.sort()
+        hist.append(row[k_neighbor])
+
+    chosen_eps = np.percentile(hist, eps_prc)
+
+    sns.histplot(hist)
+    plt.axvline(x=chosen_eps, color='r', linestyle='-')
+    plt.title(f'The distance to the {k_neighbor}th closest neighbor.\nthe {eps_prc} quartile is {round(chosen_eps, 5)}')
+    data_plot_utils.save_plots(plt, f'{plots_folder}/dbscan_choose_eps')
+    plt.show()
+
+    del df  # just close instance to save memory
+
+    utils.write_log(f'finish DBScan_dynm_eps: found best eps is {chosen_eps}. now moving to preforming DBScan')
+    DBScan(path_in, path_out, eps=chosen_eps, min_samples=k_neighbor)  # call the actual dbscan using the eps we found
+
+
+def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=1.4, min_samples=20):
     utils.write_log('start DBScan')
     df = pd.read_csv(path_in, index_col=0, header=0)
     df = df.T
@@ -246,7 +271,7 @@ def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=7):
 
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     n_noise_ = list(labels).count(-1)
-    utils.write_log(f'n_clusters_: {n_clusters_} and the n_noise_: {n_noise_}')
+    utils.write_log(f'dbscan ouput: n_clusters_: {n_clusters_} (aka dbscan_labels) and the n_noise_: {n_noise_}')
 
     # labels_true = df['labels']  # TODO we can look for the correct labels/clustering of the data and compare it with our results
     # print("Estimated number of clusters: %d" % n_clusters_)
@@ -271,10 +296,10 @@ def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=7):
         legend="full",
         alpha=0.3
     )
-    plt.title(f'DBScan_eps_{eps}')
-    data_plot_utils.save_plots(plt, f'{plots_folder}/dbscan_eps_{eps}')
+    plt.title(f'DBScan_eps_{round(eps, 5)}')
+    data_plot_utils.save_plots(plt, f'{plots_folder}/dbscan_eps_{round(eps, 5)}')
     plt.show()
 
     df.T.to_csv(path_out, sep=',')
-    utils.write_log(f'finish tSNE with eps {eps}. new data with the labels from DBScan ("dbscan_labels", where -1'
-                    f' consider noise else the given label) is in shape {df.shape}. saved to {path_out} ')
+    utils.write_log(f'finish tSNE with eps {round(eps, 5)}. new data with the labels from DBScan ("dbscan_labels",'
+                    f' where -1 consider noise else the given label) is in shape {df.shape}. saved to {path_out} ')
