@@ -262,7 +262,7 @@ def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=1.4, min_sampl
     db = DBSCAN(eps=eps, min_samples=20).fit(X)
     core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
     core_samples_mask[db.core_sample_indices_] = True
-    print(core_samples_mask)
+    # print(core_samples_mask)
     labels = db.labels_
     # print(labels)
     # print(labels[100:200])
@@ -271,7 +271,7 @@ def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=1.4, min_sampl
 
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     n_noise_ = list(labels).count(-1)
-    utils.write_log(f'dbscan ouput: n_clusters_: {n_clusters_} (aka dbscan_labels) and the n_noise_: {n_noise_}')
+    utils.write_log(f'dbscan output: n_clusters_: {n_clusters_} (aka dbscan_labels) and the n_noise_: {n_noise_}')
 
     # labels_true = df['labels']  # TODO we can look for the correct labels/clustering of the data and compare it with our results
     # print("Estimated number of clusters: %d" % n_clusters_)
@@ -301,5 +301,5 @@ def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=1.4, min_sampl
     plt.show()
 
     df.T.to_csv(path_out, sep=',')
-    utils.write_log(f'finish tSNE with eps {round(eps, 5)}. new data with the labels from DBScan ("dbscan_labels",'
+    utils.write_log(f'finish DBScan with eps {round(eps, 5)}. new data with the labels from DBScan ("dbscan_labels",'
                     f' where -1 consider noise else the given label) is in shape {df.shape}. saved to {path_out} ')
