@@ -7,7 +7,6 @@ import data_plot_utils
 import time
 import utils
 from sklearn.cluster import DBSCAN
-from sklearn import metrics
 
 def tSNE(path_in, path_to_MEA = './raw_data/MEA_dimorphism_samples.xlsx', path_out='./merged_data5/tsne.csv',
          plots_folder='./plots_folder1'):
@@ -303,3 +302,4 @@ def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=1.4, min_sampl
     df.T.to_csv(path_out, sep=',')
     utils.write_log(f'finish DBScan with eps {round(eps, 5)}. new data with the labels from DBScan ("dbscan_labels",'
                     f' where -1 consider noise else the given label) is in shape {df.shape}. saved to {path_out} ')
+

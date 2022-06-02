@@ -95,9 +95,9 @@ def main():
     # # step11: PCA
     # data_processing.pca_norm_knee(path_in='./merged_data5/stacked_3.csv', path_out='./merged_data5/pca4.csv')
     #
-    # step12: tSNE
-    ml_processing.tSNE(path_in='./merged_data5/pca4.csv', path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx',
-                       path_out='./merged_data5/tsne.csv')
+    # # step12: tSNE
+    # ml_processing.tSNE(path_in='./merged_data5/pca4.csv', path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx',
+    #                    path_out='./merged_data5/tsne.csv')
 
     # # step13: DBScan
     ml_processing.DBScan_dynm_eps(eps_prc=70, k_neighbor=20, path_in='./merged_data5/tsne.csv',

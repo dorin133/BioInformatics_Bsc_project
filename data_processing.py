@@ -8,6 +8,7 @@ from itertools import islice
 from sklearn import decomposition
 import data_plot_utils
 import utils
+import time
 
 
 def features_to_csv(folder_path='./raw_data', out_folder_path='./csv_data2'):
@@ -144,10 +145,10 @@ def normalize_data(path_in_file, path_out_file, alpha=20000):
 def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plots_folder='./plots_folder1'):
     df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
     print(f'status: start calc_and_plot_cv. df original shape is {df.shape}')
-    
+
     # calculating cv and mean for each gene
     cv_res = df.apply(lambda x: np.std(x, ddof=1) / np.mean(x), axis=1)
-    mean_res = df.apply(lambda x: np.mean(x), axis=1) 
+    mean_res = df.apply(lambda x: np.mean(x), axis=1)
     # cv_res_pd = cv_res_pd.dropna()
     # cv_res = cv_res_pd
     # mean_res = mean_res[mean_res > 0]
@@ -177,7 +178,7 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     dist_cv_dict_100 = sorted(dist_cv_dict, key=dist_cv_dict.get, reverse=True)[:100]
     df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
 
-    # dist_idx = np.argsort(dist_cv)[-100:] 
+    # dist_idx = np.argsort(dist_cv)[-100:]
     # real_idx = []
     # TODO: make the new indeces the index of this stacked table!!!
     # print("dist_idx", dist_idx)
@@ -194,10 +195,10 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     # add to the plot the names of the farthest genes
     for x, y in zip(mean_res.loc[dist_cv_dict_100], cv_res.loc[dist_cv_dict_100]):
         plt.annotate(labels[i],  # this is the text
-                    (x, y),  # these are the coordinates to position the label
-                    textcoords="offset points",  # how to position the text
-                    xytext=(0, 2),  # distance from text to points (x,y)
-                    ha='center')  # horizontal alignment can be left, right or center
+                     (x, y),  # these are the coordinates to position the label
+                     textcoords="offset points",  # how to position the text
+                     xytext=(0, 2),  # distance from text to points (x,y)
+                     ha='center')  # horizontal alignment can be left, right or center
         i += 1
     plt.title("log(mean) as function of log(cv) for each gene")
     plt.xlabel("log(mean)")
@@ -209,26 +210,27 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
           f"are {labels}"
     utils.write_log(msg)
 
-    
     # find knee for threshold filter
     sorted_dict_cv = {k: v for (k, v) in dist_cv.items() if v >= 0}
     # sorted_dict_cv = {k: v for (k, v) in dist_cv.items()}  # TODO <--- check this without "v>=0"
-    sorted_dict_cv = dict(sorted(sorted_dict_cv.items(), key=lambda item: item[1], reverse = True))
+    sorted_dict_cv = dict(sorted(sorted_dict_cv.items(), key=lambda item: item[1], reverse=True))
 
     # sorted_dict_cv = np.flip(np.sort(dist_cv[dist_cv>0]))
-    y_values = (list(sorted_dict_cv.values())-np.amin(list(sorted_dict_cv.values())))/np.amax(list(sorted_dict_cv.values()))
-    x_values = np.arange(1/len(sorted_dict_cv), 1+1/len(sorted_dict_cv), 1/len(sorted_dict_cv))
+    y_values = (list(sorted_dict_cv.values()) - np.amin(list(sorted_dict_cv.values()))) / np.amax(
+        list(sorted_dict_cv.values()))
+    x_values = np.arange(1 / len(sorted_dict_cv), 1 + 1 / len(sorted_dict_cv), 1 / len(sorted_dict_cv))
     plt.plot(x_values, y_values)
     knee_val = 100
     knee_point = None
     genes_threshold = -1
     for i, point in enumerate(zip(x_values, y_values)):
-        tmp_dist = np.sqrt(point[0]**2 + point[1]**2)
-        if tmp_dist < knee_val:  
+        tmp_dist = np.sqrt(point[0] ** 2 + point[1] ** 2)
+        if tmp_dist < knee_val:
             knee_val = tmp_dist
             knee_point = point
             genes_threshold = i
     print(f'Found knee point (closest to the origin) at {knee_point}')
+    print(f'genes_threshold is {genes_threshold}')
     plt.annotate("knee",  # this is the text
                  knee_point,  # these are the coordinates to position the label
                  textcoords="offset points",  # how to position the text
@@ -255,7 +257,7 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     df_threshold = df_threshold.drop(drop_idx)
 
     df_threshold.to_csv(path_out, sep=',')
-    print(f'That removed {df.shape[0]-df_threshold.shape[0]} genes. The new csv file saved as {path_out}')
+    print(f'That removed {df.shape[0] - df_threshold.shape[0]} genes. The new csv file saved as {path_out}')
     print(f'We were left with {df_threshold.shape[0]} genes.')
     print(f'status: finish calc_and_plot_cv. the new df shape is {df_threshold.shape}')
     # print(f' which are: {df_features.loc[genes_survived.keys()].geneName.unique()}')
@@ -323,4 +325,3 @@ def pca_norm_knee(path_in, path_out, plots_folder='./plots_folder1'):
     principal_df.T.to_csv(path_out, sep=',')
     utils.write_log(f'finish PCA. left with {number_of_values_bigger_than_knee} values. current data shape is '
                     f'{principal_df.shape} (Transposed). saved to {path_out}')
-
