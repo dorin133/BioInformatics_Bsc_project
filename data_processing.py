@@ -212,7 +212,6 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
 
     # find knee for threshold filter
     sorted_dict_cv = {k: v for (k, v) in dist_cv.items() if v >= 0}
-    # sorted_dict_cv = {k: v for (k, v) in dist_cv.items()}  # TODO <--- check this without "v>=0"
     sorted_dict_cv = dict(sorted(sorted_dict_cv.items(), key=lambda item: item[1], reverse=True))
 
     # sorted_dict_cv = np.flip(np.sort(dist_cv[dist_cv>0]))
@@ -245,6 +244,13 @@ def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plot
     # df_threshold = df[dist_cv_absolute <= knee_point[1]]  # TODO double check this
     genes_survived = dict(islice(sorted_dict_cv.items(), genes_threshold))
     df_threshold = df.loc[genes_survived.keys()]  # TODO double check this
+
+    # labels_all = df_features.loc[genes_survived.keys()].geneName.unique()
+    # print("the genes who survived are: ")
+    # print(labels_all)
+    # list_for_sanity_check = ['Snap25','Stmn2','Gad2','Slc32a1','Slc17a7','Slc17a6','Sst','Sim1','Tac2','Ttr','Foxj1','Acta2','Flt1','Cldn5','Aqp4','Plp1']
+    # print(list_for_sanity_check - labels_all)
+    # print(len(labels_all - labels_all))
     print(f'Status: removing rows (gens) which their distance from their CV point to the fit-line is greater then the '
           f'threshold={round(knee_point[1], 4)}')
 
@@ -275,18 +281,18 @@ def pca_norm_knee(path_in, path_out, plots_folder='./plots_folder1'):
 
     # TODO holy bug or coesintance ??
     df_t = df.T  # TODO this way PCA is 14. according to the last call with Amit this is the right way
-    df_t = np.log2(df_t+1)
     # print("!", df_t.shape)
     # print("!!", df_t.mean(), "\n%%", df_t.mean().shape)
     # print("!!", df_t.mean(axis=0), "\n%%", df_t.mean(axis=0).shape)
     # print("!!", df_t.std(axis=0), "\n%%", df_t.std(axis=0).shape)
-    df_t = (df_t - df_t.mean(axis=0) / df_t.std(axis=0))  # TODO verify this
+    df_t = np.log2(df_t+1)
+    df_t = ((df_t - df_t.mean(axis=0)) / df_t.std(axis=0))  # TODO verify this
 
     # df = np.log2(df + 1)  # TODO we are not sure if the log and norm should be on rows or on columns. this way PCA is 18
     # df = (df - df.mean() / df.std())
     # df_t = df.T
 
-    curr_n = df_t.shape[1]  # all features
+    curr_n = df_t.shape[1]  # all genes
     pca = decomposition.PCA(n_components=curr_n)
     _ = pca.fit_transform(df_t)
     explain = pca.explained_variance_
