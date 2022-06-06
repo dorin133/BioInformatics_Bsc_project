@@ -280,10 +280,13 @@ def create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMa
 
     ax.set_title('Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage')
     plt.tight_layout()
-    plt.show()
+    # plt.show()
     # need to change to :
     # data_plot_utils.save_plots(plt, f'{plots_folder}/heatmap')
     # for experiments sake, tried only to save it in a .png format
+    
+    # hm = df_stack_data_heatmap.hvplot.heatmap(cmap='seismic', xaxis='top', width=5000, height=5000, title='Gene expression heatmap')
+    # hv.save(hm, 'heatmap.html')
     plt.savefig(str(plots_folder)+"/corr_matrix_incl_anno_double.png", dpi=300)
     utils.write_log(f"finished create_heatmap: result of create_heatmap saved to {plots_folder}")
     pass
@@ -309,5 +312,5 @@ def heatmap_pipeline():
     create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/testing2_out')
     utils.write_log(f"#### finished heatmap_pipeline ####")
 
-# if __name__=="__main__":
-#     create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/testing2_out')
+if __name__=="__main__":
+    create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/testing2_out')
