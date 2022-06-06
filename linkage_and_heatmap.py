@@ -13,6 +13,10 @@ import matplotlib.colors as mcolors
 from sklearn import decomposition
 from scipy.cluster.hierarchy import dendrogram, linkage
 from matplotlib import pyplot as plt
+from bioinfokit import analys
+import holoviews as hv 
+import hvplot.pandas # use hvplot directly with pandas
+hv.extension('bokeh')  # to generate interactive plots 
 
 
 def sanity_checks(path_in_stack, path_in_dbscan, path_to_features_csv, gene_list, plots_folder):
@@ -304,4 +308,6 @@ def heatmap_pipeline():
     # finally, compute the heatmap
     create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/testing2_out')
     utils.write_log(f"#### finished heatmap_pipeline ####")
-    
+
+# if __name__=="__main__":
+#     create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/testing2_out')
