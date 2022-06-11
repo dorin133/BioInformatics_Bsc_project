@@ -275,8 +275,8 @@ def create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMa
     vmin_val = df_stack_data_heatmap.to_numpy().min()
     vmax_val = df_stack_data_heatmap.to_numpy().max()
     
-    cmap_pass=LinearSegmentedColormap.from_list('yg',["y", "w", "g"], N=100)
-    vamx_manual = 10
+    cmap_pass = LinearSegmentedColormap.from_list('yg',["y", "w", "g"], N=100)  # TODO N
+    vamx_manual = 20  # TODO
     print(f'note that vmin={vmin_val}, vmax={vmax_val}. we manully set the vmax to be {vamx_manual}')
     # sns.heatmap(df_stack_data_heatmap, cmap = cmap_pass, vmin=vmin_val, vmax=vmax_val)
     sns.heatmap(df_stack_data_heatmap, cmap = cmap_pass, vmin=vmin_val, vmax=vamx_manual)
@@ -296,17 +296,14 @@ def create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMa
 
     # plt.title('Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage')
     plt.tight_layout()
-    plt.savefig(str(plots_folder)+"/corr_matrix_incl_anno_double.png", dpi=300)
-    # data_plot_utils.save_plots(plt, f'{plots_folder}/corr_matrix_incl_anno_double')
+    # plt.savefig(str(plots_folder)+"/corr_matrix_incl_anno_double.png", dpi=300)  # for shorting the running time
+    data_plot_utils.save_plots(plt, f'{plots_folder}/corr_matrix_incl_anno_double')
     plt.show()
-    # need to change to :
-    # data_plot_utils.save_plots(plt, f'{plots_folder}/heatmap')
-    # for experiments sake, tried only to save it in a .png format
-    
+
     # hm = df_stack_data_heatmap.hvplot.heatmap(cmap='seismic', xaxis='top', width=5000, height=5000, title='Gene expression heatmap')
     # hv.save(hm, 'heatmap.html')
     utils.write_log(f"finished create_heatmap: result of create_heatmap saved to {plots_folder}")
-    pass
+
 
 def linkage_pipeline():
     # look for further explanations and comments in the wrapper functions
