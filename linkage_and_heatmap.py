@@ -13,6 +13,7 @@ import matplotlib.colors as mcolors
 from sklearn import decomposition
 from scipy.cluster.hierarchy import dendrogram, linkage
 from matplotlib import pyplot as plt
+from  matplotlib.colors import LinearSegmentedColormap
 # from bioinfokit import analys
 # import holoviews as hv
 # import hvplot.pandas # use hvplot directly with pandas
@@ -272,7 +273,7 @@ def create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMa
     
     vmin_val = df_stack_data_heatmap.to_numpy().min()
     vmax_val = df_stack_data_heatmap.to_numpy().max()
-    from  matplotlib.colors import LinearSegmentedColormap
+    
     cmap_pass=LinearSegmentedColormap.from_list('yg',["y", "w", "g"], N=256) 
 
     sns.heatmap(df_stack_data_heatmap, cmap = cmap_pass, vmin=vmin_val, vmax=vmax_val-20)
