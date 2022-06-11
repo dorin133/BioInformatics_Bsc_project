@@ -160,7 +160,7 @@ def DBScan_exp(path_in, path_out, plots_folder='./plots_folder1'):
         DBScan(path_in='./merged_data5/tsne.csv', path_out='./merged_data5/dbscan.csv', eps=eps)
 
 
-def DBScan_dynm_eps(path_in, path_out, eps_prc=70, k_neighbor=20, plots_folder='./plots_folder1'):
+def DBScan_dynm_eps(path_in, path_out, path_out_tsne_dbscan, eps_prc=70, k_neighbor=20, plots_folder='./plots_folder1'):
     utils.write_log(f'start DBScan_dynm_eps: finding the best eps with eps_prc={eps_prc} and k_neighbor={k_neighbor}')
     df = pd.read_csv(path_in, index_col=0, header=0)
     df = df.T[['tsne-2d-one', 'tsne-2d-two']]
@@ -185,18 +185,19 @@ def DBScan_dynm_eps(path_in, path_out, eps_prc=70, k_neighbor=20, plots_folder='
     DBScan(path_in, path_out, eps=chosen_eps, min_samples=k_neighbor)  # call the actual dbscan using the eps we found
 
 
-def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=1.485, min_samples=20):
+def DBScan(path_in, path_out, path_out_tsne_dbscan, plots_folder='./plots_folder1', eps=1.4, min_samples=20):
     utils.write_log('start DBScan')
     df = pd.read_csv(path_in, index_col=0, header=0)
     df = df.T
 
-    X = df[['tsne-2d-one', 'tsne-2d-two']]
+    # X = df[['tsne-2d-one', 'tsne-2d-two']]
     db = DBSCAN(eps=eps, min_samples=min_samples).fit(X)
+    X = df[['tsne-2d-one', 'tsne-2d-two']]
     core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
     core_samples_mask[db.core_sample_indices_] = True
     labels = db.labels_
     df['dbscan_labels'] = labels
-
+    X['dbscan_labels'] = labels
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     n_noise_ = list(labels).count(-1)
     utils.write_log(f'dbscan output: n_clusters_: {n_clusters_} (aka dbscan_labels) and the n_noise_: {n_noise_}')
@@ -217,6 +218,7 @@ def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=1.485, min_sam
     plt.show()
 
     df.T.to_csv(path_out, sep=',')
+    X.T.to_csv(path_out_tsne_dbscan, sep=',')
     utils.write_log(f'finish DBScan with eps {round(eps, 5)}. new data with the labels from DBScan ("dbscan_labels",'
                     f' where -1 consider noise else the given label) is in shape {df.shape}. saved to {path_out} ')
 
