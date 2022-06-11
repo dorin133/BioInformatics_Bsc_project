@@ -60,8 +60,8 @@ def sanity_checks(path_in_stack, path_in_dbscan, path_to_features_csv, gene_list
         curr_img_name = data_plot_utils.save_plots(plt, f'{plots_folder}/{name_path}')
         img_tmp.append((curr_img_name + ".png", f'{gene_name} (gene id {gene_id})'))
         plt.cla()
-
-    plt.close()
+        plt.clf()
+        plt.close()
 
     cols = 3
     rows = int(len(img_tmp)/cols) + (len(img_tmp)%cols>0)

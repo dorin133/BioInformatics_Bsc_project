@@ -32,7 +32,7 @@ def check_files_and_folder_for_complete_run(first_folder="./raw_data"):
     write_log('status: check_files_and_folder_for_complete_run: check missing default files and folder...')
     not_found = []
     folders = [first_folder, 'plots_folder1', 'plots_folder1/testing2_out', './csv_data2',
-               './filtered_data3', './normalized_data4', './merged_data5']
+               './filtered_data3', './normalized_data4', './merged_data5', './clusttered_data']
     for folder in folders:
         if not os.path.isdir(folder):
             print(f"did not found folder named: {folder}")
