@@ -147,6 +147,7 @@ def linkage_on_clustters(path_in, path_out, path_out_translation, plots_folder='
     plt.show()
     utils.write_log(f'finished performing linkage_on_clustters, linkage output saved to: {path_out} and the indeces given to clustters by the linkage saved to {path_out_translation}')
 
+
 def heatmap_data_perp():    
     def find_marker_genes(path_in_frac, path_in_avg):
         # find for each clustter it's marker genes 
@@ -267,17 +268,19 @@ def heatmap_data_perp():
 
 def create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/testing2_out'):
     # plt.figure(figsize=(10, 10))
-    fig, ax = plt.subplots(figsize=(24, 18))
+    fig, ax = plt.subplots(figsize=(30, 22))
     utils.write_log(f"starting create_heatmap")
     df_stack_data_heatmap = pd.read_csv(path_in_heatmap_table, index_col=0, header=0)
     
     vmin_val = df_stack_data_heatmap.to_numpy().min()
     vmax_val = df_stack_data_heatmap.to_numpy().max()
     
-    cmap_pass=LinearSegmentedColormap.from_list('yg',["y", "w", "g"], N=256) 
-
-    sns.heatmap(df_stack_data_heatmap, cmap = cmap_pass, vmin=vmin_val, vmax=vmax_val-20)
-    # plt.title("Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage")
+    cmap_pass=LinearSegmentedColormap.from_list('yg',["y", "w", "g"], N=100)
+    vamx_manual = 10
+    print(f'note that vmin={vmin_val}, vmax={vmax_val}. we manully set the vmax to be {vamx_manual}')
+    # sns.heatmap(df_stack_data_heatmap, cmap = cmap_pass, vmin=vmin_val, vmax=vmax_val)
+    sns.heatmap(df_stack_data_heatmap, cmap = cmap_pass, vmin=vmin_val, vmax=vamx_manual)
+    plt.title(f"Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage\nvmin={vmin_val}, vamx_manual={vamx_manual}")
     # plt.show()
 
     # sns.heatmap(df_stack_data_heatmap, cbar=True, vmin=vmin_val, vmax=vmax_val,
@@ -293,6 +296,8 @@ def create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMa
 
     # plt.title('Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage')
     plt.tight_layout()
+    plt.savefig(str(plots_folder)+"/corr_matrix_incl_anno_double.png", dpi=300)
+    # data_plot_utils.save_plots(plt, f'{plots_folder}/corr_matrix_incl_anno_double')
     plt.show()
     # need to change to :
     # data_plot_utils.save_plots(plt, f'{plots_folder}/heatmap')
@@ -300,7 +305,6 @@ def create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMa
     
     # hm = df_stack_data_heatmap.hvplot.heatmap(cmap='seismic', xaxis='top', width=5000, height=5000, title='Gene expression heatmap')
     # hv.save(hm, 'heatmap.html')
-    # plt.savefig(str(plots_folder)+"/corr_matrix_incl_anno_double.png", dpi=300)
     utils.write_log(f"finished create_heatmap: result of create_heatmap saved to {plots_folder}")
     pass
 
@@ -320,11 +324,11 @@ def linkage_pipeline():
 
 def heatmap_pipeline():
     utils.write_log(f"#### starting heatmap_pipeline ####")
-    heatmap_data_perp()
+    # heatmap_data_perp()
 
     # finally, compute the heatmap
     create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/testing2_out')
     utils.write_log(f"#### finished heatmap_pipeline ####")
 
-if __name__=="__main__":
-    create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/testing2_out')
+# if __name__=="__main__":
+#     create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/testing2_out')
