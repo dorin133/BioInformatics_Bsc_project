@@ -17,6 +17,7 @@ def do_not_filter_files(files_path):
 
 def run_func_for_all(func_to_run, folder_in_path, folder_out_path, which_files=do_not_filter_files,
                      rename_out_files=do_not_change_name):
+    write_log(f'start run_func_for_all with {func_to_run.__name__}')
     raw_files = os.listdir(folder_in_path)  # list all raw files
     chosen_files = list(filter(which_files, raw_files))
     chosen_files.sort()
@@ -24,10 +25,11 @@ def run_func_for_all(func_to_run, folder_in_path, folder_out_path, which_files=d
         new_file_name = rename_out_files(file_name)
         path_out_file_with_name = folder_out_path + '/' + new_file_name
         func_to_run(folder_in_path + "/" + file_name, path_out_file_with_name)
+    write_log(f'finish run_func_for_all with {func_to_run.__name__}')
 
 
 def check_files_and_folder_for_complete_run(first_folder="./raw_data"):
-    print('status: check_files_and_folder_for_complete_run: check missing default files and folder...')
+    write_log('status: check_files_and_folder_for_complete_run: check missing default files and folder...')
     not_found = []
     folders = [first_folder, 'plots_folder1', './csv_data2',
                './filtered_data3', './normalized_data4', './merged_data5']
@@ -75,7 +77,7 @@ def check_files_and_folder_for_complete_run(first_folder="./raw_data"):
             f'numbers of mtx files and barcodes files are different! something is missing')
 
     if len(not_found) == 0:
-        print("All files and folder are found! have a great flight!")
+        write_log("All files and folder are found! have a great flight!")
         return True
     else:
         print("Found there are some missing files and folders! better check them before running...")
@@ -90,6 +92,7 @@ def check_files_and_folder_for_complete_run(first_folder="./raw_data"):
 
 
 def stack_csv_together(folder_path, out_file_path='./merged_data5/stacked_mtx.csv'):
+    write_log(f'start stack_csv_together')
     chosen_files = os.listdir(folder_path)  # list all raw files
     # print(raw_files)
     # raw_files = list(filter(lambda x: '_matrix2.csv' in x, raw_files))

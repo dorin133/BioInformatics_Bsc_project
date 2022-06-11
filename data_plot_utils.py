@@ -15,6 +15,7 @@ def save_plots(plot, plot_name, append_time=str(datetime.datetime.now().time())[
 
 
 def print_hist_mt_percentage(features_folder_path='./csv_data2', folder_path='./filtered_data3', plots_folder='./plots_folder1'):
+    utils.write_log(f'start print_hist_mt_percentage')
     gene_indeces = utils.find_indices_of_gene(features_folder_path)
     raw_files = os.listdir(folder_path)
     raw_files = list(filter(lambda x: 'matrix_filtered.csv' in x, raw_files))
@@ -35,6 +36,7 @@ def print_hist_mt_percentage(features_folder_path='./csv_data2', folder_path='./
 
 
 def print_pdf_mul(folder_path='./filtered_data3', plots_folder='./plots_folder1'):
+    utils.write_log(f'start print_pdf_mul')
     raw_files = os.listdir(folder_path)
     raw_files = list(filter(lambda x: 'matrix_filtered.csv' in x, raw_files))
     
@@ -55,6 +57,7 @@ def print_pdf_mul(folder_path='./filtered_data3', plots_folder='./plots_folder1'
     plt.show()
 
 def print_hist_genes(folder_path='./csv_data2', plots_folder='./plots_folder1'):
+    utils.write_log(f'start print_hist_genes')
     raw_files = os.listdir(folder_path)
     raw_files = list(filter(lambda x: 'matrix.csv' in x, raw_files))
     labels = []
@@ -77,7 +80,6 @@ def print_hist_genes(folder_path='./csv_data2', plots_folder='./plots_folder1'):
     # plt.savefig(f'{plots_folder}/hist_genes{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
     save_plots(plt, f'{plots_folder}/hist_genes')
     plt.show()
-
 
 
 def plot_female_vs_male_fraction_expression(females_path, males_path, path_to_features_csv, path_stacked_mtx_file, path_out,

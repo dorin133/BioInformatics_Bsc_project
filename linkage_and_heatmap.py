@@ -13,10 +13,10 @@ import matplotlib.colors as mcolors
 from sklearn import decomposition
 from scipy.cluster.hierarchy import dendrogram, linkage
 from matplotlib import pyplot as plt
-from bioinfokit import analys
-import holoviews as hv 
-import hvplot.pandas # use hvplot directly with pandas
-hv.extension('bokeh')  # to generate interactive plots 
+# from bioinfokit import analys
+# import holoviews as hv
+# import hvplot.pandas # use hvplot directly with pandas
+# hv.extension('bokeh')  # to generate interactive plots
 
 
 def sanity_checks(path_in_stack, path_in_dbscan, path_to_features_csv, gene_list, plots_folder):
@@ -33,9 +33,7 @@ def sanity_checks(path_in_stack, path_in_dbscan, path_to_features_csv, gene_list
     features = pd.read_csv(path_to_features_csv, header=0)
     features.set_axis(['num', 'geneID', 'geneName'], axis=1, inplace=True)
     features.set_index('geneName', inplace=True)
-    relevant_features = features.loc[gene_list].num
-    relevant_gene_expressions = df_stack.loc[relevant_features]
-    relevant_gene_expressions_log = np.log2(relevant_gene_expressions+1)
+    relevant_gene_expressions_log = np.log2(df_stack+1)
     relevant_gene_expressions = relevant_gene_expressions_log.sub(relevant_gene_expressions_log.mean(axis=1), axis=0)
     relevant_gene_expressions = relevant_gene_expressions.div(relevant_gene_expressions_log.std(axis=1), axis=0) # TODO verify this
     x_coor = df_dbscan.T['tsne-2d-one']
@@ -49,10 +47,11 @@ def sanity_checks(path_in_stack, path_in_dbscan, path_to_features_csv, gene_list
         vmin = gene_expressions_min[gene_id]
         vmax = gene_expressions_max[gene_id]
         normalize_val = mcolors.TwoSlopeNorm(vcenter=0, vmin=vmin, vmax=vmax)
-        # if gene_id not in relevant_gene_expressions.index:
-        #     print(f"!!! gen {gene_name} (gen id {gene_id}) is not in the stacked matrix data")
-        #     continue
-        # print(f'gen id for {gene_name} is {gene_id}')
+
+        if gene_id not in relevant_gene_expressions.index:
+            print(f"!!! gen {gene_name} (gen id {gene_id}) is not in the stacked matrix data")
+            continue
+        print(f'gen id for {gene_name} is {gene_id}')
         
         plt.figure(figsize=(9, 9))
         sns.scatterplot(
