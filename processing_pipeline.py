@@ -184,10 +184,10 @@ def main():
     # # step 12: tSNE
     # ml_processing.tSNE(path_in='./merged_data5/pca4.csv', path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx',
     #                    path_out='./merged_data5/tsne.csv')
-
-    # step 13: DBScan
-    ml_processing.DBScan_dynm_eps(eps_prc=70, k_neighbor=20, path_in='./merged_data5/tsne.csv',
-                                  path_out='./clusttered_data/dbscan.csv')
+    #
+    # # step 13: DBScan
+    # ml_processing.DBScan_dynm_eps(eps_prc=70, k_neighbor=20, path_in='./merged_data5/tsne.csv',
+    #                               path_out='./clusttered_data/dbscan.csv')
 
     # step 14: linkage data prep and the linkage step itself 
     link_and_heat.linkage_pipeline()

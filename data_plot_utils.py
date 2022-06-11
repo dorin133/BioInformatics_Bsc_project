@@ -12,6 +12,7 @@ def save_plots(plot, plot_name, append_time=str(datetime.datetime.now().time())[
     plot.savefig(f'{plot_name}.eps', format='eps')
     plot.savefig(f'{plot_name}.svg', format='svg', dpi=888)
     plot.savefig(f'{plot_name}.png', format='png', dpi=888)
+    return plot_name
 
 
 def print_hist_mt_percentage(features_folder_path='./csv_data2', folder_path='./filtered_data3', plots_folder='./plots_folder1'):

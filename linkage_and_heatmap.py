@@ -17,19 +17,14 @@ from matplotlib import pyplot as plt
 # import holoviews as hv
 # import hvplot.pandas # use hvplot directly with pandas
 # hv.extension('bokeh')  # to generate interactive plots
+import cv2
 
 
 def sanity_checks(path_in_stack, path_in_dbscan, path_to_features_csv, gene_list, plots_folder):
     utils.write_log(f"starting sanity check: gene expression volume on T-SNE's scatter plot")
     df_stack = pd.read_csv(path_in_stack, index_col=0, header=0)
-    # print(df_stack.isna().sum(axis=1))  # TODO not sure why is that
-    # df_stack.fillna(0, inplace=True)
-    # print(df_stack.isna().sum(axis=1))
-
     df_dbscan = pd.read_csv(path_in_dbscan, index_col=0, header=0)
-    # df = pd.concat([df_stack, df_dbscan])
-    # df = df.T
-
+    rows_cols_len = round(len(gene_list)**0.5)
     features = pd.read_csv(path_to_features_csv, header=0)
     features.set_axis(['num', 'geneID', 'geneName'], axis=1, inplace=True)
     features.set_index('geneName', inplace=True)
@@ -38,21 +33,17 @@ def sanity_checks(path_in_stack, path_in_dbscan, path_to_features_csv, gene_list
     relevant_gene_expressions = relevant_gene_expressions.div(relevant_gene_expressions_log.std(axis=1), axis=0) # TODO verify this
     x_coor = df_dbscan.T['tsne-2d-one']
     y_coor = df_dbscan.T['tsne-2d-two']
-    gene_expressions_max = relevant_gene_expressions.max(axis=1)
-    gene_expressions_min = relevant_gene_expressions.min(axis=1)
-    # relevant_gene_expressions['is_intresting'] = relevant_gene_expressions.apply(lambda x: x[gene_id] != 0, axis=1)
-    for i, gene_name in enumerate(gene_list):
-
+    found_gens = []
+    not_in_data_gens = []
+    img_tmp = []
+    for gene_name in gene_list:
         gene_id = int(features.at[gene_name, 'num'])
-        vmin = gene_expressions_min[gene_id]
-        vmax = gene_expressions_max[gene_id]
-        normalize_val = mcolors.TwoSlopeNorm(vcenter=0, vmin=vmin, vmax=vmax)
-
         if gene_id not in relevant_gene_expressions.index:
             print(f"!!! gen {gene_name} (gen id {gene_id}) is not in the stacked matrix data")
+            not_in_data_gens.append((gene_name, gene_id))
             continue
         print(f'gen id for {gene_name} is {gene_id}')
-        
+        found_gens.append((gene_name, gene_id))
         plt.figure(figsize=(9, 9))
         sns.scatterplot(
             x=x_coor,
@@ -60,17 +51,34 @@ def sanity_checks(path_in_stack, path_in_dbscan, path_to_features_csv, gene_list
             c=relevant_gene_expressions.loc[gene_id].to_numpy(),
             cmap = cm.RdBu,
             data=relevant_gene_expressions,
-            norm = normalize_val,
-            # palette='RdBu',
-            # legend="auto",
+            palette='RdBu',
             alpha=0.3
         )
         plt.title(f"Gene Experession Scatter for gene {gene_name} (gene id {gene_id})")
-
         name_path = "gene_expression_of_"+gene_name
-        data_plot_utils.save_plots(plt, f'{plots_folder}/{name_path}')
-        # plt.show()
+        curr_img_name = data_plot_utils.save_plots(plt, f'{plots_folder}/{name_path}')
+        img_tmp.append((curr_img_name + ".png", f'{gene_name} (gene id {gene_id})'))
+        plt.cla()
+
+    plt.close()
+
+    cols = 3
+    rows = int(len(img_tmp)/cols) + (len(img_tmp)%cols>0)
+    fig = plt.figure(figsize=(15, 15))
+
+    for index, img in enumerate(img_tmp):
+        fig.add_subplot(rows, cols, index+1)
+        image = cv2.imread(img[0])
+        plt.imshow(image)
+        plt.axis('off')
+        plt.title(img[1])
+
+    data_plot_utils.save_plots(plt, f'{plots_folder}/gene_expression_summarized')
+    plt.show()
+    utils.write_log(f'summarize:\n\t-created an image for the following gens {found_gens}.\n'
+                    f'\t-Did not print for the following gens which did not found in data {not_in_data_gens}')
     utils.write_log(f"finished sanity check: plots saved in {plots_folder}")
+
 
 def linkage_data_prep():
     def avg_and_fraction_clustter_expression(path_in_stack, path_tsne_dbscan_data, path_out_avg_clust_cell, path_out_frac):
@@ -293,10 +301,10 @@ def create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMa
 def linkage_pipeline():
     # look for further explanations and comments in the wrapper functions 
     utils.write_log(f"#### starting linkage_pipeline ####")
-    sanity_checks(path_in_stack='./merged_data5/stacked_3.csv',
-                    path_in_dbscan='./clusttered_data/dbscan.csv',  
-                    gene_list= ['Snap25','Gad2','Slc32a1', 'Slc17a7','Slc17a6','Sst','Tac2','Acta2','Flt1','Cldn5', 'Aqp4','Plp1'],
-                    path_to_features_csv='./csv_data2/features.csv', plots_folder = './plots_folder1/testing2_out')
+    # sanity_checks(path_in_stack='./merged_data5/stacked_3.csv',
+    #                 path_in_dbscan='./clusttered_data/dbscan.csv',
+    #                 gene_list= ['Snap25','Gad2','Slc32a1', 'Slc17a7','Slc17a6','Sst','Tac2','Acta2','Flt1','Cldn5', 'Aqp4','Plp1'],
+    #                 path_to_features_csv='./csv_data2/features.csv', plots_folder = './plots_folder1/testing2_out')
 
     linkage_data_prep()
 
