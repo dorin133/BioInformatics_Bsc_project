@@ -124,10 +124,10 @@ def linkage_data_prep():
     pca_avg_clust_cells(path_in = './clusttered_data/avg_clust_cells.csv', path_out='./clusttered_data/PCA_avg_clust.csv', pca_dim=10)
     
 
-def linkage_on_clustters(path_in, path_out, path_out_translation, plots_folder='./plots_folder1'):
+def linkage_on_clustters(path_in, path_out, path_out_translation, plots_folder='./plots_folder1/testing2_out'):
     utils.write_log(f"starting linkage_on_clustters")
     df = pd.read_csv(path_in, index_col=0, header=0)
-    Z = linkage(df.T, 'single', 'euclidean', True)
+    Z = linkage(df.T, 'single', 'euclidean', True) # change the 'single' parameter to 'average', and the 'euclidean' parameter to 'correlation'
     fig = plt.figure(figsize=(25, 10))
     dn = dendrogram(Z)
     df_linkage_data = pd.DataFrame(Z, columns=['cluster1', 'cluster2', 'dist_btw_clust1_clust2', 'orig_observations'])
@@ -259,35 +259,40 @@ def heatmap_data_perp():
 
 def create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/testing2_out'):
     # plt.figure(figsize=(10, 10))
+    fig, ax = plt.subplots(figsize=(24, 18))
     utils.write_log(f"starting create_heatmap")
     df_stack_data_heatmap = pd.read_csv(path_in_heatmap_table, index_col=0, header=0)
+    
     vmin_val = df_stack_data_heatmap.to_numpy().min()
     vmax_val = df_stack_data_heatmap.to_numpy().max()
-    # sns.heatmap(df_stack_data_normalized, annot=True, cmap = cm.RdBu, vmin=vmin_val, vmax=vmax_val)
+    from  matplotlib.colors import LinearSegmentedColormap
+    cmap_pass=LinearSegmentedColormap.from_list('yg',["y", "w", "g"], N=256) 
+
+    sns.heatmap(df_stack_data_heatmap, cmap = cmap_pass, vmin=vmin_val, vmax=vmax_val-20)
     # plt.title("Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage")
     # plt.show()
-    fig, ax = plt.subplots(figsize=(24, 18))
 
-    hm = sns.heatmap(df_stack_data_heatmap, cbar=True, vmin=vmin_val, vmax=vmax_val,
-                    fmt='.2f', annot_kws={'size': 3}, annot=True, 
-                    square=True, cmap=plt.cm.RdBu)
+    # sns.heatmap(df_stack_data_heatmap, cbar=True, vmin=vmin_val, vmax=vmax_val,
+    #                 annot=False, square=True, mask=True ,cmap=plt.cm.RdBu)
 
-    ticks = np.arange(df_stack_data_heatmap.shape[0]) + 0.5
-    ax.set_xticks(ticks)
-    ax.set_xticklabels(df_stack_data_heatmap.columns, rotation=90, fontsize=8)
-    ax.set_yticks(ticks)
-    ax.set_yticklabels(df_stack_data_heatmap.index, rotation=360, fontsize=8)
+    ticks_y = np.arange(df_stack_data_heatmap.shape[0]) + 0.5
+    # ticks_x = np.arange(df_stack_data_heatmap.shape[1]) + 0.5
+    # ax.set_xticks(ticks_x)
+    # plt.xticks(fontsize=6)
+    ax.tick_params(axis='x', which='major', labelsize=3)
+    ax.set_yticks(ticks_y)
+    ax.set_yticklabels(df_stack_data_heatmap.index, rotation=360, fontsize=4)
 
-    ax.set_title('Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage')
+    # plt.title('Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage')
     plt.tight_layout()
-    # plt.show()
+    plt.show()
     # need to change to :
     # data_plot_utils.save_plots(plt, f'{plots_folder}/heatmap')
     # for experiments sake, tried only to save it in a .png format
     
     # hm = df_stack_data_heatmap.hvplot.heatmap(cmap='seismic', xaxis='top', width=5000, height=5000, title='Gene expression heatmap')
     # hv.save(hm, 'heatmap.html')
-    plt.savefig(str(plots_folder)+"/corr_matrix_incl_anno_double.png", dpi=300)
+    # plt.savefig(str(plots_folder)+"/corr_matrix_incl_anno_double.png", dpi=300)
     utils.write_log(f"finished create_heatmap: result of create_heatmap saved to {plots_folder}")
     pass
 
