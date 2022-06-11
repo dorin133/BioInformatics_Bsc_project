@@ -102,7 +102,6 @@ def tSNE(path_in, path_to_MEA = './raw_data/MEA_dimorphism_samples.xlsx', path_o
 def tSNE_3d(path_in, path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx', path_out='./merged_data5/tsne.csv',
          plots_folder='./plots_folder1'):
     df_f_m_index = pd.read_excel(path_to_MEA)
-    # print(df_f_m_index)
     f_list, m_list = [], []
     p_list, no_p_list = [], []
     for index, row in df_f_m_index.iterrows():
@@ -155,11 +154,6 @@ def tSNE_3d(path_in, path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx', path_
     plt.show()
 
 
-def DBScan_exp(path_in, path_out, plots_folder='./plots_folder1'):
-    for eps in [0.1, 0.7, 1, 2, 3, 4, 5, 6, 7, 10, 20, 40, 60, 70]:
-        DBScan(path_in='./merged_data5/tsne.csv', path_out='./merged_data5/dbscan.csv', eps=eps)
-
-
 def DBScan_dynm_eps(path_in, path_out, path_out_tsne_dbscan, eps_prc=70, k_neighbor=20, plots_folder='./plots_folder1'):
     utils.write_log(f'start DBScan_dynm_eps: finding the best eps with eps_prc={eps_prc} and k_neighbor={k_neighbor}')
     df = pd.read_csv(path_in, index_col=0, header=0)
@@ -182,7 +176,7 @@ def DBScan_dynm_eps(path_in, path_out, path_out_tsne_dbscan, eps_prc=70, k_neigh
     del df  # just close instance to save memory
 
     utils.write_log(f'finish DBScan_dynm_eps: found best eps is {chosen_eps}. now moving to preforming DBScan')
-    DBScan(path_in, path_out, eps=chosen_eps, min_samples=k_neighbor)  # call the actual dbscan using the eps we found
+    DBScan(path_in, path_out, eps=chosen_eps, path_out_tsne_dbscan=path_out_tsne_dbscan, min_samples=k_neighbor)  # call the actual dbscan using the eps we found
 
 
 def DBScan(path_in, path_out, path_out_tsne_dbscan, plots_folder='./plots_folder1', eps=1.4, min_samples=20):
@@ -190,9 +184,8 @@ def DBScan(path_in, path_out, path_out_tsne_dbscan, plots_folder='./plots_folder
     df = pd.read_csv(path_in, index_col=0, header=0)
     df = df.T
 
-    # X = df[['tsne-2d-one', 'tsne-2d-two']]
-    db = DBSCAN(eps=eps, min_samples=min_samples).fit(X)
     X = df[['tsne-2d-one', 'tsne-2d-two']]
+    db = DBSCAN(eps=eps, min_samples=min_samples).fit(X)
     core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
     core_samples_mask[db.core_sample_indices_] = True
     labels = db.labels_
@@ -201,7 +194,6 @@ def DBScan(path_in, path_out, path_out_tsne_dbscan, plots_folder='./plots_folder
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     n_noise_ = list(labels).count(-1)
     utils.write_log(f'dbscan output: n_clusters_: {n_clusters_} (aka dbscan_labels) and the n_noise_: {n_noise_}')
-
 
     plt.figure(figsize=(16, 10))
     sns.scatterplot(

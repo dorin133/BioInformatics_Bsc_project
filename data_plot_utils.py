@@ -88,8 +88,6 @@ def plot_female_vs_male_fraction_expression(females_path, males_path, path_to_fe
     df_f = pd.read_csv(females_path, index_col=0, header=0)
     df_m = pd.read_csv(males_path, index_col=0, header=0)
 
-    # mean_f = pd.DataFrame(df_f.mean(axis=1))
-    
     mean_f = df_f.astype(bool).sum(axis=1)/df_f.shape[1]
     # print("mean f\n", mean_f)
     mean_m = df_m.astype(bool).sum(axis=1)/df_m.shape[1]
@@ -102,18 +100,9 @@ def plot_female_vs_male_fraction_expression(females_path, males_path, path_to_fe
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.scatter(mean_f, mean_m, s=5, c='b', marker="s")
-    # plt.ax
-    # mean_f_np = mean_f.to_numpy()
-    # mean_m_np = mean_m.to_numpy()
+
     p = np.poly1d(np.polyfit(mean_f, mean_m, 1))
     plt.plot(np.unique(mean_f), p(np.unique(mean_f)))
-
-
-    # n_zeros_f = np.count_nonzero(mean_f_np==0)
-    # non_zeros_f = np.count_nonzero(mean_f_np!=0)
-
-    # print("There are "+ str(n_zeros_f)+" genes not expressed in females and "+str(non_zeros_f)+" genes expressed in females")
-
 
     # find the 20 farthest genes from p
     dist_f = abs(mean_m - p(mean_f))
@@ -126,11 +115,6 @@ def plot_female_vs_male_fraction_expression(females_path, males_path, path_to_fe
 
     # print("dist_idx", dist_idx)
     df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
-    # real_idx = []
-    # # print(mean_f.index)
-    # for index, j in enumerate(mean_f.index):
-    #     if index in dist_idx:
-    #         real_idx.append(j)
 
     labels = df_features.loc[dist_f_20].geneName.unique()
     i = 0
@@ -165,8 +149,6 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, pat
     df_f = pd.read_csv(females_path, index_col=0, header=0)
     df_m = pd.read_csv(males_path, index_col=0, header=0)
 
-    # mean_f = pd.DataFrame(df_f.mean(axis=1))
-    
     mean_f = np.log2(df_f + 1).mean(axis=1)
     # print("mean f\n", mean_f)
     mean_m = np.log2(df_m + 1).mean(axis=1)
@@ -178,18 +160,9 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, pat
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.scatter(mean_f, mean_m, s=5, c='b', marker="s")
-    # plt.ax
-    # mean_f_np = mean_f.to_numpy()
-    # mean_m_np = mean_m.to_numpy()
+
     p = np.poly1d(np.polyfit(mean_f, mean_m, 1))
     plt.plot(np.unique(mean_f), p(np.unique(mean_f)))
-
-
-    # n_zeros_f = np.count_nonzero(mean_f_np==0)
-    # non_zeros_f = np.count_nonzero(mean_f_np!=0)
-
-    # print("There are "+ str(n_zeros_f)+" genes not expressed in females and "+str(non_zeros_f)+" genes expressed in females")
-
 
     # find the 20 farthest genes from p
     dist_f = abs(mean_m - p(mean_f))
@@ -202,11 +175,6 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, pat
 
     # print("dist_idx", dist_idx)
     df_features = pd.read_csv(path_to_features_csv, index_col=0, header=0)
-    # real_idx = []
-    # # print(mean_f.index)
-    # for index, j in enumerate(mean_f.index):
-    #     if index in dist_idx:
-    #         real_idx.append(j)
 
     labels = df_features.loc[dist_f_20].geneName.unique()
     i = 0

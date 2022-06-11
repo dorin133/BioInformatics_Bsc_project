@@ -124,12 +124,13 @@ def filter_metadata_rows(folder_mtx_path, folder_to_metadata, out_folder_path):
 
 def filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_normalized_mtx.csv', path_out_file=
 './merged_data/stacked_normalized_filtered_mtx.csv'):
+    utils.write_log(f'start filter_common_and_rare_gens')
     df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
     hist_row_non_zeros = (df != 0).sum(axis=1)
     df_filtered = df[5 < hist_row_non_zeros]
     hist_row_non_zeros = (df_filtered != 0).sum(axis=1)
     df_filtered = df_filtered[hist_row_non_zeros < df.shape[0] / 2]
-    print(f'status: filter_common_and_rare_gens: filtered {df.shape[0]-df_filtered.shape[0]} genes. filtered csv saved '
+    print(f'filtered {df.shape[0]-df_filtered.shape[0]} genes. filtered csv saved '
           f'as {path_out_file}')
     df_filtered.to_csv(path_out_file, sep=',')
 
@@ -147,7 +148,7 @@ def normalize_data(path_in_file, path_out_file, alpha=20000):
 
 def calc_and_plot_cv(path_stacked_mtx_file, path_to_features_csv, path_out, plots_folder='./plots_folder1'):
     df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
-    print(f'status: start calc_and_plot_cv. df original shape is {df.shape}')
+    utils.write_log(f'start calc_and_plot_cv. df original shape is {df.shape}')
 
     # calculating cv and mean for each gene
     cv_res = df.apply(lambda x: np.std(x, ddof=1) / np.mean(x), axis=1)
@@ -284,16 +285,8 @@ def pca_norm_knee(path_in, path_out, plots_folder='./plots_folder1'):
 
     # TODO holy bug or coesintance ??
     df_t = df.T  # TODO this way PCA is 14. according to the last call with Amit this is the right way
-    # print("!", df_t.shape)
-    # print("!!", df_t.mean(), "\n%%", df_t.mean().shape)
-    # print("!!", df_t.mean(axis=0), "\n%%", df_t.mean(axis=0).shape)
-    # print("!!", df_t.std(axis=0), "\n%%", df_t.std(axis=0).shape)
     df_t = np.log2(df_t+1)
     df_t = ((df_t - df_t.mean(axis=0)) / df_t.std(axis=0))  # TODO verify this
-
-    # df = np.log2(df + 1)  # TODO we are not sure if the log and norm should be on rows or on columns. this way PCA is 18
-    # df = (df - df.mean() / df.std())
-    # df_t = df.T
 
     curr_n = df_t.shape[1]  # all genes
     pca = decomposition.PCA(n_components=curr_n)

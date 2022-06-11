@@ -135,7 +135,7 @@ def linkage_data_prep():
 def linkage_on_clustters(path_in, path_out, path_out_translation, plots_folder='./plots_folder1/testing2_out'):
     utils.write_log(f"starting linkage_on_clustters")
     df = pd.read_csv(path_in, index_col=0, header=0)
-    Z = linkage(df.T, 'single', 'euclidean', True) # change the 'single' parameter to 'average', and the 'euclidean' parameter to 'correlation'
+    Z = linkage(df.T, 'average', 'correlation', True) # change the 'single' parameter to 'average', and the 'euclidean' parameter to 'correlation'
     fig = plt.figure(figsize=(25, 10))
     dn = dendrogram(Z)
     df_linkage_data = pd.DataFrame(Z, columns=['cluster1', 'cluster2', 'dist_btw_clust1_clust2', 'orig_observations'])
@@ -144,7 +144,7 @@ def linkage_on_clustters(path_in, path_out, path_out_translation, plots_folder='
     df_clustter_idx_translation.T.to_csv(path_out_translation, sep=',')
     df_linkage_data.T.to_csv(path_out, sep=',')
     data_plot_utils.save_plots(plt, f'{plots_folder}/linkage_of_clustters')
-    # plt.show()
+    plt.show()
     utils.write_log(f'finished performing linkage_on_clustters, linkage output saved to: {path_out} and the indeces given to clustters by the linkage saved to {path_out_translation}')
 
 def heatmap_data_perp():    
@@ -305,17 +305,18 @@ def create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMa
     pass
 
 def linkage_pipeline():
-    # look for further explanations and comments in the wrapper functions 
+    # look for further explanations and comments in the wrapper functions
     utils.write_log(f"#### starting linkage_pipeline ####")
-    # sanity_checks(path_in_stack='./merged_data5/stacked_3.csv',
-    #                 path_in_dbscan='./clusttered_data/dbscan.csv',
-    #                 gene_list= ['Snap25','Gad2','Slc32a1', 'Slc17a7','Slc17a6','Sst','Tac2','Acta2','Flt1','Cldn5', 'Aqp4','Plp1'],
-    #                 path_to_features_csv='./csv_data2/features.csv', plots_folder = './plots_folder1/testing2_out')
+    sanity_checks(path_in_stack='./merged_data5/stacked_3.csv',
+                    path_in_dbscan='./clusttered_data/dbscan.csv',
+                    gene_list= ['Snap25','Gad2','Slc32a1', 'Slc17a7','Slc17a6','Sst','Tac2','Acta2','Flt1','Cldn5', 'Aqp4','Plp1'],
+                    path_to_features_csv='./csv_data2/features.csv', plots_folder = './plots_folder1/testing2_out')
 
     linkage_data_prep()
 
     linkage_on_clustters(path_in='./clusttered_data/PCA_avg_clust.csv', path_out='./clusttered_data/linkage_out.csv', path_out_translation='./clusttered_data/clust_idx_translation_table.csv')
     utils.write_log(f"#### finished linkage_pipeline ####")
+
 
 def heatmap_pipeline():
     utils.write_log(f"#### starting heatmap_pipeline ####")
