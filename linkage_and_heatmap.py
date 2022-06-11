@@ -95,9 +95,9 @@ def linkage_data_prep():
         df_stack_normalized.loc['dbscan_labels'] = df_tsne_dbscan.iloc[2]
         df_stack_log.loc['dbscan_labels'] = df_tsne_dbscan.iloc[2]
         # the mean() next line is taken on each clustter seperately
-        df_stack_normalized_avg = (df_stack_normalized.T.groupby(by = 'dbscan_labels').mean()).iloc[1:] # iloc[1:] to drop the '-1' clustter idx 
+        df_stack_normalized_avg = (df_stack_normalized.T.groupby(by = 'dbscan_labels', sort=True).mean()).iloc[1:] # iloc[1:] to drop the '-1' clustter idx 
         # for all cells in each clustter - sum the gene expression value for every gene 
-        df_stack_frac = (df_stack_log.T.groupby(by = 'dbscan_labels').sum()).iloc[1:] # iloc[1:] to drop the '-1' clustter idx 
+        df_stack_frac = (df_stack_log.T.groupby(by = 'dbscan_labels', sort=True).sum()).iloc[1:] # iloc[1:] to drop the '-1' clustter idx 
         # now, for each row (meaning, for each clustter) divide by the sum of gene expression of all genes
         # each gene now (meaning every value in the metrics) is a fraction of how much he is expressed 
         df_stack_frac = df_stack_frac.div(df_stack_frac.sum(axis=1), axis=0) 
@@ -113,7 +113,7 @@ def linkage_data_prep():
         df = pd.read_csv(path_in, index_col=0, header=0)
         utils.write_log(f"starting pca_avg_clust_cells: original data shape is {df.shape} (we Transpose this in a moment)")
 
-        df_t = df.T  # TODO this way PCA is 14. according to the last call with Amit this is the right way
+        df_t = df.T  
         pca = decomposition.PCA(n_components=pca_dim)
         principal_components = pca.fit_transform(df_t)
         explain = pca.explained_variance_
@@ -235,9 +235,11 @@ def heatmap_data_perp():
 
         df_stack_data = pd.read_csv(path_in_stack_data, index_col=0, header=0)
         # some of the indeces are integers and some are strings (problem!) so we make them all strings and the marker genes list also
-        marker_genes_by_order = map(str, marker_genes_by_order)
+        marker_genes_by_order = list(map(str, marker_genes_by_order))
         df_stack_data.index = df_stack_data.index.map(str)
         # keep only rows (meaning, genes) who are marker genes of the clustters
+        df_stack_data_T = df_stack_data.T
+        df_stack_data = (df_stack_data_T[df_stack_data_T['linkage_labels'] != -1]).T
         df_stack_data = df_stack_data.loc[marker_genes_by_order]
         # order the rows (meaning, genes) in the order they appear in "marker_genes_by_order"
         df_stack_data.reindex(marker_genes_by_order)
@@ -255,7 +257,7 @@ def heatmap_data_perp():
     # now, the keys will be translated to linkage clustter idx and sorted accordingly from 0 to [num_of clustters-1]  
     marker_dict_linkage_idx = translate_and_sort_dict_keys(marker_dict_dbscan_idx= marker_genes_dict, path_in_translation='./clusttered_data/clust_idx_translation_table.csv')
     
-    # same goes for the stacked data, need to translate to linkage clusster idx and sort accordingly
+    # same goes for the stacked data, need to translate to linkage clustter idx and sort accordingly
     translate_clustter_data(path_in_clustter_data = './clusttered_data/clust_tsne_data.csv', path_in_translation='./clusttered_data/clust_idx_translation_table.csv',
                             path_out_clustter_data='./clusttered_data/clust_tsne_data.csv')
     
@@ -295,7 +297,7 @@ def create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMa
     ax.set_yticklabels(df_stack_data_heatmap.index, rotation=360, fontsize=4)
 
     # plt.title('Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage')
-    plt.tight_layout()
+    # plt.tight_layout()
     # plt.savefig(str(plots_folder)+"/corr_matrix_incl_anno_double.png", dpi=300)  # for shorting the running time
     data_plot_utils.save_plots(plt, f'{plots_folder}/corr_matrix_incl_anno_double')
     plt.show()
@@ -308,10 +310,10 @@ def create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMa
 def linkage_pipeline():
     # look for further explanations and comments in the wrapper functions
     utils.write_log(f"#### starting linkage_pipeline ####")
-    sanity_checks(path_in_stack='./merged_data5/stacked_3.csv',
-                    path_in_dbscan='./clusttered_data/dbscan.csv',
-                    gene_list= ['Snap25','Gad2','Slc32a1', 'Slc17a7','Slc17a6','Sst','Tac2','Acta2','Flt1','Cldn5', 'Aqp4','Plp1'],
-                    path_to_features_csv='./csv_data2/features.csv', plots_folder = './plots_folder1/testing2_out')
+    # sanity_checks(path_in_stack='./merged_data5/stacked_3.csv',
+    #                 path_in_dbscan='./clusttered_data/dbscan.csv',
+    #                 gene_list= ['Snap25','Gad2','Slc32a1', 'Slc17a7','Slc17a6','Sst','Tac2','Acta2','Flt1','Cldn5', 'Aqp4','Plp1'],
+    #                 path_to_features_csv='./csv_data2/features.csv', plots_folder = './plots_folder1/testing2_out')
 
     linkage_data_prep()
 
