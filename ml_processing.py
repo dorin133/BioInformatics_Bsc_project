@@ -205,7 +205,7 @@ def DBScan(path_in, path_out, path_out_tsne_dbscan, plots_folder='./plots_folder
         legend="full",
         alpha=0.3
     )
-    plt.title(f'DBScan_eps_{round(eps, 5)}')
+    plt.title(f'DBScan_eps_{round(eps, 5)} (#{n_clusters_} clusters, #{n_noise_} noise labeled as -1)')
     data_plot_utils.save_plots(plt, f'{plots_folder}/dbscan_eps_{round(eps, 5)}')
     plt.show()
 
