@@ -324,7 +324,7 @@ def linkage_pipeline():
 
 def heatmap_pipeline():
     utils.write_log(f"#### starting heatmap_pipeline ####")
-    # heatmap_data_perp()
+    heatmap_data_perp()
 
     # finally, compute the heatmap
     create_heatmap(path_in_heatmap_table='./clusttered_data/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/testing2_out')
