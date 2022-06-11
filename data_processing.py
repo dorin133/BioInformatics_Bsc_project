@@ -12,6 +12,7 @@ import time
 
 
 def features_to_csv(folder_path='./raw_data', out_folder_path='./csv_data2'):
+    utils.write_log(f'start features_to_csv')
     raw_files = os.listdir(folder_path)  # list all raw files
     file_name = list(filter(lambda x: '_features.tsv' in x, raw_files))[0]
     lst = []
@@ -44,7 +45,7 @@ def raw_mtx_to_csv(file_path, path_out):
             curr_feature, curr_barcode, curr_value = int(curr_feature), int(curr_barcode), int(curr_value)
             table[curr_feature, curr_barcode] = curr_value
 
-            if index % 1000000 == 0:
+            if index % 2000000 == 0:
                 print(f'status: reached line #{index}')
 
     f_input.close()
@@ -57,6 +58,7 @@ def raw_mtx_to_csv(file_path, path_out):
     
 
 def prepare_metadata_single_files(folder_path='./raw_data', out_folder_path='./csv_data2'):
+    utils.write_log(f'start prepare_metadata_single_files')
     raw_files = os.listdir(folder_path)  # list all raw files
     # print(raw_files)
     raw_files = list(filter(lambda x: '_barcodes.tsv' in x, raw_files))  # filter files which are not barcodes files
@@ -101,6 +103,7 @@ def filter_cols(path_in_file, path_out_file, min_sum_for_col=3000, min_diff_for_
     print(f'status: finish filtering {path_in_file}. result saved to {path_out_file}')
 
 def filter_metadata_rows(folder_mtx_path, folder_to_metadata, out_folder_path):
+    utils.write_log(f'start filter_metadata_rows')
     raw_files = os.listdir(folder_mtx_path)  # list all raw files
     raw_files = list(filter(lambda x: '_matrix_filtered.csv' in x, raw_files))  
     for file_name in raw_files:

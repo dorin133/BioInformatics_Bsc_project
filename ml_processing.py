@@ -7,6 +7,8 @@ import data_plot_utils
 import time
 import utils
 from sklearn.cluster import DBSCAN
+from distinctipy import distinctipy
+
 
 def tSNE(path_in, path_to_MEA = './raw_data/MEA_dimorphism_samples.xlsx', path_out='./merged_data5/tsne.csv',
          plots_folder='./plots_folder1'):
@@ -152,62 +154,6 @@ def tSNE_3d(path_in, path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx', path_
     data_plot_utils.save_plots(plt, f'{plots_folder}/tSNE_3d')
     plt.show()
 
-#
-# def DBScan2(df):
-#     plt.figure(figsize=(16, 10))
-#     sns.scatterplot(
-#         x="tsne-2d-one",
-#         y="tsne-2d-two",
-#         # hue="gender",
-#         # palette=['tab:blue', 'tab:orange'],
-#         data=df,
-#         legend="full",
-#         alpha=0.3
-#     )
-#     plt.show()
-#
-#     X = df[['tsne-2d-one', 'tsne-2d-two']]
-#     db = DBSCAN(eps=7, min_samples=20).fit(X)
-#     core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
-#     core_samples_mask[db.core_sample_indices_] = True
-#     print(core_samples_mask)
-#     labels = db.labels_
-#     print(labels)
-#     print(labels[100:200])
-#     print(sum(labels), len(labels))
-#     X2 = X.copy()
-#     X2['dbscan_labels'] = labels
-#
-#     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
-#     print(n_clusters_)
-#     n_noise_ = list(labels).count(-1)
-#     print(n_noise_)
-#     labels_true = df['labels']
-#
-#     print("Estimated number of clusters: %d" % n_clusters_)
-#     print("Estimated number of noise points: %d" % n_noise_)
-#     print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels))
-#     print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels))
-#     print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels))
-#     print("Adjusted Rand Index: %0.3f" % metrics.adjusted_rand_score(labels_true, labels))
-#     print(
-#         "Adjusted Mutual Information: %0.3f"
-#         % metrics.adjusted_mutual_info_score(labels_true, labels)
-#     )
-#     print("Silhouette Coefficient: %0.3f" % metrics.silhouette_score(X, labels))
-#
-#     print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-#     plt.figure(figsize=(16, 10))
-#     sns.scatterplot(
-#         x="tsne-2d-one",
-#         y="tsne-2d-two",
-#         hue="dbscan_labels",
-#         # palette=sns.color_palette("gist_heat_r", 4),
-#         # palette = ['tab:blue', 'tab:green', 'tab:orange', 'tab:red'],
-#         data=X2,
-#         legend="full",
-#         alpha=0.3
-#     )
 
 def DBScan_exp(path_in, path_out, plots_folder='./plots_folder1'):
     for eps in [0.1, 0.7, 1, 2, 3, 4, 5, 6, 7, 10, 20, 40, 60, 70]:
@@ -239,58 +185,29 @@ def DBScan_dynm_eps(path_in, path_out, eps_prc=70, k_neighbor=20, plots_folder='
     DBScan(path_in, path_out, eps=chosen_eps, min_samples=k_neighbor)  # call the actual dbscan using the eps we found
 
 
-def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=1.4, min_samples=20):
+def DBScan(path_in, path_out, plots_folder='./plots_folder1', eps=1.485, min_samples=20):
     utils.write_log('start DBScan')
     df = pd.read_csv(path_in, index_col=0, header=0)
     df = df.T
-    #
-    # plt.figure(figsize=(16, 10))  # TODO uses for check plt does not fail with the current df-csv file. del this later
-    # sns.scatterplot(
-    #     x="tsne-2d-one",
-    #     y="tsne-2d-two",
-    #     # hue="gender",
-    #     # palette=['tab:blue', 'tab:orange'],
-    #     data=df,
-    #     legend="full",
-    #     alpha=0.3
-    # )
-    # plt.show()
 
     X = df[['tsne-2d-one', 'tsne-2d-two']]
-    # db = DBSCAN(eps=eps, min_samples=20, metric=).fit(X)  # TODO
-    db = DBSCAN(eps=eps, min_samples=20).fit(X)
+    db = DBSCAN(eps=eps, min_samples=min_samples).fit(X)
     core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
     core_samples_mask[db.core_sample_indices_] = True
-    # print(core_samples_mask)
     labels = db.labels_
-    # print(labels)
-    # print(labels[100:200])
-    # print(sum(labels), len(labels))
     df['dbscan_labels'] = labels
 
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     n_noise_ = list(labels).count(-1)
     utils.write_log(f'dbscan output: n_clusters_: {n_clusters_} (aka dbscan_labels) and the n_noise_: {n_noise_}')
 
-    # labels_true = df['labels']  # TODO we can look for the correct labels/clustering of the data and compare it with our results
-    # print("Estimated number of clusters: %d" % n_clusters_)
-    # print("Estimated number of noise points: %d" % n_noise_)
-    # print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels))
-    # print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels))
-    # print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels))
-    # print("Adjusted Rand Index: %0.3f" % metrics.adjusted_rand_score(labels_true, labels))
-    # print(
-    #     "Adjusted Mutual Information: %0.3f"
-    #     % metrics.adjusted_mutual_info_score(labels_true, labels)
-    # )
-    # print("Silhouette Coefficient: %0.3f" % metrics.silhouette_score(X, labels))
 
     plt.figure(figsize=(16, 10))
     sns.scatterplot(
         x="tsne-2d-one",
         y="tsne-2d-two",
         hue="dbscan_labels",
-        # palette = ['tab:blue', 'tab:green', 'tab:orange', 'tab:red'],
+        palette=distinctipy.get_colors(n_clusters_+1, pastel_factor=0.6),
         data=df,
         legend="full",
         alpha=0.3
