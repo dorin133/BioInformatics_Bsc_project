@@ -34,26 +34,31 @@ def mark_nueronal_genes(path_to_features, path_frac_clust_cells):
             continue
         print(f'gen id for {gene_name} is {gene_id}')
         found_genes.append(gene_id)
-    df_nueronal_frac_T = (df_frac_clust_cells.loc[found_genes]).T
-    df_nueronal_frac_T['max_expression'] = df_nueronal_frac_T.max(axis=1)
-    df_nueronal_frac_T['id_max_expression'] = df_nueronal_frac_T.idxmax(axis=1)
-    df_nueronal_frac_T['largest2'] = df_nueronal_frac_T.apply(lambda x: x.nlargest(2).iloc[1], axis=1)
-    df_nueronal_frac = df_nueronal_frac_T.T
+    df_nueronal_frac = (df_frac_clust_cells.loc[found_genes])
+    # df_nueronal_frac_T['largest2'] = df_nueronal_frac_T.apply(lambda x: x.nlargest(2).iloc[1], axis=1)
+    # df_nueronal_frac_T['max_expression'] = df_nueronal_frac_T.max(axis=1)
+    # df_nueronal_frac_T['id_max_expression'] = df_nueronal_frac_T.idxmax(axis=1)
+    # df_nueronal_frac = df_nueronal_frac_T.T
     # if df_nueronal_frac_T['max_expression'] < df_nueronal_frac_T['largest2'] * 2:
     # df_nueronal_frac_T['id_max_expression'] = df_nueronal_frac_T['id_max_expression'] if (df_nueronal_frac_T['max_expression'] < df_nueronal_frac_T['largest2'] * 2) else id_doublets
-    clust_nueonal_class = {}
+    clust_nueral_class = {}
     for col in df_nueronal_frac.columns:
-        nueral_frac_list = df_nueronal_frac[col].tolist()
-        if [glut1_id, glut2_id] in nueral_frac_list.nlargest(2):
-            clust_nueonal_class[col] = nueral_frac_list.idmax()
+        nueral_frac_arr = df_nueronal_frac[col].to_numpy()  
+        two_largest_idx = (df_nueronal_frac[col].nlargest(2).index).tolist()
+        if [found_genes[glut1_id], found_genes[glut2_id]] == two_largest_idx:
+            clust_nueral_class[col] = nueral_frac_arr.argmax()
             continue
         # search for doublets:
-        if nueral_frac_list.max() < nueral_frac_list.min() * 2:
-            clust_nueonal_class[col] = id_doublets
+        if nueral_frac_arr.max() < nueral_frac_arr.min() * 2:
+            clust_nueral_class[col] = id_doublets
+            continue
         # search for no type 
-        if nueral_frac_list.max() == 0:
-            clust_nueonal_class[col] = id_no_type
-            
+        if nueral_frac_arr.max() == 0:
+            clust_nueral_class[col] = id_no_type
+
+        clust_nueral_class[col] = nueral_frac_arr.argmax()
+    print("!")
+    pass
 
 
 
