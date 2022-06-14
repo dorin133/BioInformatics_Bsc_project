@@ -4,6 +4,7 @@ import data_plot_utils
 import ml_processing
 import pandas as pd
 import linkage_and_heatmap as link_and_heat
+import gaba_genes_processing
 
 
 def main():
@@ -191,10 +192,21 @@ def main():
     #
     # # step 14: linkage data prep and the linkage step itself
     # link_and_heat.linkage_pipeline()
+    #
+    # # step 14: heatmap data prep and the heatmap step itself
+    # link_and_heat.heatmap_pipeline()
 
-    # step 14: heatmap data prep and the heatmap step itself 
-    link_and_heat.heatmap_pipeline()
-
+    # step 15:
+    gaba_genes_processing.avg_and_fraction_clustter_expression(path_in_stack='./merged_data5/stacked_1.csv',
+                                         path_tsne_dbscan_data='./clusttered_data/clust_tsne_data.csv',
+                                         path_out_avg_clust_cell='./clusttered_data/avg_clust_cells_stk1.csv',
+                                         path_out_frac='./clusttered_data/frac_clust_cells_stk1.csv')
+    gaba_genes_processing.clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
+                                  path_frac_clust_cells='./clusttered_data/frac_clust_cells_stk1.csv',
+                                  path_in_cluseters='./clusttered_data/clust_tsne_data.csv',
+                                  path_out='./clusttered_data/tsne_and_clust_labels.csv')
+    gaba_genes_processing.plot_nueral_gene_expression(path_clust_tsne_data='./clusttered_data/tsne_and_clust_labels.csv',
+                                plots_folder='./plots_folder1/testing2_out')
 
     utils.write_log('*********************************** Finish pipeline run ***********************************')
 

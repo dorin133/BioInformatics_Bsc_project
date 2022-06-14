@@ -1,15 +1,8 @@
 import pandas as pd
 import numpy as np
 import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import matplotlib.cm as cm
 import data_plot_utils
-import time
 import utils
-# import ml_processing
-import matplotlib.colors as mcolors
-from sklearn import decomposition
 from matplotlib import pyplot as plt
 from distinctipy import distinctipy
 
@@ -45,11 +38,6 @@ def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_clu
         print(f'gen id for {gene_name} is {gene_id}')
         found_genes.append(gene_id)
     df_nueronal_frac = (df_frac_clust_cells.loc[found_genes])
-    # df_nueronal_frac_T['largest2'] = df_nueronal_frac_T.apply(lambda x: x.nlargest(2).iloc[1], axis=1)
-    # df_nueronal_frac_T['max_expression'] = df_nueronal_frac_T.max(axis=1)
-    # df_nueronal_frac = df_nueronal_frac_T.T
-    # if df_nueronal_frac_T['max_expression'] < df_nueronal_frac_T['largest2'] * 2:
-    # df_nueronal_frac_T['id_max_expression'] = df_nueronal_frac_T['id_max_expression'] if (df_nueronal_frac_T['max_expression'] < df_nueronal_frac_T['largest2'] * 2) else id_doublets
     clust_nueral_class = {}
     df_nueronal_frac.index.name = 'gene_id'
     for col in df_nueronal_frac.columns:
@@ -67,11 +55,6 @@ def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_clu
             clust_nueral_class[col] = id_no_type
 
         clust_nueral_class[col] = nueral_frac_arr.argmax()
-    
-    # df_nueronal_frac_T = df_nueronal_frac.T
-    # df_nueronal_frac_T['nueral_idx'] = list(clust_nueral_class.values())
-    # df_nueronal_frac_T['nueral_labels'] = df_nueronal_frac_T['nueral_idx'].map(marker_map)
-    # print("!")
 
     map_nueral_class = {float(k): marker_map[v] for k, v in clust_nueral_class.items()}
     map_nueral_class[-1.0] = 'No Type'
@@ -127,30 +110,32 @@ def avg_and_fraction_clustter_expression(path_in_stack, path_tsne_dbscan_data, p
         df_stack_normalized_avg.T.to_csv(path_out_avg_clust_cell, sep=',')
         df_stack_frac.T.to_csv(path_out_frac, sep=',')
         utils.write_log(f"finished avg_and_fraction_clustter_expression, results saved to: {path_out_avg_clust_cell} and {path_out_frac}")
-
-
-def translate_clustter_data(path_in_clustter_data, nueral_idx_arr, path_out_clustter_data ='./clusttered_data/clust_idx_translation_table.csv'):
-        utils.write_log(f"starting translate_clustter_data : adding nueral gene clustter index")
-        # df_translation = pd.read_csv(path_in_translation, index_col=0, header=0)
-        df_clust_data = pd.read_csv(path_in_clustter_data, index_col=0, header=0)
-        # initialization of the new row
-        # we'll soon replace the dbscan_labels values in this row
-        df_clust_data.loc['nueral_labels'] = 4
-        for i in df_clust_data.columns:
-            col_in_translation_table = int(df_clust_data[i]['linkage_labels'])
-            if not col_in_translation_table == -1:
-                df_clust_data[i]['nueral_labels'] = nueral_idx_arr[col_in_translation_table]
-        df_clust_data.to_csv(path_out_clustter_data, sep=',')
-        utils.write_log(f"finished translate_clustter_data: translation table of nueral gene clustter indeces saved to {path_out_clustter_data}")
+#
+#
+# def translate_clustter_data(path_in_clustter_data, nueral_idx_arr, path_out_clustter_data ='./clusttered_data/clust_idx_translation_table.csv'):
+#         utils.write_log(f"starting translate_clustter_data : adding nueral gene clustter index")
+#         # df_translation = pd.read_csv(path_in_translation, index_col=0, header=0)
+#         df_clust_data = pd.read_csv(path_in_clustter_data, index_col=0, header=0)
+#         # initialization of the new row
+#         # we'll soon replace the dbscan_labels values in this row
+#         df_clust_data.loc['nueral_labels'] = 4
+#         for i in df_clust_data.columns:
+#             col_in_translation_table = int(df_clust_data[i]['linkage_labels'])
+#             if not col_in_translation_table == -1:
+#                 df_clust_data[i]['nueral_labels'] = nueral_idx_arr[col_in_translation_table]
+#         df_clust_data.to_csv(path_out_clustter_data, sep=',')
+#         utils.write_log(f"finished translate_clustter_data: translation table of nueral gene clustter indeces saved to {path_out_clustter_data}")
 
 
 if __name__ == '__main__':
-    # avg_and_fraction_clustter_expression(path_in_stack='./merged_data5/stacked_1.csv',
-    #                           path_tsne_dbscan_data='./clusttered_data/clust_tsne_data.csv', path_out_avg_clust_cell = './clusttered_data/avg_clust_cells_stk1.csv',
-    #                           path_out_frac='./clusttered_data/frac_clust_cells_stk1.csv')
-    # arr = clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
-    #                               path_frac_clust_cells='./clusttered_data/frac_clust_cells_stk1.csv',
-    #                               path_in_cluseters='./clusttered_data/clust_tsne_data.csv',
-    #                               path_out='./clusttered_data/tsne_and_clust_labels.csv')
-    plot_nueral_gene_expression(path_clust_tsne_data='./clusttered_data/tsne_and_clust_labels.csv', plots_folder='./plots_folder1/testing2_out')
+    avg_and_fraction_clustter_expression(path_in_stack='./merged_data5/stacked_1.csv',
+                                         path_tsne_dbscan_data='./clusttered_data/clust_tsne_data.csv',
+                                         path_out_avg_clust_cell = './clusttered_data/avg_clust_cells_stk1.csv',
+                                         path_out_frac='./clusttered_data/frac_clust_cells_stk1.csv')
+    arr = clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
+                                  path_frac_clust_cells='./clusttered_data/frac_clust_cells_stk1.csv',
+                                  path_in_cluseters='./clusttered_data/clust_tsne_data.csv',
+                                  path_out='./clusttered_data/tsne_and_clust_labels.csv')
+    plot_nueral_gene_expression(path_clust_tsne_data='./clusttered_data/tsne_and_clust_labels.csv',
+                                plots_folder='./plots_folder1/testing2_out')
     print("Done")
