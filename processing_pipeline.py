@@ -171,8 +171,8 @@ def main():
     #                                          path_out='????Not yet imp?????')
     #
     # # step 9: filter the whole stacked mtx's very common genes and very rare ones (now for the first time in the code, we filter rows and not columns + no need to adjust metadata)
-    # data_processing.filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_1.csv',
-    #                                             path_out_file='./merged_data5/stacked_2.csv')
+    data_processing.filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_1.csv',
+                                                path_out_file='./merged_data5/stacked_2_v2.csv')
     #
     # # step 10: plot and calculate the mean w.r.t. the coe. of variance for each gene
     # data_processing.calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_2.csv',
@@ -195,18 +195,18 @@ def main():
     #
     # # step 14: heatmap data prep and the heatmap step itself
     # link_and_heat.heatmap_pipeline()
-
-    # step 15:
-    gaba_genes_processing.avg_and_fraction_clustter_expression(path_in_stack='./merged_data5/stacked_1.csv',
-                                         path_tsne_dbscan_data='./clusttered_data/clust_tsne_data.csv',
-                                         path_out_avg_clust_cell='./clusttered_data/avg_clust_cells_stk1.csv',
-                                         path_out_frac='./clusttered_data/frac_clust_cells_stk1.csv')
-    gaba_genes_processing.clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
-                                  path_frac_clust_cells='./clusttered_data/frac_clust_cells_stk1.csv',
-                                  path_in_cluseters='./clusttered_data/clust_tsne_data.csv',
-                                  path_out='./clusttered_data/tsne_and_clust_labels.csv')
-    gaba_genes_processing.plot_nueral_gene_expression(path_clust_tsne_data='./clusttered_data/tsne_and_clust_labels.csv',
-                                plots_folder='./plots_folder1/testing2_out')
+    #
+    # # step 15:
+    # gaba_genes_processing.avg_and_fraction_clustter_expression(path_in_stack='./merged_data5/stacked_1.csv',
+    #                                      path_tsne_dbscan_data='./clusttered_data/clust_tsne_data.csv',
+    #                                      path_out_avg_clust_cell='./clusttered_data/avg_clust_cells_stk1.csv',
+    #                                      path_out_frac='./clusttered_data/frac_clust_cells_stk1.csv')
+    # gaba_genes_processing.clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
+    #                               path_frac_clust_cells='./clusttered_data/frac_clust_cells_stk1.csv',
+    #                               path_in_cluseters='./clusttered_data/clust_tsne_data.csv',
+    #                               path_out='./clusttered_data/tsne_and_clust_labels.csv')
+    # gaba_genes_processing.plot_nueral_gene_expression(path_clust_tsne_data='./clusttered_data/tsne_and_clust_labels.csv',
+    #                             plots_folder='./plots_folder1/testing2_out')
 
     utils.write_log('*********************************** Finish pipeline run ***********************************')
 

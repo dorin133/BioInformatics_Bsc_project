@@ -21,7 +21,7 @@ def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_clu
         1: 'Glut1',
         2: 'Glut2',
         3: 'Doublets',
-        4: 'No Type'
+        4: 'Non Nueronal'
     }
     features = pd.read_csv(path_to_features, header=0)
     df_frac_clust_cells = pd.read_csv(path_frac_clust_cells, header=0, index_col=0)
@@ -52,17 +52,19 @@ def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_clu
             continue
         # search for no type 
         if nueral_frac_arr.max() == 0:
+            print("! no type for ", col)
             clust_nueral_class[col] = id_no_type
 
         clust_nueral_class[col] = nueral_frac_arr.argmax()
 
     map_nueral_class = {float(k): marker_map[v] for k, v in clust_nueral_class.items()}
-    map_nueral_class[-1.0] = 'No Type'
+    map_nueral_class[-1.0] = 'noise cluster'
     clusters_df = pd.read_csv(path_in_cluseters, header=0, index_col=0).T
     clusters_df['nueral_labels'] = clusters_df['linkage_labels'].map(map_nueral_class)
     clusters_df = clusters_df.T
     clusters_df.to_csv(path_out, sep=',')
-    utils.write_log(f"finished clustter_nueronal_genes")
+    # clusters_df.value_counts()
+    utils.write_log(f"finished clustter_nueronal_genes {clusters_df.T['nueral_labels'].value_counts().to_dict()}")
 
 
 def plot_nueral_gene_expression(path_clust_tsne_data='./clusttered_data/clust_tsne_data.csv', plots_folder='./plots_folder1/testing2_out'):
@@ -128,10 +130,10 @@ def avg_and_fraction_clustter_expression(path_in_stack, path_tsne_dbscan_data, p
 
 
 if __name__ == '__main__':
-    avg_and_fraction_clustter_expression(path_in_stack='./merged_data5/stacked_1.csv',
-                                         path_tsne_dbscan_data='./clusttered_data/clust_tsne_data.csv',
-                                         path_out_avg_clust_cell = './clusttered_data/avg_clust_cells_stk1.csv',
-                                         path_out_frac='./clusttered_data/frac_clust_cells_stk1.csv')
+    # avg_and_fraction_clustter_expression(path_in_stack='./merged_data5/stacked_1.csv',
+    #                                      path_tsne_dbscan_data='./clusttered_data/clust_tsne_data.csv',
+    #                                      path_out_avg_clust_cell = './clusttered_data/avg_clust_cells_stk1.csv',
+    #                                      path_out_frac='./clusttered_data/frac_clust_cells_stk1.csv')
     arr = clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
                                   path_frac_clust_cells='./clusttered_data/frac_clust_cells_stk1.csv',
                                   path_in_cluseters='./clusttered_data/clust_tsne_data.csv',

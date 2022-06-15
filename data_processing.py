@@ -122,16 +122,19 @@ def filter_metadata_rows(folder_mtx_path, folder_to_metadata, out_folder_path):
         df_metadata.to_csv(path_output[:-4]+'_filtered.csv', sep=',')
 
 
-def filter_common_and_rare_gens(path_stacked_mtx_file='./merged_data5/stacked_normalized_mtx.csv', path_out_file=
-'./merged_data/stacked_normalized_filtered_mtx.csv'):
+def filter_common_and_rare_gens(path_stacked_mtx_file, path_out_file):
     utils.write_log(f'start filter_common_and_rare_gens')
     df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
+    original_shape = df.shape
     hist_row_non_zeros = (df != 0).sum(axis=1)
     df_filtered = df[5 < hist_row_non_zeros]
     hist_row_non_zeros = (df_filtered != 0).sum(axis=1)
-    df_filtered = df_filtered[hist_row_non_zeros < df.shape[0] / 2]
-    print(f'filtered {df.shape[0]-df_filtered.shape[0]} genes. filtered csv saved '
-          f'as {path_out_file}')
+    print('df.shape', df.shape)
+    print('df.shape[0]', df.shape[0])
+    print('df.shape[1]', df.shape[1])
+    df_filtered = df_filtered[hist_row_non_zeros < df.shape[1] / 2]  # TODO
+    utils.write_log(f'filtered {df.shape[0]-df_filtered.shape[0]} genes (original shape was {original_shape} and the '
+                    f'update one is {df_filtered.shape}). filtered csv saved as {path_out_file}')
     df_filtered.to_csv(path_out_file, sep=',')
 
 

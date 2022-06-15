@@ -40,7 +40,21 @@ def check_for_marker_genes():
         # how to subtract one list from another: set(marker_genes_curr_genes) - set(selected_mareker_genes)
     pass
 
+
+def exp4():
+    print("exp4")
+    df = pd.read_csv('./merged_data5/stacked_1.csv', index_col=0, header=0).T
+    print('df.shape', df.shape)
+    count = (df[1868] != 0).sum()
+    print(count)
+    count = (df[12665] != 0).sum()
+    print(count)
+    count = (df[12788] != 0).sum()
+    print(count)
+    print('end of exp4')
+
 if __name__=="__main__":
     # dir = 'C:/Users/Dorin Shteyman/Documents/GitHub/brains_v2/test_folder' #path to root dir
     # erase_all_files_from_root(dir)
-    check_for_marker_genes()
+    # check_for_marker_genes()
+    exp4()
