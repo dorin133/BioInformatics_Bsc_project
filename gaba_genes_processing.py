@@ -66,8 +66,10 @@ def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_clu
     # clusters_df.value_counts()
     utils.write_log(f"finished clustter_nueronal_genes {clusters_df.T['nueral_labels'].value_counts().to_dict()}")
 
+    plot_nueral_gene_expression(path_clust_tsne_data=path_out)
 
-def plot_nueral_gene_expression(path_clust_tsne_data='./clusttered_data/clust_tsne_data.csv', plots_folder='./plots_folder1/testing2_out'):
+
+def plot_nueral_gene_expression(path_clust_tsne_data, plots_folder='plots_folder1/part2'):
     utils.write_log(f"starting plot_nueral_gene_expression")
     df_tsne = pd.read_csv(path_clust_tsne_data, index_col=0, header=0).T
     df_tsne['tsne-2d-one'] = df_tsne['tsne-2d-one'].astype('float64')
