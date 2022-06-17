@@ -122,14 +122,16 @@ def linkage_data_prep():
         principal_df = pd.DataFrame(data=principal_components, columns=new_cols, index=df_t.index)
         print(f'Now PCA with {pca_dim}. explain now is:\n', explain)
         principal_df.T.to_csv(path_out, sep=',')
-        utils.write_log(f'finish PCA on the avg cells of each clustter. left with {pca_dim} values. current data shape is '
-                        f'{principal_df.shape} (Transposed). saved to {path_out}')
+        utils.write_log(f'finish PCA on the avg cells of each clustter. left with {pca_dim} values. current data '
+                        f'shape is {principal_df.shape} (Transposed). saved to {path_out}')
 
     avg_and_fraction_clustter_expression(path_in_stack='./merged_data5/stacked_3_v2.csv',
-                              path_tsne_dbscan_data='./clusttered_data6/clust_tsne_data.csv', path_out_avg_clust_cell = './clusttered_data6/avg_clust_cells.csv',
-                              path_out_frac='./clusttered_data6/frac_clust_cells.csv')
+                                         path_tsne_dbscan_data='./clusttered_data6/clust_tsne_data.csv',
+                                         path_out_avg_clust_cell = './clusttered_data6/avg_clust_cells.csv',
+                                         path_out_frac='./clusttered_data6/frac_clust_cells.csv')
 
-    pca_avg_clust_cells(path_in = './clusttered_data6/avg_clust_cells.csv', path_out='./clusttered_data6/PCA_avg_clust.csv', pca_dim=10)
+    pca_avg_clust_cells(path_in='./clusttered_data6/avg_clust_cells.csv',
+                        path_out='./clusttered_data6/PCA_avg_clust.csv', pca_dim=10)
     
 
 def linkage_on_clustters(path_in, path_out, path_out_translation, plots_folder='./plots_folder1/part2'):
@@ -252,57 +254,68 @@ def heatmap_data_perp():
         utils.write_log(f"result of prepare_data_for_heatmap saved to {path_out}")
 
     # here, the dict keys are still according to the dbscan clustter indeces
-    marker_genes_dict = find_marker_genes(path_in_frac = './clusttered_data6/frac_clust_cells.csv', path_in_avg= './clusttered_data6/avg_clust_cells.csv')
+    marker_genes_dict = find_marker_genes(path_in_frac='./clusttered_data6/frac_clust_cells.csv',
+                                          path_in_avg='./clusttered_data6/avg_clust_cells.csv')
     
     # now, the keys will be translated to linkage clustter idx and sorted accordingly from 0 to [num_of clustters-1]  
-    marker_dict_linkage_idx = translate_and_sort_dict_keys(marker_dict_dbscan_idx= marker_genes_dict, path_in_translation='./clusttered_data6/clust_idx_translation_table.csv')
+    marker_dict_linkage_idx = translate_and_sort_dict_keys(marker_dict_dbscan_idx= marker_genes_dict,
+                                                           path_in_translation='./clusttered_data6/clust_idx_translation_table.csv')
     
     # same goes for the stacked data, need to translate to linkage clustter idx and sort accordingly
-    translate_clustter_data(path_in_clustter_data = './clusttered_data6/clust_tsne_data.csv', path_in_translation='./clusttered_data6/clust_idx_translation_table.csv',
+    translate_clustter_data(path_in_clustter_data = './clusttered_data6/clust_tsne_data.csv',
+                            path_in_translation='./clusttered_data6/clust_idx_translation_table.csv',
                             path_out_clustter_data='./clusttered_data6/clust_tsne_data.csv')
     
-    sort_stack_data_by_clustter(path_in_clustter_data = './clusttered_data6/clust_tsne_data.csv', path_in_stack_data='./merged_data5/stacked_3_v2.csv',
-                                path_out = './clusttered_data6/stacked_3_sort_by_clust.csv')
+    sort_stack_data_by_clustter(path_in_clustter_data='./clusttered_data6/clust_tsne_data.csv',
+                                path_in_stack_data='./merged_data5/stacked_3_v2.csv',
+                                path_out='./clusttered_data6/stacked_3_sort_by_clust.csv')
 
     # now, final preperations to create the .csv table for the heatmap
-    prepare_data_for_heatmap(path_in_stack_data = './clusttered_data6/stacked_3_sort_by_clust.csv', sorted_marker_genes_dict = marker_dict_linkage_idx,
+    prepare_data_for_heatmap(path_in_stack_data='./clusttered_data6/stacked_3_sort_by_clust.csv',
+                             sorted_marker_genes_dict=marker_dict_linkage_idx,
                     path_out = './clusttered_data6/stacked_3_for_heatMap.csv')
 
-def create_heatmap(path_in_heatmap_table='./clusttered_data6/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/part2'):
+def create_heatmap(path_in_heatmap_table,
+                   features_csv_path,
+                   plots_folder='./plots_folder1/part2'):
     # plt.figure(figsize=(10, 10))
     fig, ax = plt.subplots(figsize=(30, 22))
     utils.write_log(f"starting create_heatmap")
-    df_stack_data_heatmap = pd.read_csv(path_in_heatmap_table, index_col=0, header=0)
-    
-    vmin_val = np.percentile(df_stack_data_heatmap.to_numpy(),1)
-    vmax_val = np.percentile(df_stack_data_heatmap.to_numpy(),99)
+    df = pd.read_csv(path_in_heatmap_table, index_col=0, header=0)
+
+    features = pd.read_csv(features_csv_path, header=0)
+    features.set_axis(['num', 'geneID', 'geneName'], axis=1, inplace=True)
+    feat_dict = dict(zip(features['num'], features['geneName']))
+    df['index_new'] = df.index.map(feat_dict)
+    df.set_index('index_new', inplace=True)
+
+    vmin_val = np.percentile(df.to_numpy(), 1)
+    vmax_val = np.percentile(df.to_numpy(), 99)
     
     cmap_pass = LinearSegmentedColormap.from_list('yg',["y", "w", "g"], N=100)  # TODO N
-    # print(f'note that vmin={vmin_val}, vmax={vmax_val}. we manully set the vmax to be {vamx_manual}')
-    # sns.heatmap(df_stack_data_heatmap, cmap = cmap_pass, vmin=vmin_val, vmax=vmax_val)
-    sns.heatmap(df_stack_data_heatmap, cmap = cmap_pass, vmin=vmin_val, vmax=vmax_val)
+
+    sns.heatmap(df, cmap=cmap_pass, vmin=vmin_val, vmax=vmax_val)
     plt.title(f"Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage\nvmin={vmin_val}, vmax={vmax_val}")
-    # plt.show()
 
-    # sns.heatmap(df_stack_data_heatmap, cbar=True, vmin=vmin_val, vmax=vmax_val,
-    #                 annot=False, square=True, mask=True ,cmap=plt.cm.RdBu)
+    # counter = 0  # TODO
+    # cols = df.columns
+    # prev = cols[0].split('__')[1]
+    # for index, col in enumerate(cols):
+    #     tmp = col.split('__')[1]
+    #     if tmp != prev:
+    #         plt.axvline(x=index, color='b')
+    #         counter += 1
+    #         prev = tmp
+    # print(counter)
 
-    ticks_y = np.arange(df_stack_data_heatmap.shape[0]) + 0.5
-    # ticks_x = np.arange(df_stack_data_heatmap.shape[1]) + 0.5
-    # ax.set_xticks(ticks_x)
-    # plt.xticks(fontsize=6)
+    ticks_y = np.arange(df.shape[0]) + 0.5
     ax.tick_params(axis='x', which='major', labelsize=3)
     ax.set_yticks(ticks_y)
-    ax.set_yticklabels(df_stack_data_heatmap.index, rotation=360, fontsize=4)
+    ax.set_yticklabels(df.index, rotation=360, fontsize=4)
 
-    # plt.title('Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage')
-    # plt.tight_layout()
-    # plt.savefig(str(plots_folder)+"/corr_matrix_incl_anno_double.png", dpi=300)  # for shorting the running time
     # data_plot_utils.save_plots(plt, f'{plots_folder}/corr_matrix_incl_anno_double')
     plt.show()
 
-    # hm = df_stack_data_heatmap.hvplot.heatmap(cmap='seismic', xaxis='top', width=5000, height=5000, title='Gene expression heatmap')
-    # hv.save(hm, 'heatmap.html')
     utils.write_log(f"finished create_heatmap: result of create_heatmap saved to {plots_folder}")
 
 
@@ -322,8 +335,13 @@ def heatmap_pipeline():
     heatmap_data_perp()
 
     # finally, compute the heatmap
-    create_heatmap(path_in_heatmap_table='./clusttered_data6/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/part2')
+    create_heatmap(path_in_heatmap_table='./clusttered_data6/stacked_3_for_heatMap.csv',
+                   features_csv_path='./csv_data2/features.csv',
+                   plots_folder='./plots_folder1/part2')
     utils.write_log(f"#### finished heatmap_pipeline ####")
 
-if __name__=="__main__":
-    create_heatmap(path_in_heatmap_table='./clusttered_data6/stacked_3_for_heatMap.csv', plots_folder = './plots_folder1/part2')
+
+if __name__ == "__main__":
+    create_heatmap(path_in_heatmap_table='./clusttered_data6/stacked_3_for_heatMap.csv',
+                   features_csv_path='./csv_data2/features.csv',
+                   plots_folder='./plots_folder1/part2')
