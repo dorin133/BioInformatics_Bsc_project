@@ -273,11 +273,15 @@ def heatmap_data_perp():
     # now, final preperations to create the .csv table for the heatmap
     prepare_data_for_heatmap(path_in_stack_data='./clusttered_data6/stacked_3_sort_by_clust.csv',
                              sorted_marker_genes_dict=marker_dict_linkage_idx,
-                    path_out = './clusttered_data6/stacked_3_for_heatMap.csv')
+                    path_out='./clusttered_data6/stacked_3_for_heatMap.csv')
 
 def create_heatmap(path_in_heatmap_table,
+                   path_in_stack_data,
                    features_csv_path,
                    plots_folder='./plots_folder1/part2'):
+
+    dict_cell_cluster = pd.read_csv(path_in_stack_data, index_col=0, header=0).T['linkage_labels']
+
     # plt.figure(figsize=(10, 10))
     fig, ax = plt.subplots(figsize=(30, 22))
     utils.write_log(f"starting create_heatmap")
@@ -298,15 +302,18 @@ def create_heatmap(path_in_heatmap_table,
     plt.title(f"Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage\nvmin={vmin_val}, vmax={vmax_val}")
 
     counter = 0  # TODO
-    # cols = df.columns
-    # prev = cols[0].split('__')[1]
-    # for index, col in enumerate(cols):
-    #     tmp = col.split('__')[1]
-    #     if tmp != prev:
-    #         plt.axvline(x=index, color='b')
-    #         counter += 1
-    #         prev = tmp
-    # print(counter)
+    cols = df.columns
+    # print(list(cols))
+    prev = 0.0
+    for index, col in enumerate(cols):
+        tmp = dict_cell_cluster.at[col]
+        # print(f'{col}: {tmp}, ', end='')
+        if tmp != prev:
+            # print('**********************')
+            plt.axvline(x=index, color='black', linewidth=1)
+            counter += 1
+            prev = tmp
+    print(counter)
 
     ticks_y = np.arange(df.shape[0]) + 0.5
     ax.tick_params(axis='x', which='major', labelsize=3)
@@ -343,5 +350,6 @@ def heatmap_pipeline():
 
 if __name__ == "__main__":
     create_heatmap(path_in_heatmap_table='./clusttered_data6/stacked_3_for_heatMap.csv',
+                   path_in_stack_data='./clusttered_data6/stacked_3_sort_by_clust.csv',
                    features_csv_path='./csv_data2/features.csv',
                    plots_folder='./plots_folder1/part2')
