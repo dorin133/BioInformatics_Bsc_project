@@ -297,7 +297,7 @@ def create_heatmap(path_in_heatmap_table,
     sns.heatmap(df, cmap=cmap_pass, vmin=vmin_val, vmax=vmax_val)
     plt.title(f"Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage\nvmin={vmin_val}, vmax={vmax_val}")
 
-    # counter = 0  # TODO
+    counter = 0  # TODO
     # cols = df.columns
     # prev = cols[0].split('__')[1]
     # for index, col in enumerate(cols):
