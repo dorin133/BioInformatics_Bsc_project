@@ -298,6 +298,7 @@ def create_heatmap(path_in_heatmap_table,
     
     cmap_pass = LinearSegmentedColormap.from_list('yg',["y", "w", "g"], N=100)  # TODO N
 
+
     sns.heatmap(df, cmap=cmap_pass, vmin=vmin_val, vmax=vmax_val)
     plt.title(f"Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage\nvmin={vmin_val}, vmax={vmax_val}")
 
@@ -313,7 +314,7 @@ def create_heatmap(path_in_heatmap_table,
     ax.tick_params(axis='x', which='major', labelsize=3)
     ax.set_yticks(ticks_y)
     ax.set_yticklabels(df.index, rotation=360, fontsize=4)
-
+    ax.format_coord = lambda x, y: 'x={:d}, y={:d}, z={:2f}'.format(int(np.floor(x)), int(np.floor(y), ), df.iloc[int(np.floor(y)), int(np.floor(x))])
     # data_plot_utils.save_plots(plt, f'{plots_folder}/corr_matrix_incl_anno_double')
     plt.show()
 
