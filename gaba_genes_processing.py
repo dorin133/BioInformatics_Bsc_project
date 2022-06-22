@@ -9,55 +9,82 @@ from distinctipy import distinctipy
 
 def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_cluseters, path_out):
     utils.write_log(f"starting clustter_nueronal_genes: nueral gene expression on T-SNE's scatter plot")
-    # nueronal_genes_lst = ['GABA','Glut1','Glut2','non-neurons','doublets']
-    nueronal_genes_lst = ['Gad2','Slc17a7','Slc17a6']
-    gaba_id = 0
-    glut1_id = 1
-    glut2_id = 2
-    id_doublets = 3
-    id_no_type = 4
-    marker_map = {
-        0: 'Gaba',
-        1: 'Glut1',
-        2: 'Glut2',
-        3: 'Doublets',
-        4: 'Non Nueronal'
-    }
+
     features = pd.read_csv(path_to_features, header=0)
     df_frac_clust_cells = pd.read_csv(path_frac_clust_cells, header=0, index_col=0)
     features.set_axis(['num', 'geneID', 'geneName'], axis=1, inplace=True)
     features.set_index('geneName', inplace=True)
+    exclude_markers_names = {'C1qc', 'C1qa', 'C1qb', 'Gja1', 'Cx3cr1', 'Acta2', 'Ly6c1', 'Mfge8', 'Plxnb3', 'Cldn11', 'Aqp4',
+                       'Vtn', 'Cldn5', 'Pdgfrb', 'Flt1', 'Slc25a18', 'Pdgfra', 'Foxj1', 'Olig1', 'Olig2', 'Sox10',
+                       'Hbb-bs', 'Hbb-bt', 'Hba-a2', 'Ttr'}  # TODO
+    exclude_markers_ids = []
+    for gene_name in exclude_markers_names:
+        gene_id = int(features.at[gene_name, 'num'])
+        if gene_id not in df_frac_clust_cells.index:
+            print(f"!!! exclude marker {gene_name} (gen id {gene_id}) is not in the stacked matrix data")
+            continue
+        print(f'exclude marker gen id for {gene_name} is {gene_id}')
+        exclude_markers_ids.append(gene_id)
+    print(df_frac_clust_cells.shape)
+    sum_exclude_markers = df_frac_clust_cells.T[exclude_markers_ids].sum(1).T
+    print(df_frac_clust_cells.index[-1])
+    df_frac_clust_cells.loc[len(df_frac_clust_cells.index)+1] = sum_exclude_markers
+    print(df_frac_clust_cells.index[-1])
+
+    nueronal_genes_name = {
+        'Gad2': 'Gaba',
+        'Slc17a7': 'Glut1',
+        'Slc17a6': 'Glut2'
+    }
+
+    glut1_id = 999
+    glut2_id = 999
+    nueronal_genes_idx = {}
     found_genes = []
     not_in_data_gens = []
-    for gene_name in nueronal_genes_lst:
+    counter = 0
+    for gene_name in nueronal_genes_name:
         gene_id = int(features.at[gene_name, 'num'])
         if gene_id not in df_frac_clust_cells.index:
             print(f"!!! gen {gene_name} (gen id {gene_id}) is not in the stacked matrix data")
             not_in_data_gens.append((gene_name, gene_id))
             continue
         print(f'gen id for {gene_name} is {gene_id}')
+        if gene_name == 'Slc17a7':
+            glut1_id = counter
+        if gene_name == 'Slc17a6':
+            glut2_id = counter
         found_genes.append(gene_id)
+        nueronal_genes_idx[counter] = nueronal_genes_name[gene_name]
+        counter += 1
+    found_genes.append(df_frac_clust_cells.index[-1])
+    nueronal_genes_idx[counter] = 'Non Nueronal'
+    counter += 1
+    doublets_idx = counter
+    nueronal_genes_idx[counter] = 'Doublets'
+
+    # print(found_genes)
     df_nueronal_frac = (df_frac_clust_cells.loc[found_genes])
+    # print(df_nueronal_frac.shape)
+    # print(df_nueronal_frac)
     clust_nueral_class = {}
     df_nueronal_frac.index.name = 'gene_id'
     for col in df_nueronal_frac.columns:
-        nueral_frac_arr = df_nueronal_frac[col].to_numpy()  
+        nueral_frac_arr = df_nueronal_frac[col].to_numpy()
+        # print(nueral_frac_arr)
+        two_largest = df_nueronal_frac[col].nlargest(2)
+        # print('two_largest:\n', two_largest)
         two_largest_idx = (df_nueronal_frac[col].nlargest(2).index).tolist()
-        if [found_genes[glut1_id], found_genes[glut2_id]] == two_largest_idx:
+        if [found_genes[glut1_id], found_genes[glut2_id]] == two_largest_idx or \
+                [found_genes[glut2_id], found_genes[glut1_id]] == two_largest_idx:
             clust_nueral_class[col] = nueral_frac_arr.argmax()
-            continue
-        # search for doublets:
-        if nueral_frac_arr.max() < nueral_frac_arr.min() * 2:
-            clust_nueral_class[col] = id_doublets
-            continue
-        # search for no type 
-        if nueral_frac_arr.max() == 0:
-            print("! no type for ", col)
-            clust_nueral_class[col] = id_no_type
+        elif two_largest.max() < two_largest.min() * 2:  # search for doublets
+        # elif nueral_frac_arr.max() < two_largest_idx.min() * 2:  # search for doublets
+            clust_nueral_class[col] = doublets_idx
+        else:
+            clust_nueral_class[col] = nueral_frac_arr.argmax()
 
-        clust_nueral_class[col] = nueral_frac_arr.argmax()
-
-    map_nueral_class = {float(k): marker_map[v] for k, v in clust_nueral_class.items()}
+    map_nueral_class = {float(k): nueronal_genes_idx[v] for k, v in clust_nueral_class.items()}
     map_nueral_class[-1.0] = 'noise cluster'
     clusters_df = pd.read_csv(path_in_cluseters, header=0, index_col=0).T
     clusters_df['nueral_labels'] = clusters_df['linkage_labels'].map(map_nueral_class)
@@ -72,6 +99,7 @@ def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_clu
 def plot_nueral_gene_expression(path_clust_tsne_data, plots_folder='plots_folder1/part2'):
     utils.write_log(f"starting plot_nueral_gene_expression")
     df_tsne = pd.read_csv(path_clust_tsne_data, index_col=0, header=0).T
+    df_tsne = df_tsne[df_tsne['nueral_labels'] != 'noise cluster']
     df_tsne['tsne-2d-one'] = df_tsne['tsne-2d-one'].astype('float64')
     df_tsne['tsne-2d-two'] = df_tsne['tsne-2d-two'].astype('float64')
     sns.scatterplot(
@@ -136,10 +164,14 @@ if __name__ == '__main__':
     #                                      path_tsne_dbscan_data='./clusttered_data/clust_tsne_data.csv',
     #                                      path_out_avg_clust_cell = './clusttered_data/avg_clust_cells_stk1.csv',
     #                                      path_out_frac='./clusttered_data/frac_clust_cells_stk1.csv')
-    arr = clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
-                                  path_frac_clust_cells='./clusttered_data/frac_clust_cells_stk1.csv',
-                                  path_in_cluseters='./clusttered_data/clust_tsne_data.csv',
-                                  path_out='./clusttered_data/tsne_and_clust_labels.csv')
-    plot_nueral_gene_expression(path_clust_tsne_data='./clusttered_data/tsne_and_clust_labels.csv',
-                                plots_folder='./plots_folder1/testing2_out')
+    # arr = clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
+    #                               path_frac_clust_cells='./clusttered_data/frac_clust_cells_stk1.csv',
+    #                               path_in_cluseters='./clusttered_data/clust_tsne_data.csv',
+    #                               path_out='./clusttered_data/tsne_and_clust_labels.csv')
+    # plot_nueral_gene_expression(path_clust_tsne_data='./clusttered_data/tsne_and_clust_labels.csv',
+    #                             plots_folder='./plots_folder1/testing2_out')
+    clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
+                                  path_frac_clust_cells='./clusttered_data6/frac_clust_cells_stk1.csv',
+                                  path_in_cluseters='./clusttered_data6/clust_tsne_data.csv',
+                                  path_out='./clusttered_data6/tsne_and_clust_labels.csv')
     print("Done")
