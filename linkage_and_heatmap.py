@@ -301,19 +301,13 @@ def create_heatmap(path_in_heatmap_table,
     sns.heatmap(df, cmap=cmap_pass, vmin=vmin_val, vmax=vmax_val)
     plt.title(f"Heatmap for gene expression of Marker Genes of all clusters ordered by Linkage\nvmin={vmin_val}, vmax={vmax_val}")
 
-    counter = 0  # TODO
     cols = df.columns
-    # print(list(cols))
     prev = 0.0
     for index, col in enumerate(cols):
         tmp = dict_cell_cluster.at[col]
-        # print(f'{col}: {tmp}, ', end='')
         if tmp != prev:
-            # print('**********************')
             plt.axvline(x=index, color='black', linewidth=1)
-            counter += 1
             prev = tmp
-    print(counter)
 
     ticks_y = np.arange(df.shape[0]) + 0.5
     ax.tick_params(axis='x', which='major', labelsize=3)
