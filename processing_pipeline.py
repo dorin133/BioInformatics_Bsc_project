@@ -124,12 +124,12 @@ def main():
     # link_and_heat.heatmap_pipeline()
     
     # step 17: gaba_genes_processing
-    gaba_genes_processing.avg_and_fraction_clustter_expression(path_in_stack='./merged_data5/stacked_3_v2.csv',
+    gaba_genes_processing.avg_and_fraction_clustter_expression(path_in_stack='./merged_data5/stacked_1.csv',
                                          path_tsne_dbscan_data='./clusttered_data6/clust_tsne_data.csv',
-                                         path_out_avg_clust_cell='./clusttered_data6/avg_clust_cells_stk3.csv',
-                                         path_out_frac='./clusttered_data6/frac_clust_cells_stk3.csv')
+                                         path_out_avg_clust_cell='./clusttered_data6/avg_clust_cells_stk1.csv',
+                                         path_out_frac='./clusttered_data6/frac_clust_cells_stk1.csv')
     gaba_genes_processing.clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
-                                  path_frac_clust_cells='./clusttered_data6/avg_clust_cells_stk3.csv',
+                                  path_frac_clust_cells='./clusttered_data6/avg_clust_cells_stk1.csv',
                                   path_in_cluseters='./clusttered_data6/clust_tsne_data.csv',
                                   path_out='./clusttered_data6/tsne_and_clust_labels.csv')
 
