@@ -126,9 +126,9 @@ def avg_and_fraction_clustter_expression(path_in_stack, path_tsne_dbscan_data, p
         df_stack_log = np.log2(df_stack+1)
         df_stack_normalized = df_stack_log.sub(df_stack_log.mean(axis=1), axis=0)
         df_stack_normalized = df_stack_normalized.div(df_stack_log.std(axis=1), axis=0)  # TODO verify this
-        # add to the raw gene expression data (already normalized) the clustter idx of each cell
-        df_stack_normalized.loc['linkage_labels'] = df_tsne_dbscan.iloc[2]
-        df_stack_log.loc['linkage_labels'] = df_tsne_dbscan.iloc[2]
+        # add to the raw gene expression data (already normalized) the clustter idx (by linkage!!!) of each cell
+        df_stack_normalized.loc['linkage_labels'] = df_tsne_dbscan.iloc[3]
+        df_stack_log.loc['linkage_labels'] = df_tsne_dbscan.iloc[3]
         # the mean() next line is taken on each clustter seperately
         df_stack_normalized_avg = (df_stack_normalized.T.groupby(by = 'linkage_labels', sort=True).mean()).iloc[1:] # iloc[1:] to drop the '-1' clustter idx 
         # for all cells in each clustter - sum the gene expression value for every gene 
