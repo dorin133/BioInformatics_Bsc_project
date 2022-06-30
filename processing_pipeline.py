@@ -94,20 +94,20 @@ def main():
     # data_processing.calc_and_plot_cv(path_stacked_mtx_file='./merged_data5/stacked_2_v2.csv',
     #                                  path_out='./merged_data5/stacked_3_v2.csv',
     #                                  path_to_features_csv='./csv_data2/features.csv')
-    
-    # # step 11: PCA
+    #
+    # # # step 11: PCA
     # data_processing.pca_norm_knee(path_in='./merged_data5/stacked_3_v2.csv', path_out='./merged_data5/pca4.csv')
-    
+    #
     # # step 12: tSNE
     # ml_processing.tSNE(path_in='./merged_data5/pca4.csv', path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx',
     #                    path_out='./merged_data5/tsne.csv')
-    
+    #
     # # step 13: DBScan
     # ml_processing.DBScan_dynm_eps(eps_prc=70, k_neighbor=20, path_in='./merged_data5/tsne.csv',
     #                               path_out='./clusttered_data6/dbscan.csv',
     #                               path_out_tsne_dbscan='./clusttered_data6/clust_tsne_data.csv')
-    
-    # step 14: sanity_checks
+    #
+    # # step 14: sanity_checks
     # link_and_heat.sanity_checks(path_in_stack='./merged_data5/stacked_3_v2.csv',
     #                                path_in_dbscan='./clusttered_data6/dbscan.csv',
     #                                path_to_features_csv='./csv_data2/features.csv',
@@ -121,13 +121,14 @@ def main():
     #                                path_to_features_csv='./csv_data2/features.csv')
     
     # step 16: heatmap data prep and the heatmap step itself
-    # link_and_heat.heatmap_pipeline()
+    link_and_heat.heatmap_pipeline()
     
     # step 17: gaba_genes_processing
     gaba_genes_processing.avg_and_fraction_clustter_expression(path_in_stack='./merged_data5/stacked_1.csv',
                                          path_tsne_dbscan_data='./clusttered_data6/clust_tsne_data.csv',
                                          path_out_avg_clust_cell='./clusttered_data6/avg_clust_cells_stk1.csv',
                                          path_out_frac='./clusttered_data6/frac_clust_cells_stk1.csv')
+
     gaba_genes_processing.clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
                                   path_frac_clust_cells='./clusttered_data6/avg_clust_cells_stk1.csv',
                                   path_in_cluseters='./clusttered_data6/clust_tsne_data.csv',
