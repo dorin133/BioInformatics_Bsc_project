@@ -176,7 +176,8 @@ def DBScan_dynm_eps(path_in, path_out, path_out_tsne_dbscan, eps_prc=70, k_neigh
     del df  # just close instance to save memory
 
     utils.write_log(f'finish DBScan_dynm_eps: found best eps is {chosen_eps}. now moving to preforming DBScan')
-    DBScan(path_in, path_out, eps=chosen_eps, path_out_tsne_dbscan=path_out_tsne_dbscan, min_samples=k_neighbor)  # call the actual dbscan using the eps we found
+    DBScan(path_in, path_out, eps=chosen_eps, path_out_tsne_dbscan=path_out_tsne_dbscan, min_samples=k_neighbor,
+           plots_folder=plots_folder)  # call the actual dbscan using the eps we found
 
 
 def DBScan(path_in, path_out, path_out_tsne_dbscan, plots_folder='./plots_folder1', eps=1.4, min_samples=20):

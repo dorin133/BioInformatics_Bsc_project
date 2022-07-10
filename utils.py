@@ -31,8 +31,8 @@ def run_func_for_all(func_to_run, folder_in_path, folder_out_path, which_files=d
 def check_files_and_folder_for_complete_run(first_folder="./raw_data"):
     write_log('status: check_files_and_folder_for_complete_run: check missing default files and folder...')
     not_found = []
-    folders = [first_folder, 'plots_folder1', 'plots_folder1/part2', 'plots_folder1/testing2_out', './csv_data2',
-               './filtered_data3', './normalized_data4', './merged_data5', './clusttered_data6']
+    folders = [first_folder, 'plots_folder1', 'plots_folder1/part2', 'plots_folder1/part3', 'plots_folder1/testing2_out', './csv_data2',
+               './filtered_data3', './normalized_data4', './merged_data5', './clusttered_data6', './csv_gaba7']
     for folder in folders:
         if not os.path.isdir(folder):
             print(f"did not found folder named: {folder}")
@@ -91,13 +91,14 @@ def check_files_and_folder_for_complete_run(first_folder="./raw_data"):
     return False
 
 
-def stack_csv_together(folder_path, out_file_path='./merged_data5/stacked_mtx.csv'):
+def stack_csv_together(folder_path, out_file_path='./merged_data5/stacked_mtx.csv',
+                       filters=lambda x: 'matrix_normalized.csv' in x):
     write_log(f'start stack_csv_together')
     chosen_files = os.listdir(folder_path)  # list all raw files
     # print(raw_files)
     # raw_files = list(filter(lambda x: '_matrix2.csv' in x, raw_files))
     chosen_files = list(
-        filter(lambda x: 'matrix_normalized.csv' in x, chosen_files))
+        filter(filters, chosen_files))
     chosen_files.sort()
     print('status: stack_csv_together for', chosen_files)
 

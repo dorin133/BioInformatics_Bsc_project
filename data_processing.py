@@ -292,6 +292,8 @@ def pca_norm_knee(path_in, path_out, plots_folder='./plots_folder1'):
     df_t = ((df_t - df_t.mean(axis=0)) / df_t.std(axis=0))  # TODO verify this
 
     curr_n = df_t.shape[1]  # all genes
+    if curr_n > df_t.shape[0]:
+        curr_n = df_t.shape[0]
     pca = decomposition.PCA(n_components=curr_n)
     _ = pca.fit_transform(df_t)
     explain = pca.explained_variance_
