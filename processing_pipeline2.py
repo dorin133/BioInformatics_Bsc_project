@@ -30,11 +30,15 @@ def main():
     #
     # ml_processing.tSNE(path_in='./cluster_gaba8/pca_gaba.csv', path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx',
     #                    path_out='./cluster_gaba8/tsne_gaba.csv', plots_folder='./plots_folder1/part3')
+    #
+    # ml_processing.DBScan_dynm_eps(eps_prc=70, k_neighbor=20, path_in='./cluster_gaba8/tsne_gaba.csv',
+    #                               path_out='./cluster_gaba8/dbscan_gaba.csv',
+    #                               path_out_tsne_dbscan='./cluster_gaba8/clust_tsne_gaba.csv',
+    #                               print_noise=False, plots_folder='./plots_folder1/part3')
 
-    ml_processing.DBScan_dynm_eps(eps_prc=70, k_neighbor=20, path_in='./cluster_gaba8/tsne_gaba.csv',
-                                  path_out='./cluster_gaba8/dbscan_gaba.csv',
-                                  path_out_tsne_dbscan='./cluster_gaba8/clust_tsne_gaba.csv',
-                                  plots_folder='./plots_folder1/part3')
+    data_processing2.sanity_checks_gaba(path_in='./cluster_gaba8/dbscan_gaba.csv',
+                                        path_to_MEA = './raw_data/MEA_dimorphism_samples.xlsx',
+                                        print_noise=False, plots_folder='./plots_folder1/part3')
 
     utils.write_log('*********************************** Finish pipeline run (v2) ***********************************')
 

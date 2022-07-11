@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 import data_plot_utils
 import utils
 import time
+from distinctipy import distinctipy
+from colour import Color
+
 
 
 def filter_gaba_only(path_clust_labels, folder_path_in, folder_path_out):
@@ -56,4 +59,98 @@ def filter_rare_gens(path_stacked_mtx_file, path_out_file):
     utils.write_log(f'filtered {df.shape[0]-df_filtered.shape[0]} genes (original shape was {original_shape} and the '
                     f'update one is {df_filtered.shape}). filtered csv saved as {path_out_file}')
     df_filtered.to_csv(path_out_file, sep=',')
+
+
+def sanity_checks_gaba(path_in, path_to_MEA = './raw_data/MEA_dimorphism_samples.xlsx',
+                       print_noise=True, plots_folder='./plots_folder1/part3'):
+    utils.write_log('start sanity_checks_gaba')
+    df_f_m_index = pd.read_excel(path_to_MEA, index_col=0, header=0)
+
+    df = pd.read_csv(path_in, index_col=0, header=0)
+    df = df.T
+    if print_noise == False:
+        df = df[df['dbscan_labels'] != -1]
+
+    hist_group = {}
+    hist_count = {}
+    hist_tsne1 = {}
+    hist_tsne2 = {}
+    for index, row in df.iterrows():
+        cell_id = index.split('__')[1]
+        gender = df_f_m_index.at[cell_id, 'female']
+        parent = df_f_m_index.at[cell_id, 'parent']
+        label = int(row['dbscan_labels'])
+        if label not in hist_count:
+            hist_count[label] = 0
+            # male_no_parent=0, male_parent=1, female_no_parent=2, female_parent=3
+            hist_group[label] = [0, 0, 0, 0]
+            hist_tsne1[label] = 0
+            hist_tsne2[label] = 0
+
+        hist_count[label] += 1
+        hist_group[label][(2*gender) + parent] += 1
+        hist_tsne1[label] += row['tsne-2d-one']
+        hist_tsne2[label] += row['tsne-2d-two']
+
+    for label in hist_group:
+        hist_tsne1[label] = hist_tsne1[label]/hist_count[label]
+        hist_tsne2[label] = hist_tsne2[label]/hist_count[label]
+
+    tmp_colors = distinctipy.get_colors(len(hist_group), pastel_factor=0.6)
+    gradient_colors = list(Color("red").range_to(Color("green"), 100))
+
+    def plot_tmp():
+        sns.scatterplot(
+            x="tsne-2d-one",
+            y="tsne-2d-two",
+            hue="dbscan_labels",
+            palette=tmp_colors,
+            data=df,
+            legend=False,
+            alpha=0.3
+        )
+        fig = plt.gcf()
+        fig.set_size_inches(16, 14)
+
+    # male_no_parent=0, male_parent=1, female_no_parent=2, female_parent=3
+    plot_tmp()
+    for label in hist_group:
+        score = (hist_group[label][2] + hist_group[label][3]) * 100 // hist_count[label]
+        msg = f'{label}\n{score}%'
+        plt.text(hist_tsne1[label], hist_tsne2[label], msg, horizontalalignment='center', size='large',
+                 color=gradient_colors[score].get_rgb(), weight='bold')
+    plt.title(f"DBSAN clustering (2D tSNE) on Gaba cells\nFemale Percentage")
+    # data_plot_utils.save_plots(plt, f'{plots_folder}/????')
+    plt.show()
+
+    plot_tmp()
+    for label in hist_group:
+        score = (hist_group[label][0] + hist_group[label][1]) * 100 // hist_count[label]
+        msg = f'{label}\n{score}%'
+        plt.text(hist_tsne1[label], hist_tsne2[label], msg, horizontalalignment='center', size='large',
+                 color=gradient_colors[score].get_rgb(), weight='bold')
+    plt.title(f"DBSAN clustering (2D tSNE) on Gaba cells\nMale Percentage")
+    # data_plot_utils.save_plots(plt, f'{plots_folder}/???')
+    plt.show()
+
+    plot_tmp()
+    for label in hist_group:
+        score = (hist_group[label][1] + hist_group[label][3]) * 100 // hist_count[label]
+        msg = f'{label}\n{score}%'
+        plt.text(hist_tsne1[label], hist_tsne2[label], msg, horizontalalignment='center', size='large',
+                 color=gradient_colors[score].get_rgb(), weight='bold')
+    plt.title(f"DBSAN clustering (2D tSNE) on Gaba cells\nParent Percentage")
+    # data_plot_utils.save_plots(plt, f'{plots_folder}/???')
+    plt.show()
+
+    plot_tmp()
+    for label in hist_group:
+        score = (hist_group[label][3]) * 100 // hist_count[label]
+        msg = f'{label}\n{score}%'
+        plt.text(hist_tsne1[label], hist_tsne2[label], msg, horizontalalignment='center', size='large',
+                 color=gradient_colors[score].get_rgb(), weight='bold')
+    plt.title(f"DBSAN clustering (2D tSNE) on Gaba cells\nFemale Parent Percentage")
+    # data_plot_utils.save_plots(plt, f'{plots_folder}/???')
+    plt.show()
+
 
