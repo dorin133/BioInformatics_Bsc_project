@@ -50,7 +50,7 @@ def sanity_checks(path_in_stack, path_in_dbscan, path_to_features_csv, gene_list
             x=x_coor,
             y=y_coor,
             c=relevant_gene_expressions.loc[gene_id].to_numpy(),
-            cmap = cm.RdBu,
+            cmap=cm.RdBu,
             data=relevant_gene_expressions,
             palette='RdBu',
             alpha=0.3

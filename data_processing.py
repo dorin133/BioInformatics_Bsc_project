@@ -111,6 +111,9 @@ def filter_metadata_rows(folder_mtx_path, folder_to_metadata, out_folder_path):
         df = pd.read_csv(input_file_path, index_col=0, header=0, dtype=np.int32)
         tmp = file_name.index('_matrix_filtered')
         file_id = file_name[tmp-4:tmp]
+        if 'gaba' in file_name:
+            tmp = file_name.index('_gaba')
+            file_id = file_name[:tmp]
 
         path_to_metadata = folder_to_metadata + '/' + file_id + '_metadata.csv'
         path_output = out_folder_path + '/' + file_id + '_metadata.csv'
