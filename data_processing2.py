@@ -9,6 +9,7 @@ import utils
 import time
 from distinctipy import distinctipy
 from colour import Color
+import cv2
 
 
 
@@ -154,3 +155,54 @@ def sanity_checks_gaba(path_in, path_to_MEA = './raw_data/MEA_dimorphism_samples
     plt.show()
 
 
+def compare_all_data_to_gaba_only(path_in_all='./plots_folder1/part1+2', path_in_gaba='./plots_folder1/part3',
+                                  plots_folder='./plots_folder1/compare_plots'):
+    # utils.write_log(f'start compare_all_data_to_gaba_only')
+
+    def clean_files_names_from_date(name):
+        if '.png' not in name:
+            return ''
+        name = name[:-12]
+        return name
+
+    def get_all_updated_png(path_in):
+        raw_files = os.listdir(path_in)  # list all raw files
+        files = list(filter(lambda x: '.png' in x, raw_files))
+        files.sort()
+        chosen_files = {}
+        for file in files:
+            chosen_files[clean_files_names_from_date(file)] = f'{path_in}/{file}'
+        # print(chosen_files)
+        return chosen_files
+
+    part1_all_data = get_all_updated_png(path_in_all)
+    part2_only_gaba = get_all_updated_png(path_in_gaba)
+    print(part1_all_data)
+    print(part2_only_gaba)
+    common_files = set(part2_only_gaba.keys()).intersection(set(part1_all_data.keys()))
+    print(f'common_files: {common_files}')
+    for file_name in common_files:
+        fig = plt.figure(figsize=(22, 9))
+        fig.suptitle(f'{file_name}\n\nCompare plots between part1 (all cells) and part2 (only gaba)')
+
+        fig.add_subplot(1, 2, 1)
+        image = cv2.imread(part1_all_data[file_name])
+        plt.imshow(image)
+        plt.axis('off')
+        plt.title('All cells')
+
+        fig.add_subplot(1, 2, 2)
+        image = cv2.imread(part2_only_gaba[file_name])
+        plt.imshow(image)
+        plt.axis('off')
+        plt.title('Gaba cells only')
+
+        curr_name = f'{plots_folder}/compare_parts_{file_name}'
+        # data_plot_utils.save_plots(plt, curr_name)
+        plt.savefig(f'{curr_name}.png', format='png', dpi=888)
+
+        plt.show()
+
+
+if __name__ == '__main__':
+    compare_all_data_to_gaba_only()
