@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from distinctipy import distinctipy
 
 
-def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_cluseters, path_out):
+def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_cluseters, path_out, plots_folder='plots_folder1/part2'):
     utils.write_log(f"starting clustter_nueronal_genes: nueral gene expression on T-SNE's scatter plot")
 
     features = pd.read_csv(path_to_features, header=0)
@@ -93,7 +93,7 @@ def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_clu
     # clusters_df.value_counts()
     utils.write_log(f"finished clustter_nueronal_genes {clusters_df.T['nueral_labels'].value_counts().to_dict()}")
 
-    plot_nueral_gene_expression(path_clust_tsne_data=path_out)
+    plot_nueral_gene_expression(path_clust_tsne_data=path_out, plots_folder=plots_folder)
 
 
 def plot_nueral_gene_expression(path_clust_tsne_data, plots_folder='plots_folder1/part2'):
@@ -170,8 +170,10 @@ if __name__ == '__main__':
     #                               path_out='./clusttered_data/tsne_and_clust_labels.csv')
     # plot_nueral_gene_expression(path_clust_tsne_data='./clusttered_data/tsne_and_clust_labels.csv',
     #                             plots_folder='./plots_folder1/testing2_out')
-    clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
-                                  path_frac_clust_cells='./clusttered_data6/frac_clust_cells_stk1.csv',
-                                  path_in_cluseters='./clusttered_data6/clust_tsne_data.csv',
-                                  path_out='./clusttered_data6/tsne_and_clust_labels.csv')
+    # clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
+    #                               path_frac_clust_cells='./clusttered_data6/frac_clust_cells_stk1.csv',
+    #                               path_in_cluseters='./clusttered_data6/clust_tsne_data.csv',
+    #                               path_out='./clusttered_data6/tsne_and_clust_labels.csv')
+    #
+    plot_nueral_gene_expression('./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv', plots_folder='./plots_folder1/part3')
     print("Done")

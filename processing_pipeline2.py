@@ -88,18 +88,22 @@ def main():
     #                                                         path_out='????Not yet imp?????',
     #                                                         plots_folder='./plots_folder1/part3')
     #
-    # # # step 9: filter the whole stacked mtx's very common genes and very rare ones (now for the first time in the code, we filter rows and not columns + no need to adjust metadata)
+    # # step 9: filter the whole stacked mtx's very common genes and very rare ones (now for the first time in the code, we filter rows and not columns + no need to adjust metadata)
     # data_processing.filter_common_and_rare_gens(path_stacked_mtx_file='./gaba_merged_data10/gaba_stacked_1.csv',
-    #                                             path_out_file='./gaba_merged_data10/gaba_stacked_2.csv')
+    #                                             path_out_file='./gaba_merged_data10/gaba_stacked_2.csv')  # TODO VVV which one to take??
+    # data_processing.filter_common_and_rare_gens(path_stacked_mtx_file='./gaba_merged_data10/gaba_stacked_1.csv', # TODO ^^
+    #                                             path_out_file='./gaba_merged_data10/gaba_stacked_2_v2.csv',
+    #                                             do_no_filter_gens=[1868])  # 1868 is gaba (gad2)
+    #
     #
     # # step 10: plot and calculate the mean w.r.t. the coe. of variance for each gene
-    # data_processing.calc_and_plot_cv(path_stacked_mtx_file='./gaba_merged_data10/gaba_stacked_2.csv',
-    #                                  path_out='./gaba_merged_data10/gaba_stacked_3.csv',
+    # data_processing.calc_and_plot_cv(path_stacked_mtx_file='./gaba_merged_data10/gaba_stacked_2_v2.csv',
+    #                                  path_out='./gaba_merged_data10/gaba_stacked_3_v2.csv',
     #                                  path_to_features_csv='./csv_data2/features.csv',
     #                                  plots_folder='./plots_folder1/part3')
     #
     # # # step 11: PCA
-    # data_processing.pca_norm_knee(path_in='./gaba_merged_data10/gaba_stacked_3.csv',
+    # data_processing.pca_norm_knee(path_in='./gaba_merged_data10/gaba_stacked_3_v2.csv',
     #                               path_out='./gaba_merged_data10/gaba_pca4.csv', plots_folder='./plots_folder1/part3')
     #
     # # step 12: tSNE
@@ -114,7 +118,7 @@ def main():
     #                               plots_folder='./plots_folder1/part3')
     #
     # # step 14: sanity_checks
-    # link_and_heat.sanity_checks(path_in_stack='./gaba_merged_data10/gaba_stacked_3.csv',
+    # link_and_heat.sanity_checks(path_in_stack='./gaba_merged_data10/gaba_stacked_3_v2.csv',
     #                             path_in_dbscan='./gaba_clustered_data11/gaba_dbscan.csv',
     #                             path_to_features_csv='./csv_data2/features.csv',
     #                             gene_list=['Snap25', 'Gad2', 'Slc32a1', 'Slc17a7', 'Slc17a6', 'Sst', 'Tac2', 'Acta2',
@@ -128,7 +132,7 @@ def main():
     #
     # # # step 15: linkage data prep and the linkage step itself
     # # link_and_heat.linkage_pipeline()
-    # link_and_heat.linkage_pipeline(path_in_stack='./gaba_merged_data10/gaba_stacked_3.csv',
+    # link_and_heat.linkage_pipeline(path_in_stack='./gaba_merged_data10/gaba_stacked_3_v2.csv',
     #                                path_in_dbscan='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
     #                                path_out_avg_clust_cell='./gaba_clustered_data11/gaba_avg_clust_cells.csv',
     #                                path_out_frac='./gaba_clustered_data11/gaba_frac_clust_cells.csv',
@@ -144,22 +148,29 @@ def main():
     #                                features_csv_path='./csv_data2/features.csv',
     #                                path_in_translation='./gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
     #                                path_in_clustter_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
-    #                                path_in_stack_data='./gaba_merged_data10/gaba_stacked_3.csv',
-    #                                path_out_sort_stack_data='./gaba_clustered_data11/gaba_stacked_3_sort_by_clust.csv',
-    #                                path_out_stack_for_heatmap='./gaba_clustered_data11/gaba_stacked_3_for_heatMap.csv',
+    #                                path_in_stack_data='./gaba_merged_data10/gaba_stacked_3_v2.csv',
+    #                                path_out_sort_stack_data='./gaba_clustered_data11/gaba_stacked_3_v2_sort_by_clust.csv',
+    #                                path_out_stack_for_heatmap='./gaba_clustered_data11/gaba_stacked_3_v2_for_heatMap.csv',
     #                                plots_folder='./plots_folder1/part3')
+    #
+    # # TODO that probably should be deleted VVV
+    # # TODO 2: something in the output just looks strange... i thought all gonna be gaba but they are not
+    # # step 17: gaba_genes_processing
+    # gaba_genes_processing.avg_and_fraction_clustter_expression(path_in_stack='./gaba_merged_data10/gaba_stacked_1.csv',
+    #                                                            path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
+    #                                                            path_out_avg_clust_cell='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
+    #                                                            path_out_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv')
+    #
+    # gaba_genes_processing.clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
+    #                                               path_frac_clust_cells='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
+    #                                               path_in_cluseters='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
+    #                                               path_out='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv',
+    #                                               plots_folder='./plots_folder1/part3')
 
-    # TODO that probably should be deleted VVV
-    # step 17: gaba_genes_processing
-    gaba_genes_processing.avg_and_fraction_clustter_expression(path_in_stack='./gaba_merged_data10/gaba_stacked_1.csv',
-                                                               path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
-                                                               path_out_avg_clust_cell='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
-                                                               path_out_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv')
 
-    gaba_genes_processing.clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
-                                                  path_frac_clust_cells='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
-                                                  path_in_cluseters='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
-                                                  path_out='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv')
+    data_processing2.clusters_bar_groups(path_in='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv',
+                                         path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx',
+                                         plots_folder='./plots_folder1/part3')
 
     utils.write_log('*********************************** Finish pipeline run (v2) ***********************************')
 

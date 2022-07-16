@@ -125,17 +125,19 @@ def filter_metadata_rows(folder_mtx_path, folder_to_metadata, out_folder_path):
         df_metadata.to_csv(path_output[:-4]+'_filtered.csv', sep=',')
 
 
-def filter_common_and_rare_gens(path_stacked_mtx_file, path_out_file):
+def filter_common_and_rare_gens(path_stacked_mtx_file, path_out_file, do_no_filter_gens=[1868]):
     utils.write_log(f'start filter_common_and_rare_gens')
     df = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)
     original_shape = df.shape
     hist_row_non_zeros = (df != 0).sum(axis=1)
+    for gen in do_no_filter_gens:
+        hist_row_non_zeros[gen] = 6  # TODO because next line threshold is 5
     df_filtered = df[5 < hist_row_non_zeros]
     hist_row_non_zeros = (df_filtered != 0).sum(axis=1)
-    print('df.shape', df.shape)
-    print('df.shape[0]', df.shape[0])
-    print('df.shape[1]', df.shape[1])
-    df_filtered = df_filtered[hist_row_non_zeros < df.shape[1] / 2]  # TODO
+    print(f'df.shape {df.shape}, df.shape[0]={df.shape[0]}, df.shape[1]={df.shape[1]}')
+    for gen in do_no_filter_gens:
+        hist_row_non_zeros[gen] = 0
+    df_filtered = df_filtered[hist_row_non_zeros < df.shape[1] / 2]  # TODO do we need to save the shape at the beginning?
     utils.write_log(f'filtered {df.shape[0]-df_filtered.shape[0]} genes (original shape was {original_shape} and the '
                     f'update one is {df_filtered.shape}). filtered csv saved as {path_out_file}')
     df_filtered.to_csv(path_out_file, sep=',')

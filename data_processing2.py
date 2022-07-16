@@ -204,5 +204,31 @@ def compare_all_data_to_gaba_only(path_in_all='./plots_folder1/part1+2', path_in
         plt.show()
 
 
+def clusters_bar_groups(path_in, path_to_MEA, plots_folder):
+    utils.write_log(f'start clusters_bar_groups')
+    df_f_m_index = pd.read_excel(path_to_MEA, index_col=0, header=0)
+    cell_to_label = pd.read_csv(path_in, index_col=0, header=0).T
+    hist_group = {}
+    for index, row in cell_to_label.iterrows():
+        cell_id = index.split('__')[1]
+        gender = df_f_m_index.at[cell_id, 'female']
+        parent = df_f_m_index.at[cell_id, 'parent']
+        label = int(float(row['dbscan_labels']))
+        if label not in hist_group:
+            # male_no_parent=0, male_parent=1, female_no_parent=2, female_parent=3
+            hist_group[label] = [0, 0, 0, 0]
+
+        hist_group[label][(2 * gender) + parent] += 1
+    # if -1 in hist_group:  # remove from comment if noise cluster should be ignored
+    #     del hist_group[-1]
+    hist_df = pd.DataFrame.from_dict(hist_group, orient='index')
+    # male_no_parent=0, male_parent=1, female_no_parent=2, female_parent=3
+    hist_df.columns = ['male_no_parent', 'father', 'female_no_parents', 'mother']
+    hist_df.sort_index(axis=0, inplace=True)
+    hist_df.plot.bar(stacked=True, figsize=(16, 10), title='clusters bar groups')
+    data_plot_utils.save_plots(plt, f'{plots_folder}/clusters_bar_groups')
+    plt.show()
+
+
 if __name__ == '__main__':
     compare_all_data_to_gaba_only()
