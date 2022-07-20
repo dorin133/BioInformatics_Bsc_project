@@ -33,7 +33,8 @@ def check_files_and_folder_for_complete_run(first_folder="./raw_data"):
     not_found = []
     folders = [first_folder, 'plots_folder1', 'plots_folder1/part2', 'plots_folder1/part3',
                'plots_folder1/testing2_out', './csv_data2', './filtered_data3', './normalized_data4', './merged_data5',
-               './clusttered_data6', './csv_gaba7', 'gaba_filtered_data8']
+               './clusttered_data6', './csv_gaba7', './gaba_filtered_data8', './gaba_normalized_data9',
+               './gaba_merged_data10', './gaba_clustered_data11']
     for folder in folders:
         if not os.path.isdir(folder):
             print(f"did not found folder named: {folder}")
