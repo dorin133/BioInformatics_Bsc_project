@@ -13,7 +13,7 @@ import matplotlib.colors as mcolors
 from sklearn import decomposition
 from scipy.cluster.hierarchy import dendrogram, linkage
 from matplotlib import pyplot as plt
-from  matplotlib.colors import LinearSegmentedColormap
+from matplotlib.colors import LinearSegmentedColormap
 # from bioinfokit import analys
 # import holoviews as hv
 # import hvplot.pandas # use hvplot directly with pandas

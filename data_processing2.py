@@ -222,12 +222,14 @@ def clusters_bar_groups(path_in, path_to_MEA, plots_folder):
     # if -1 in hist_group:  # remove from comment if noise cluster should be ignored
     #     del hist_group[-1]
     hist_df = pd.DataFrame.from_dict(hist_group, orient='index')
+    hist_df = hist_df.div(hist_df.sum(axis=1), axis=0)
     # male_no_parent=0, male_parent=1, female_no_parent=2, female_parent=3
     hist_df.columns = ['male_no_parent', 'father', 'female_no_parents', 'mother']
     hist_df.sort_index(axis=0, inplace=True)
     hist_df.plot.bar(stacked=True, figsize=(16, 10), title='clusters bar groups')
     data_plot_utils.save_plots(plt, f'{plots_folder}/clusters_bar_groups')
     plt.show()
+
 
 
 if __name__ == '__main__':

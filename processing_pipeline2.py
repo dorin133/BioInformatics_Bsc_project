@@ -161,11 +161,11 @@ def main():
     #                                                            path_out_avg_clust_cell='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
     #                                                            path_out_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv')
     #
-    # gaba_genes_processing.clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
-    #                                               path_frac_clust_cells='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
-    #                                               path_in_cluseters='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
-    #                                               path_out='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv',
-    #                                               plots_folder='./plots_folder1/part3')
+    gaba_genes_processing.clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
+                                                  path_frac_clust_cells='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
+                                                  path_in_cluseters='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
+                                                  path_out='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv',
+                                                  plots_folder='./plots_folder1/part3')
 
 
     data_processing2.clusters_bar_groups(path_in='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv',

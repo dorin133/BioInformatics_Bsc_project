@@ -175,5 +175,10 @@ if __name__ == '__main__':
     #                               path_in_cluseters='./clusttered_data6/clust_tsne_data.csv',
     #                               path_out='./clusttered_data6/tsne_and_clust_labels.csv')
     #
-    plot_nueral_gene_expression('./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv', plots_folder='./plots_folder1/part3')
+    # plot_nueral_gene_expression('./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv', plots_folder='./plots_folder1/part3')
+    clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
+                            path_frac_clust_cells='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
+                            path_in_cluseters='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
+                            path_out='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv',
+                            plots_folder='./plots_folder1/part3')
     print("Done")
