@@ -338,6 +338,7 @@ def heatmap_pipeline():
 
     # finally, compute the heatmap
     create_heatmap(path_in_heatmap_table='./clusttered_data6/stacked_3_for_heatMap.csv',
+                   path_in_stack_data='./clusttered_data6/stacked_3_sort_by_clust.csv',
                    features_csv_path='./csv_data2/features.csv',
                    plots_folder='./plots_folder1/part2')
     utils.write_log(f"#### finished heatmap_pipeline ####")
