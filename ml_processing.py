@@ -154,7 +154,7 @@ def tSNE_3d(path_in, path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx', path_
     plt.show()
 
 
-def DBScan_dynm_eps(path_in, path_out, path_out_tsne_dbscan, eps_prc=70, k_neighbor=20, plots_folder='./plots_folder1'):
+def DBScan_dynm_eps(path_in, path_out, path_out_tsne_dbscan, eps_prc=70, k_neighbor=20, print_noise=True, plots_folder='./plots_folder1'):
     utils.write_log(f'start DBScan_dynm_eps: finding the best eps with eps_prc={eps_prc} and k_neighbor={k_neighbor}')
     df = pd.read_csv(path_in, index_col=0, header=0)
     df = df.T[['tsne-2d-one', 'tsne-2d-two']]
@@ -176,10 +176,11 @@ def DBScan_dynm_eps(path_in, path_out, path_out_tsne_dbscan, eps_prc=70, k_neigh
     del df  # just close instance to save memory
 
     utils.write_log(f'finish DBScan_dynm_eps: found best eps is {chosen_eps}. now moving to preforming DBScan')
-    DBScan(path_in, path_out, eps=chosen_eps, path_out_tsne_dbscan=path_out_tsne_dbscan, min_samples=k_neighbor)  # call the actual dbscan using the eps we found
+    DBScan(path_in, path_out, eps=chosen_eps, path_out_tsne_dbscan=path_out_tsne_dbscan, min_samples=k_neighbor,
+           print_noise=print_noise, plots_folder=plots_folder)  # call the actual dbscan using the eps we found
 
 
-def DBScan(path_in, path_out, path_out_tsne_dbscan, plots_folder='./plots_folder1', eps=1.4, min_samples=20):
+def DBScan(path_in, path_out, path_out_tsne_dbscan, print_noise=True, plots_folder='./plots_folder1', eps=1.4, min_samples=20):
     utils.write_log('start DBScan')
     df = pd.read_csv(path_in, index_col=0, header=0)
     df = df.T
@@ -194,14 +195,19 @@ def DBScan(path_in, path_out, path_out_tsne_dbscan, plots_folder='./plots_folder
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     n_noise_ = list(labels).count(-1)
     utils.write_log(f'dbscan output: n_clusters_: {n_clusters_} (aka dbscan_labels) and the n_noise_: {n_noise_}')
+    df_print = df.copy()
+    n_clusters_print = n_clusters_+1
+    if print_noise == False:
+        df_print = df_print[df_print['dbscan_labels'] != -1]
+        n_clusters_print -= 1
 
     plt.figure(figsize=(16, 10))
     sns.scatterplot(
         x="tsne-2d-one",
         y="tsne-2d-two",
         hue="dbscan_labels",
-        palette=distinctipy.get_colors(n_clusters_+1, pastel_factor=0.6),
-        data=df,
+        palette=distinctipy.get_colors(n_clusters_print, pastel_factor=0.6),
+        data=df_print,
         legend="full",
         alpha=0.3
     )
