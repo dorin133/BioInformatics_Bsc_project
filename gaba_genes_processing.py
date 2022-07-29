@@ -7,6 +7,7 @@ import utils
 from matplotlib import pyplot as plt
 from distinctipy import distinctipy
 import linkage_and_heatmap as link_and_heat
+from scipy.stats import hypergeom
 
 
 def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_cluseters, path_out, plots_folder='plots_folder1/part2'):
@@ -91,7 +92,7 @@ def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_clu
     clusters_df = pd.read_csv(path_in_cluseters, header=0, index_col=0).T
     clusters_df['nueral_labels'] = clusters_df['linkage_labels'].map(map_nueral_class)
     clusters_df = clusters_df.T
-    clusters_df.to_csv(path_out, sep=',')
+    clusters_df.to_excel(path_out)
     # clusters_df.value_counts()
     utils.write_log(f"finished clustter_nueronal_genes {clusters_df.T['nueral_labels'].value_counts().to_dict()}")
 
@@ -200,12 +201,13 @@ def clustter_stats_2marker_genes(path_in_frac,
         utils.write_log(f"finished identifying clusters' marker genes for GABA stats, results saved to: {path_out}")
 
     marker_dict_gene_names = translate_dict_values_to_gene_names(path_to_features, marker_dict_linkage_idx)
-
+    for i in range(len(marker_dict_gene_names)):
+        utils.write_log(f"the 2 marker genes of Gaba cluster with linkage label {i} are: {marker_dict_gene_names[i]}")
     save_2marker_genes(marker_dict_gene_names, path_tsne_dbscan_data, path_out)
 
 
 def add_gender_parent_stats(path_to_stats_table, folder_path_in, path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx'):
-    utils.write_log(f'start filter_gaba_only')
+    utils.write_log(f'start identifying clusters cells by gender and parenthood for GABA stats')
     clust_stats = pd.read_csv(path_to_stats_table, index_col=0, header=0)
 
     raw_files = os.listdir(folder_path_in)  # list all raw files
@@ -239,13 +241,44 @@ def add_gender_parent_stats(path_to_stats_table, folder_path_in, path_to_MEA='./
             paernt_or_not_per_cell.append(0)
         
     clust_stats_T = clust_stats.T
-    clust_stats_T['female'] = pd.Series(gender_per_cell, index=clust_stats_T.index)
-    clust_stats_T['parent'] = pd.Series(paernt_or_not_per_cell, index=clust_stats_T.index)
+    clust_stats_T['female'] = pd.Series(gender_per_cell, index=clust_stats_T.index, dtype=int)
+    clust_stats_T['parent'] = pd.Series(paernt_or_not_per_cell, index=clust_stats_T.index, dtype=int)
+    clust_stats_T['female'].astype(float)
+    clust_stats_T['parent'].astype(float)
     path_out = path_to_stats_table #cause we want to keep adding to this table
     clust_stats_T.T.to_csv(path_out, sep=',')
     utils.write_log(f"finished identifying clusters' cells by gender and parenthood for GABA stats, results saved to: {path_out}")
 
 
+def cluster_enrichment_stats(path_to_stats_table, path_to_linkage_labels_table, path_out_cluster_stats_table):
+    utils.write_log(f"starting count_gender_parent_per_clust")
+    df_stack = pd.read_csv(path_to_stats_table, index_col=0, header=0)
+    gender_sum_per_cluster = (df_stack.T.groupby(by='linkage_labels')['female'].sum()).iloc[1:]
+    parent_sum_per_cluster = (df_stack.T.groupby(by='linkage_labels')['parent'].sum()).iloc[1:]
+    females_sum = df_stack.T['female'].astype('int').sum() # iloc[1:] to drop the '-1' clustter idx
+    parents_sum = df_stack.T['parent'].astype('int').sum()  # iloc[1:] to drop the '-1' clustter idx
+    linkage_clust_num = parent_sum_per_cluster #let's not consider '-1' as a clustter
+    num_of_cells = df_stack.shape[1]
+    df_cluster_stats = pd.read_csv(path_to_linkage_labels_table, index_col=0, header=0).T
+    p_value_females_list = []
+    p_value_parents_list = []
+
+    for i in range(len(linkage_clust_num)):
+        clust_size = len(gender_sum_per_cluster[i])
+        females_in_clust = gender_sum_per_cluster[i].count("1")
+        parents_in_clust = parent_sum_per_cluster[i].count("1")
+        p_value_females_list.append(1-hypergeom.cdf(females_in_clust, num_of_cells, females_sum, clust_size))
+        p_value_parents_list.append(1-hypergeom.cdf(parents_in_clust, num_of_cells, parents_sum, clust_size))
+
+    df_cluster_stats['female'] = pd.Series(p_value_females_list, index=df_cluster_stats.index, dtype=float)
+    df_cluster_stats['parent'] = pd.Series(p_value_parents_list, index=df_cluster_stats.index, dtype=float)
+    df_cluster_stats['female'].astype(float)
+    df_cluster_stats['parent'].astype(float)
+    df_cluster_stats.T.to_csv(path_out_cluster_stats_table, sep=',') #cause we want to keep adding to this table
+    for i in range(len(linkage_clust_num)):
+        utils.write_log(f"the p-values of Gaba cluster with linkage label: {i} female p-value: {p_value_females_list[i]} parent p-value: {p_value_parents_list[i]}")
+    utils.write_log(
+        f"finished group_enrichment_stats, results saved to: {path_out_cluster_stats_table}")
 
 
 if __name__ == '__main__':

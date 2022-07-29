@@ -140,7 +140,7 @@ def main():
     #                                path_out_pca_avg='./gaba_clustered_data11/gaba_PCA_avg_clust.csv',
     #                                path_out_linkage='./gaba_clustered_data11/gaba_linkage_out.csv',
     #                                path_out_translation='./gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
-                                #    plots_folder='./plots_folder1/part3')
+    #                                plots_folder='./plots_folder1/part3')
     
     # # step 16: heatmap data prep and the heatmap step itself
     # link_and_heat.heatmap_pipeline()
@@ -153,9 +153,7 @@ def main():
     #                                path_out_sort_stack_data='./gaba_clustered_data11/gaba_stacked_2_sort_by_clust.csv',
     #                                path_out_stack_for_heatmap='./gaba_clustered_data11/gaba_stacked_2_for_heatMap.csv',
     #                                plots_folder='./plots_folder1/part3')
-    
-    # # TODO that probably should be deleted VVV
-    # # TODO 2: something in the output just looks strange... i thought all gonna be gaba but they are not
+
     # step 17: gaba_genes_processing
     # gaba_genes_processing.avg_and_fraction_clustter_expression(path_in_stack='./gaba_merged_data10/gaba_stacked_1.csv',
     #                                                            path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
@@ -174,20 +172,29 @@ def main():
     #                                      plots_folder='./plots_folder1/part3')
 
 
-    # step 18: gathering some informative info about the gaba  genes
-    # gaba_genes_processing.clustter_stats_2marker_genes(path_in_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv',
-    #                                 path_in_avg='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv', 
-    #                                 max_genes_amount = 2,
-    #                                 path_in_translation='./gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
-    #                                 path_to_features='./csv_data2/features.csv',
-    #                                 path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv', 
-    #                                 path_out='./gaba_clustered_data11/gaba_all_clustter_stats.csv')
+    # # step 18: get the 2 marker genes of each cluster
+    #
+    gaba_genes_processing.clustter_stats_2marker_genes(path_in_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv',
+                                    path_in_avg='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
+                                    max_genes_amount = 2,
+                                    path_in_translation='./gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
+                                    path_to_features='./csv_data2/features.csv',
+                                    path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
+                                    path_out='./gaba_clustered_data11/gaba_all_samples_stats.csv')
 
-    # sub-step: add to the stats excel on each gaba smaple the gender and parenthood of each smaple 
-    gaba_genes_processing.add_gender_parent_stats(path_to_stats_table='./gaba_clustered_data11/gaba_all_clustter_stats.csv',folder_path_in='./csv_gaba7', path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx')
+    # sub-step: add to the stats excel on each gaba smaple the gender and parenthood of each smaple
+    gaba_genes_processing.add_gender_parent_stats(path_to_stats_table='./gaba_clustered_data11/gaba_all_samples_stats.csv',
+                                                  folder_path_in='./csv_gaba7',
+                                                  path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx')
+
+    # step 19: get the p-value (females/parents) of the cdf of hypergeom distribution (enrichment value)
+    gaba_genes_processing.cluster_enrichment_stats(path_to_stats_table='./gaba_clustered_data11/gaba_all_samples_stats.csv',
+                      path_to_linkage_labels_table= './gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
+                      path_out_cluster_stats_table='./gaba_clustered_data11/gaba_all_cluster_stats.csv')
+
     utils.write_log('*********************************** Finish pipeline run (v2) ***********************************')
 
 
 if __name__ == '__main__':
     main()
-    print("Donee")
+    print("Done")
