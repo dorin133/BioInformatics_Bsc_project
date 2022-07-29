@@ -5,6 +5,7 @@ import data_plot_utils
 import utils
 from matplotlib import pyplot as plt
 from distinctipy import distinctipy
+import linkage_and_heatmap as link_and_heat
 
 
 def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_cluseters, path_out, plots_folder='plots_folder1/part2'):
@@ -157,6 +158,52 @@ def avg_and_fraction_clustter_expression(path_in_stack, path_tsne_dbscan_data, p
 #                 df_clust_data[i]['nueral_labels'] = nueral_idx_arr[col_in_translation_table]
 #         df_clust_data.to_csv(path_out_clustter_data, sep=',')
 #         utils.write_log(f"finished translate_clustter_data: translation table of nueral gene clustter indeces saved to {path_out_clustter_data}")
+
+###################### gaba stats functions - new analysis that weren't conducted before! ##########
+
+def clustter_stats_2marker_genes(path_in_frac,
+                                    path_in_avg, 
+                                    max_genes_amount,
+                                    path_in_translation,
+                                    path_to_features,
+                                    path_tsne_dbscan_data, 
+                                    path_out):
+    utils.write_log(f"started identifying clusters' marker genes for GABA stats")
+    # here, the dict keys are still according to the dbscan clustter indeces
+    marker_genes_dict = link_and_heat.find_marker_genes(path_in_frac,
+                                        path_in_avg, max_genes_amount = 2)
+
+    # now, the keys will be translated to linkage clustter idx and sorted accordingly from 0 to [num_of clustters-1]
+    marker_dict_linkage_idx = link_and_heat.translate_and_sort_dict_keys(marker_genes_dict, path_in_translation)
+
+    def translate_dict_values_to_gene_names(path_to_features, marker_dict_linkage_idx=marker_dict_linkage_idx):
+        marker_dict_gene_names = marker_dict_linkage_idx
+        features = pd.read_csv(path_to_features, header=0)
+        features.set_axis(['num', 'geneID', 'geneName'], axis=1, inplace=True)
+        features.set_index('num', inplace=True)
+        for key in marker_dict_linkage_idx.keys():
+            curr_value = []
+            for curr_gene_id in marker_dict_linkage_idx[key]:
+                curr_value.append(str(features.at[curr_gene_id, 'geneName']))
+            marker_dict_gene_names[key] = curr_value
+        return marker_dict_gene_names
+    
+    def save_2marker_genes(marker_dict_gene_names, path_tsne_dbscan_data, path_out):
+        first_marker_genes = {float(k): v[0] for k, v in marker_dict_gene_names.items()}
+        second_marker_genes = {float(k): v[1] for k, v in marker_dict_gene_names.items()}
+        clusters_df = pd.read_csv(path_tsne_dbscan_data, header=0, index_col=0).T
+        clusters_df['first_marker_gene'] = clusters_df['linkage_labels'].map(first_marker_genes)
+        clusters_df['second_marker_gene'] = clusters_df['linkage_labels'].map(second_marker_genes)
+        clusters_df = clusters_df.T
+        clusters_df.to_csv(path_out, sep=',')
+        utils.write_log(f"finished identifying clusters' marker genes for GABA stats, results saved to: {path_out}")
+
+    marker_dict_gene_names = translate_dict_values_to_gene_names(path_to_features, marker_dict_linkage_idx)
+
+    save_2marker_genes(marker_dict_gene_names, path_tsne_dbscan_data, path_out)
+
+
+
 
 
 if __name__ == '__main__':

@@ -3,14 +3,16 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+mpl.rcParams['agg.path.chunksize'] = 10000
 import seaborn as sns
 import utils
 
 
 def save_plots(plot, plot_name, append_time=str(datetime.datetime.now().time())[:8].replace(":", "_")):
     plot_name += append_time
-    plot.savefig(f'{plot_name}.eps', format='eps')
-    plot.savefig(f'{plot_name}.svg', format='svg', dpi=888)
+    # plot.savefig(f'{plot_name}.eps', format='eps')
+    # plot.savefig(f'{plot_name}.svg', format='svg', dpi=888)
     plot.savefig(f'{plot_name}.png', format='png', dpi=888)
     return plot_name
 

@@ -53,8 +53,13 @@ def exp4():
     print(count)
     print('end of exp4')
 
+def exp5():
+    x = [[5,21,101], [10,22,102], [15,25,103]]
+    df = pd.DataFrame(x, columns=[1500,2000,3000])
+    print(df.iloc[0,0])
+
 if __name__=="__main__":
     # dir = 'C:/Users/Dorin Shteyman/Documents/GitHub/brains_v2/test_folder' #path to root dir
     # erase_all_files_from_root(dir)
     # check_for_marker_genes()
-    exp4()
+    exp5()

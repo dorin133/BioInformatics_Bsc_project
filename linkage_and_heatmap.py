@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.cm as cm
 import data_plot_utils
+import math
 import time
 import utils
 import ml_processing
@@ -141,7 +142,7 @@ def linkage_on_clustters(path_in, path_out, path_out_translation, plots_folder='
     utils.write_log(f'finished performing linkage_on_clustters, linkage output saved to: {path_out} and the indeces given to clustters by the linkage saved to {path_out_translation}')
 
 
-def find_marker_genes(path_in_frac, path_in_avg):
+def find_marker_genes(path_in_frac, path_in_avg, max_genes_amount = math.inf):
     # find for each clustter it's marker genes
     # clustters' indeces are according to the dbscan, we need to later transform them to linkage indeces!!!
     utils.write_log(f"starting find_marker_genes: currently each clustter will have at most 8 unique markers")
@@ -168,9 +169,12 @@ def find_marker_genes(path_in_frac, path_in_avg):
         # how to subtract one list from another: set(unique_curr_marker_genes) - set(selected_marker_genes)
         unique_curr_marker_genes = set(unique_curr_marker_genes) - set(selected_marker_genes)
         clustter_idx = int(float(clustter_idx))
-        marker_genes_dict[clustter_idx] = unique_curr_marker_genes
+        marker_genes_dict[clustter_idx] = list(unique_curr_marker_genes)
+        if (max_genes_amount != math.inf):
+            marker_genes_dict[clustter_idx] = marker_genes_dict[clustter_idx][:2]
         # make sure to keep all genes we already chose
         selected_marker_genes = selected_marker_genes + list(unique_curr_marker_genes)
+        selected_marker_genes = selected_marker_genes[:max_genes_amount]
     utils.write_log(f"finished find_marker_genes: returning a dictionary [keys - dbscan clustter idx, values - idx of marker genes]")
     return marker_genes_dict
 
