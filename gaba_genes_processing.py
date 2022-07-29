@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import seaborn as sns
+import os
 import data_plot_utils
 import utils
 from matplotlib import pyplot as plt
@@ -202,6 +203,47 @@ def clustter_stats_2marker_genes(path_in_frac,
 
     save_2marker_genes(marker_dict_gene_names, path_tsne_dbscan_data, path_out)
 
+
+def add_gender_parent_stats(path_to_stats_table, folder_path_in, path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx'):
+    utils.write_log(f'start filter_gaba_only')
+    clust_stats = pd.read_csv(path_to_stats_table, index_col=0, header=0)
+
+    raw_files = os.listdir(folder_path_in)  # list all raw files
+    chosen_files = list(filter(lambda x: 'matrix.csv' in x, raw_files))
+    chosen_files.sort()
+
+    df_f_m_index = pd.read_excel(path_to_MEA)
+    f_list, m_list = [], []
+    p_list, no_p_list = [], []
+    for _, row in df_f_m_index.iterrows():
+        if row['female'] == 1:
+            f_list.append(row.iloc[0])
+        else:
+            m_list.append(row.iloc[0])
+        if row['parent'] == 1:
+            p_list.append(row.iloc[0])
+        else:
+            no_p_list.append(row.iloc[0])
+    
+    gender_per_cell = []
+    paernt_or_not_per_cell = []
+    for col_name in clust_stats.columns:
+        tmp = col_name.split('__')[1]
+        if tmp in f_list:
+            gender_per_cell.append(1)
+        else:
+            gender_per_cell.append(0)
+        if tmp in p_list:
+            paernt_or_not_per_cell.append(1)
+        else:
+            paernt_or_not_per_cell.append(0)
+        
+    clust_stats_T = clust_stats.T
+    clust_stats_T['female'] = pd.Series(gender_per_cell, index=clust_stats_T.index)
+    clust_stats_T['parent'] = pd.Series(paernt_or_not_per_cell, index=clust_stats_T.index)
+    path_out = path_to_stats_table #cause we want to keep adding to this table
+    clust_stats_T.T.to_csv(path_out, sep=',')
+    utils.write_log(f"finished identifying clusters' cells by gender and parenthood for GABA stats, results saved to: {path_out}")
 
 
 

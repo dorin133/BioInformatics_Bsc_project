@@ -175,57 +175,16 @@ def main():
 
 
     # step 18: gathering some informative info about the gaba  genes
-    gaba_genes_processing.clustter_stats_2marker_genes(path_in_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv',
-                                    path_in_avg='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv', 
-                                    max_genes_amount = 2,
-                                    path_in_translation='./gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
-                                    path_to_features='./csv_data2/features.csv',
-                                    path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv', 
-                                    path_out='./gaba_clustered_data11/gaba_all_clustter_stats.csv')
-    
-    def x(path_in='./gaba_clustered_data11/gaba_all_clustter_stats.csv',folder_path_in='./csv_gaba7', path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx'):
-        utils.write_log(f'start filter_gaba_only')
-        clust_stats = pd.read_csv(path_in, index_col=0, header=0)
+    # gaba_genes_processing.clustter_stats_2marker_genes(path_in_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv',
+    #                                 path_in_avg='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv', 
+    #                                 max_genes_amount = 2,
+    #                                 path_in_translation='./gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
+    #                                 path_to_features='./csv_data2/features.csv',
+    #                                 path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv', 
+    #                                 path_out='./gaba_clustered_data11/gaba_all_clustter_stats.csv')
 
-        raw_files = os.listdir(folder_path_in)  # list all raw files
-        chosen_files = list(filter(lambda x: 'matrix.csv' in x, raw_files))
-        chosen_files.sort()
-
-        df_f_m_index = pd.read_excel(path_to_MEA)
-        f_list, m_list = [], []
-        p_list, no_p_list = [], []
-        for _, row in df_f_m_index.iterrows():
-            if row['female'] == 1:
-                f_list.append(row.iloc[0])
-            else:
-                m_list.append(row.iloc[0])
-            if row['parent'] == 1:
-                p_list.append(row.iloc[0])
-            else:
-                no_p_list.append(row.iloc[0])
-        
-        gender_per_cell = []
-        paernt_or_not_per_cell = []
-        for col_name in clust_stats.columns:
-            tmp = col_name.split('__')[1]
-            if tmp in f_list:
-                gender_per_cell.append(1)
-            else:
-                gender_per_cell.append(0)
-            if tmp in p_list:
-                paernt_or_not_per_cell.append(1)
-            else:
-                paernt_or_not_per_cell.append(0)
-
-        clust_stats_T = clust_stats.T
-        clust_stats_T['female'] = pd.Series(gender_per_cell, index=clust_stats_T.index)
-        clust_stats_T['parent'] = pd.Series(paernt_or_not_per_cell, index=clust_stats_T.index)
-        path_out = path_in #cause we want to keep adding to this table
-        clust_stats_T.T.to_csv(path_out, sep=',')
-        utils.write_log(f"finished identifying clusters' cells by gender and parenthood for GABA stats, results saved to: {path_out}")
-
-
-    x(path_in='./gaba_clustered_data11/gaba_all_clustter_stats.csv',folder_path_in='./csv_gaba7', path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx')
+    # sub-step: add to the stats excel on each gaba smaple the gender and parenthood of each smaple 
+    gaba_genes_processing.add_gender_parent_stats(path_to_stats_table='./gaba_clustered_data11/gaba_all_clustter_stats.csv',folder_path_in='./csv_gaba7', path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx')
     utils.write_log('*********************************** Finish pipeline run (v2) ***********************************')
 
 
