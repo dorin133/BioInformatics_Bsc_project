@@ -11,7 +11,7 @@ import data_processing2
 
 def main():
 
-    utils.write_log('*********************************** Start pipeline run (v2) ***********************************')
+    # utils.write_log('*********************************** Start pipeline run (v2) ***********************************')
     
     # utils.check_files_and_folder_for_complete_run(first_folder="./raw_data")
     
@@ -157,35 +157,35 @@ def main():
     # # TODO that probably should be deleted VVV
     # # TODO 2: something in the output just looks strange... i thought all gonna be gaba but they are not
     # step 17: gaba_genes_processing
-    # gaba_genes_processing.avg_and_fraction_clustter_expression(path_in_stack='./gaba_merged_data10/gaba_stacked_1.csv',
-    #                                                            path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
-    #                                                            path_out_avg_clust_cell='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
-    #                                                            path_out_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv')
+    gaba_genes_processing.avg_and_fraction_clustter_expression(path_in_stack='./gaba_merged_data10/gaba_stacked_1.csv',
+                                                               path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
+                                                               path_out_avg_clust_cell='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
+                                                               path_out_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv')
     
-    # gaba_genes_processing.clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
-    #                                               path_frac_clust_cells='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv',
-    #                                               path_in_cluseters='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
-    #                                               path_out='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv',
-    #                                               plots_folder='./plots_folder1/part3')
+    gaba_genes_processing.clustter_nueronal_genes(path_to_features='./csv_data2/features.csv',
+                                                  path_frac_clust_cells='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv',
+                                                  path_in_cluseters='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
+                                                  path_out='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv',
+                                                  plots_folder='./plots_folder1/part3')
 
 
-    # data_processing2.clusters_bar_groups(path_in='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv',
-    #                                      path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx',
-    #                                      plots_folder='./plots_folder1/part3')
+    data_processing2.clusters_bar_groups(path_in='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv',
+                                         path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx',
+                                         plots_folder='./plots_folder1/part3')
 
 
     # step 18: gathering some informative info about the gaba  genes
-    # gaba_genes_processing.clustter_stats_2marker_genes(path_in_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv',
-    #                                 path_in_avg='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv', 
-    #                                 max_genes_amount = 2,
-    #                                 path_in_translation='./gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
-    #                                 path_to_features='./csv_data2/features.csv',
-    #                                 path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv', 
-    #                                 path_out='./gaba_clustered_data11/gaba_all_clustter_stats.csv')
+    gaba_genes_processing.clustter_stats_2marker_genes(path_in_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv',
+                                    path_in_avg='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
+                                    max_genes_amount = 2,
+                                    path_in_translation='./gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
+                                    path_to_features='./csv_data2/features.csv',
+                                    path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
+                                    path_out='./gaba_clustered_data11/gaba_all_clustter_stats.csv')
 
     # sub-step: add to the stats excel on each gaba smaple the gender and parenthood of each smaple 
     gaba_genes_processing.add_gender_parent_stats(path_to_stats_table='./gaba_clustered_data11/gaba_all_clustter_stats.csv',folder_path_in='./csv_gaba7', path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx')
-    utils.write_log('*********************************** Finish pipeline run (v2) ***********************************')
+    # utils.write_log('*********************************** Finish pipeline run (v2) ***********************************')
 
 
 if __name__ == '__main__':

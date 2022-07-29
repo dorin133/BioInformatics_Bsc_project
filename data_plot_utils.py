@@ -86,7 +86,7 @@ def print_hist_genes(folder_path='./csv_data2', plots_folder='./plots_folder1'):
 
 
 def plot_female_vs_male_fraction_expression(females_path, males_path, path_to_features_csv, path_stacked_mtx_file, path_out,
-                             plots_folder='./plots_folder1'):
+                             plots_folder='./plots_folder1', append_to_plot_name=''):
     df_f = pd.read_csv(females_path, index_col=0, header=0)
     df_m = pd.read_csv(males_path, index_col=0, header=0)
 
@@ -128,11 +128,15 @@ def plot_female_vs_male_fraction_expression(females_path, males_path, path_to_fe
                      xytext=(0, 2),  # distance from text to points (x,y)
                      ha='center')  # horizontal alignment can be left, right or center
         i += 1
-    plt.title("Females vs Males genes expression ratio")
+    if append_to_plot_name != '':
+        plt.title(f"Females vs Males genes expression ratio ({append_to_plot_name})")
+        append_to_plot_name = f'_{append_to_plot_name}'
+    else:
+        plt.title("Females vs Males genes expression ratio")
     plt.ylabel("Males ratio of expression")  # TODO double check this
     plt.xlabel("Females ratio of expression")
     # plt.savefig(f'{plots_folder}/female_vs_male_expression_ratio{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
-    save_plots(plt, f'{plots_folder}/female_vs_male_expression_ratio')
+    save_plots(plt, f'{plots_folder}/female_vs_male_expression_ratio{append_to_plot_name}')
     plt.show()
 
     # df_all = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)  # TODO add this if needed
@@ -147,7 +151,7 @@ def plot_female_vs_male_fraction_expression(females_path, males_path, path_to_fe
 
 
 def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, path_stacked_mtx_file, path_out,
-                             plots_folder='./plots_folder1'):
+                             plots_folder='./plots_folder1', append_to_plot_name=''):
     df_f = pd.read_csv(females_path, index_col=0, header=0)
     df_m = pd.read_csv(males_path, index_col=0, header=0)
 
@@ -189,11 +193,15 @@ def plot_female_vs_male_mean(females_path, males_path, path_to_features_csv, pat
                      ha='center')  # horizontal alignment can be left, right or center
         i += 1
 
-    plt.title("Females vs Males genes mean")
+    if append_to_plot_name != '':
+        plt.title(f"Females vs Males genes mean ({append_to_plot_name})")
+        append_to_plot_name = f'_{append_to_plot_name}'
+    else:
+        plt.title("Females vs Males genes mean")
     plt.ylabel("mean(Males)")  # TODO double check this
     plt.xlabel("mean(Females)")
     # plt.savefig(f'{plots_folder}/female_vs_male_mean{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
-    save_plots(plt, f'{plots_folder}/female_vs_male_mean')
+    save_plots(plt, f'{plots_folder}/female_vs_male_mean{append_to_plot_name}')
     plt.show()
 
     # df_all = pd.read_csv(path_stacked_mtx_file, index_col=0, header=0)  # TODO add this if needed
