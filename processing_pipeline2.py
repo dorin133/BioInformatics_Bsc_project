@@ -172,8 +172,7 @@ def main():
     #                                      plots_folder='./plots_folder1/part3')
 
 
-    # # step 18: get the 2 marker genes of each cluster
-    #
+    # step 18: get the 2 marker genes of each cluster
     gaba_genes_processing.clustter_stats_2marker_genes(path_in_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv',
                                     path_in_avg='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
                                     max_genes_amount = 2,
@@ -182,7 +181,7 @@ def main():
                                     path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
                                     path_out='./gaba_clustered_data11/gaba_all_samples_stats.csv')
 
-    # sub-step: add to the stats excel on each gaba smaple the gender and parenthood of each smaple
+    # sub-step: add to the stats excel on each gaba sample the gender and parenthood of each sample
     gaba_genes_processing.add_gender_parent_stats(path_to_stats_table='./gaba_clustered_data11/gaba_all_samples_stats.csv',
                                                   folder_path_in='./csv_gaba7',
                                                   path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx')
@@ -192,7 +191,7 @@ def main():
                       path_to_linkage_labels_table= './gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
                       path_out_cluster_stats_table='./gaba_clustered_data11/gaba_all_cluster_stats.csv')
 
-    utils.write_log('*********************************** Finish pipeline run (v2) ***********************************')
+    # utils.write_log('*********************************** Finish pipeline run (v2) ***********************************')
 
 
 if __name__ == '__main__':
