@@ -333,7 +333,8 @@ def heatmap_pipeline(path_in_frac='./clusttered_data6/frac_clust_cells.csv',
     # heatmap_data_perp()
     # here, the dict keys are still according to the dbscan clustter indeces
     marker_genes_dict = find_marker_genes(path_in_frac=path_in_frac,
-                                          path_in_avg=path_in_avg)
+                                          path_in_avg=path_in_avg,
+                                          max_genes_amount=2)
 
     # now, the keys will be translated to linkage clustter idx and sorted accordingly from 0 to [num_of clustters-1]
     marker_dict_linkage_idx = translate_and_sort_dict_keys(marker_dict_dbscan_idx=marker_genes_dict,

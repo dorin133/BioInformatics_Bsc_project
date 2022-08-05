@@ -1,0 +1,94 @@
+
+2022-07-09 21:29:35.10: *********************************** Start pipeline run ***********************************
+2022-07-09 21:29:35.10: status: check_files_and_folder_for_complete_run: check missing default files and folder...
+2022-07-09 21:29:35.41: start features_to_csv
+2022-07-09 21:29:35.60: start run_func_for_all with raw_mtx_to_csv
+2022-07-09 21:39:51.33: finish run_func_for_all with raw_mtx_to_csv
+2022-07-09 21:39:51.33: start prepare_metadata_single_files
+2022-07-09 21:39:52.29: start run_func_for_all with filter_cols
+2022-07-09 21:40:16.84: filter_by_min_sum: ./csv_data2/35_1_matrix.csv: Note: started with 5238 cols, after filtering left with 2436 (filtered 2802 cols)
+2022-07-09 21:40:42.98: filter_by_min_sum: ./csv_data2/35_2_matrix.csv: Note: started with 5029 cols, after filtering left with 2849 (filtered 2180 cols)
+2022-07-09 21:41:04.95: filter_by_min_sum: ./csv_data2/36_1_matrix.csv: Note: started with 4479 cols, after filtering left with 2287 (filtered 2192 cols)
+2022-07-09 21:41:26.43: filter_by_min_sum: ./csv_data2/36_2_matrix.csv: Note: started with 4441 cols, after filtering left with 2281 (filtered 2160 cols)
+2022-07-09 21:41:44.90: filter_by_min_sum: ./csv_data2/37_1_matrix.csv: Note: started with 4197 cols, after filtering left with 1879 (filtered 2318 cols)
+2022-07-09 21:42:10.57: filter_by_min_sum: ./csv_data2/37_2_matrix.csv: Note: started with 5564 cols, after filtering left with 2462 (filtered 3102 cols)
+2022-07-09 21:42:34.13: filter_by_min_sum: ./csv_data2/38_1_matrix.csv: Note: started with 4684 cols, after filtering left with 2588 (filtered 2096 cols)
+2022-07-09 21:42:48.09: filter_by_min_sum: ./csv_data2/38_2_matrix.csv: Note: started with 3919 cols, after filtering left with 1707 (filtered 2212 cols)
+2022-07-09 21:43:35.64: filter_by_min_sum: ./csv_data2/51_1_matrix.csv: Note: started with 8195 cols, after filtering left with 2871 (filtered 5324 cols)
+2022-07-09 21:44:01.81: filter_by_min_sum: ./csv_data2/51_2_matrix.csv: Note: started with 5009 cols, after filtering left with 2928 (filtered 2081 cols)
+2022-07-09 21:44:15.78: filter_by_min_sum: ./csv_data2/51_3_matrix.csv: Note: started with 3858 cols, after filtering left with 1762 (filtered 2096 cols)
+2022-07-09 21:44:34.95: filter_by_min_sum: ./csv_data2/51_4_matrix.csv: Note: started with 4458 cols, after filtering left with 1870 (filtered 2588 cols)
+2022-07-09 21:44:57.81: filter_by_min_sum: ./csv_data2/52_1_matrix.csv: Note: started with 5231 cols, after filtering left with 2196 (filtered 3035 cols)
+2022-07-09 21:45:24.40: filter_by_min_sum: ./csv_data2/52_2_matrix.csv: Note: started with 6364 cols, after filtering left with 2321 (filtered 4043 cols)
+2022-07-09 21:45:44.90: filter_by_min_sum: ./csv_data2/52_3_matrix.csv: Note: started with 4362 cols, after filtering left with 2194 (filtered 2168 cols)
+2022-07-09 21:46:06.23: filter_by_min_sum: ./csv_data2/52_4_matrix.csv: Note: started with 4585 cols, after filtering left with 2236 (filtered 2349 cols)
+2022-07-09 21:46:06.24: finish run_func_for_all with filter_cols
+2022-07-09 21:46:06.24: start filter_metadata_rows
+2022-07-09 21:47:04.50: start print_hist_genes
+2022-07-09 21:51:30.15: start print_pdf_mul
+2022-07-09 21:52:31.01: start print_hist_mt_percentage
+2022-07-09 21:53:31.79: start run_func_for_all with normalize_data
+2022-07-09 22:01:58.35: finish run_func_for_all with normalize_data
+2022-07-09 22:01:58.35: start stack_csv_together
+2022-07-09 22:04:18.993844 stack_csv_together: [('35_1_matrix_normalized.csv', 1), ('35_2_matrix_normalized.csv', 2437), ('36_1_matrix_normalized.csv', 5286), ('36_2_matrix_normalized.csv', 7573), ('37_1_matrix_normalized.csv', 9854), ('37_2_matrix_normalized.csv', 11733), ('38_1_matrix_normalized.csv', 14195), ('38_2_matrix_normalized.csv', 16783), ('51_1_matrix_normalized.csv', 18490), ('51_2_matrix_normalized.csv', 21361), ('51_3_matrix_normalized.csv', 24289), ('51_4_matrix_normalized.csv', 26051), ('52_1_matrix_normalized.csv', 27921), ('52_2_matrix_normalized.csv', 30117), ('52_3_matrix_normalized.csv', 32438), ('52_4_matrix_normalized.csv', 34632)]
+2022-07-09 22:40:55.12: plot_female_vs_male_mean: the 20 genes we found in this function are: ['Xist' 'Gm10076' 'Ddx3y' 'Eif2s3y' 'Tsix' 'Gm42418' 'Uba52' 'Rpl35'
+ 'Rpl38' 'Rps29' 'Rps28' 'Rpl37' 'Polr2l' 'Pdcd4' 'Rpl39' 'mt-Nd4l'
+ 'mt-Co1' 'Ecel1' 'Rps21' 'Rpl6']
+2022-07-09 22:47:44.13: plot_female_vs_male_expression_fraction: the 20 genes we found in this function are: ['Xist' 'Ddx3y' 'Eif2s3y' 'Tsix' 'Gm10076' 'Kdm5d' 'Ccdc85b' 'Polr2l'
+ 'Uty' 'Uba52' 'Ecel1' 'Gm10073' 'Rbm3' 'Gstp1' 'PISD' 'Eif2s3x' 'Greb1'
+ 'Brinp2' 'Snhg6' 'Col25a1']
+2022-07-09 22:47:44.14: start filter_common_and_rare_gens
+2022-07-09 23:02:12.39: filtered 10499 genes (original shape was (27998, 36867) and the update one is (17499, 36867)). filtered csv saved as ./merged_data5/stacked_2_v2.csv
+2022-07-09 23:22:10.94: start calc_and_plot_cv. df original shape is (17499, 36867)
+2022-07-09 23:22:55.43: calc_and_plot_cv: finished plotting mean as a function of cv for each gene
+ The 100 genes we cleaned are ['Hbb-bs' 'Oxt' 'Plp1' 'Hba-a1' 'Avp' 'Hba-a2' 'Hbb-bt' 'Ptgds' 'Mal'
+ 'Acta2' 'Gfap' 'Vip' 'Sst' 'Apoe' 'Cldn5' 'Myoc' 'Cnp' 'Cartpt' 'Flt1'
+ 'Cort' 'Ucn3' 'Mobp' 'Ccl4' 'Klf2' 'Tagln' 'Rgs5' 'Mag' 'Npy' 'Itm2a'
+ 'Tac2' 'Mbp' 'Cldn11' 'Aqp4' 'Top2a' 'Pltp' 'Ly6c1' 'Nts' 'Lyz2' 'Atp1a2'
+ 'Trf' 'Vtn' 'Dbi' 'Slco1a4' 'Tmem212' 'Ly6a' 'C1qa' 'Igfbp7' 'C1qb'
+ 'Cxcl12' 'Tm4sf1' 'Plac8' 'Ifitm3' 'Ccl3' 'Gal' 'Gpr17' 'Mog' 'Id3'
+ 'Sparc' 'Id1' 'H2-Aa' 'Ccl5' 'Gkn3' 'Cryab' 'Ctla2a' 'C1ql3' 'Apod'
+ 'Hspb1' 'Epas1' 'S100a3' 'Klf4' 'Ptprb' 'Tcf7l2' 'Mgp' 'Ube2c' 'C1qc'
+ 'Hexb' 'Cd74' 'Snca' 'Crip1' 'Tac1' 'Olig1' 'Cnr1' 'Opalin' 'Ndrg2' 'Ptn'
+ 'Sepp1' 'Bcas1' 'Ermn' 'Car2' 'Kif14' 'Gm44129' 'Fabp7' 'Tpm2' 'Cx3cr1'
+ 'Gad2' 'Fos' 'Myl9' 'Gatm' 'Plpp3' 'Atf3']
+2022-07-09 23:23:29.61: pca_norm_knee: starting. original data shape is (454, 36867) (we Transpose this in a moment)
+2022-07-09 23:23:33.76: finish PCA. left with 13 values. current data shape is (36867, 13) (Transposed). saved to ./merged_data5/pca4.csv
+2022-07-09 23:23:33.76: start tSNE
+2022-07-09 23:27:55.90: t-SNE done! Time elapsed: 260.0452778339386 seconds
+2022-07-09 23:28:32.51: finish tSNE. new data with the two tSNE cols is in shape (36867, 18), saved to ./merged_data5/tsne.csv
+2022-07-09 23:28:32.53: start DBScan_dynm_eps: finding the best eps with eps_prc=70 and k_neighbor=20
+2022-07-09 23:32:37.28: finish DBScan_dynm_eps: found best eps is 1.4724638059244137. now moving to preforming DBScan
+2022-07-09 23:32:37.28: start DBScan
+2022-07-09 23:32:38.89: dbscan output: n_clusters_: 86 (aka dbscan_labels) and the n_noise_: 2629
+2022-07-09 23:33:05.43: finish DBScan with eps 1.47246. new data with the labels from DBScan ("dbscan_labels", where -1 consider noise else the given label) is in shape (36867, 16). saved to ./clusttered_data6/dbscan.csv
+2022-07-09 23:33:06.15: starting sanity check: gene expression volume on T-SNE's scatter plot
+2022-07-09 23:38:39.56: summarize:
+	-created an image for the following gens [('Gad2', 1868), ('Slc32a1', 3682), ('Slc17a7', 12665), ('Slc17a6', 12788), ('Sst', 24074), ('Tac2', 15165), ('Acta2', 27614), ('Flt1', 10037), ('Cldn5', 23996), ('Aqp4', 26583), ('Plp1', 4923)].
+	-Did not print for the following gens which did not found in data [('Snap25', 3364)]
+2022-07-09 23:38:39.56: finished sanity check: plots saved in ./plots_folder1/part2
+2022-07-09 23:38:39.59: #### starting linkage_pipeline ####
+2022-07-09 23:38:39.59: starting avg_and_fraction_clustter_expression
+2022-07-09 23:38:54.96: saving a table of each clustter's its average cell and average expression percentage of each gene
+2022-07-09 23:38:55.04: finished avg_and_fraction_clustter_expression, results saved to: ./clusttered_data6/avg_clust_cells.csv and ./clusttered_data6/frac_clust_cells.csv
+2022-07-09 23:38:55.10: starting pca_avg_clust_cells: original data shape is (454, 86) (we Transpose this in a moment)
+2022-07-09 23:38:55.13: finish PCA on the avg cells of each clustter. left with 10 values. current data shape is (86, 10) (Transposed). saved to ./clusttered_data6/PCA_avg_clust.csv
+2022-07-09 23:38:55.13: starting linkage_on_clustters
+2022-07-09 23:39:02.30: finished performing linkage_on_clustters, linkage output saved to: ./clusttered_data6/linkage_out.csv and the indeces given to clustters by the linkage saved to ./clusttered_data6/clust_idx_translation_table.csv
+2022-07-09 23:39:02.30: #### finished linkage_pipeline ####
+2022-07-09 23:39:02.30: #### starting heatmap_pipeline ####
+2022-07-09 23:39:02.30: starting find_marker_genes: currently each clustter will have at most 8 unique markers
+2022-07-09 23:39:02.45: finished find_marker_genes: returning a dictionary [keys - dbscan clustter idx, values - idx of marker genes]
+2022-07-09 23:39:02.45: starting translate_and_sort_dict_keys
+2022-07-09 23:39:02.46: finished translate_and_sort_dict_keys: returning a sorted(!) dictionary [keys - linkage(!) clustter idx, values - idx of marker genes]
+2022-07-09 23:39:02.46: starting translate_clustter_data
+2022-07-09 23:54:48.41: finished translate_clustter_data: translation table of clustter indeces saved to ./clusttered_data6/clust_tsne_data.csv
+2022-07-09 23:54:49.75: starting sort_stack_data_by_clustter
+2022-07-09 23:55:25.20: finished sort_stack_data_by_clustter: mapping each cell to its clustter linkage idx instead dbscan clustter idx
+2022-07-09 23:55:25.21: result of sort_stack_data_by_clustter saved to ./clusttered_data6/stacked_3_sort_by_clust.csv
+2022-07-09 23:55:25.21: starting prepare_data_for_heatmap
+2022-07-09 23:55:51.08: finished prepare_data_for_heatmap: marker genes are order accoring to linkage clustters, gene expressions are normalized
+2022-07-09 23:55:51.08: result of prepare_data_for_heatmap saved to ./clusttered_data6/stacked_3_for_heatMap.csv
+2022-07-09 23:56:06.88: starting create_heatmap
+2022-07-09 23:56:20.59: finished create_heatmap: result of create_heatmap saved to ./plots_folder1/part2
+2022-07-09 23:56:20.60: #### finished heatmap_pipeline ####
