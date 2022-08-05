@@ -59,6 +59,9 @@ def barplot_dataset(path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx', plots_
     plt.show()
     pass
 
+
+
+
 if __name__ == '__main__':
     barplot_dataset()
     print("Done")
