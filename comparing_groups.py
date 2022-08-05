@@ -186,8 +186,7 @@ def ranksum_plot(folder_in, path_to_features='./csv_data2/features.csv', plots_f
             pvalue_res = full_res.pvalue
             # print(pvalue_res)
             log_pvalue_res.append(-log10(pvalue_res))
-            means_diff.append(mean2 - mean1)  # TODO
-            # means_diff.append(log10(mean2) - log10(mean1))
+            means_diff.append(log10(mean2+1) - log10(mean1+1))  # means_diff.append(mean2 - mean1)
             gens_names.append(features.loc[i, 'geneName'])
 
         fig, ax = plt.subplots()
@@ -195,15 +194,18 @@ def ranksum_plot(folder_in, path_to_features='./csv_data2/features.csv', plots_f
         texts = []
         radius_w = (plt.xlim()[1] - plt.xlim()[0]) / 50
         radius_h = (plt.ylim()[1] - plt.ylim()[0]) / 43
+        above_gender = {True: 0, False: 0}
         for i, txt in enumerate(gens_names):
             if log_pvalue_res[i] > 3:
                 texts.append(ax.text(means_diff[i], log_pvalue_res[i], txt))
                 ellipse = Ellipse(xy=(means_diff[i], log_pvalue_res[i]), width=radius_w,
                                   height=radius_h, edgecolor='r', fc='None', lw=1, fill=False)
                 ax.add_patch(ellipse)
-        plt.title(f"Ranksums for cluster {cluster} - females vs males")
-        plt.xlabel("means_diff (males-females)")  # TODO double check this later
+                above_gender[means_diff[i] > 0] += 1
+        plt.title(f"Ranksums for cluster {cluster} - females vs males\n{above_gender[True]} males above, {above_gender[False]} females above")
+        plt.xlabel(f"means_diff (males-females)")
         plt.ylabel("-log10(ranksum_log_pvalue)")
+
         # plt.savefig(f'{plots_folder}/female_vs_male_mean{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
         data_plot_utils.save_plots(plt, f'{plots_folder}/ranksum_{cluster}_')
         plt.show()
@@ -234,7 +236,7 @@ if __name__ == '__main__':
 
     # compere_female_vs_male_for_each_cluster(folder_in='gaba_groups12')
 
-    # ranksum_plot(folder_in='gaba_groups12')
+    ranksum_plot(folder_in='gaba_groups12')
 
-    size_of_clusters(path_in='./gaba_clustered_data11/gaba_all_samples_stats.csv')
+    # size_of_clusters(path_in='./gaba_clustered_data11/gaba_all_samples_stats.csv')
 
