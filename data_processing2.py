@@ -231,6 +231,26 @@ def clusters_bar_groups(path_in, path_to_MEA, plots_folder):
     plt.show()
 
 
+def filter_unwanted(path_in, path_out, feature_in='./csv_data2/features.csv'):
+    utils.write_log(f'start filter_unwanted')
+    df = pd.read_csv(path_in, index_col=0, header=0)
+
+    manually_remove = ['Xist', 'Tsix', 'Eif2s3y', 'Ddx3y', 'Uty', 'Kdm5d']
+    features = pd.read_csv(feature_in, header=0)
+    features.set_axis(['num', 'geneID', 'geneName'], axis=1, inplace=True)
+    features.set_index('geneName', inplace=True)
+    print(f'Manually removing {manually_remove} from {path_in}')
+    for gen in manually_remove:
+        idx = features.loc[gen, 'num']
+        print(f'{gen} -> {idx}')
+        if idx in df.index:
+            df.drop(idx, inplace=True)
+    df.to_csv(path_out)
+    utils.write_log(f'finished filter_unwanted')
+
 
 if __name__ == '__main__':
-    compare_all_data_to_gaba_only()
+    # compare_all_data_to_gaba_only()
+    filter_unwanted('./gaba_merged_data10/gaba_stacked_2_v2.csv',
+                    './gaba_merged_data10/gaba_stacked_2_v3.csv')
+

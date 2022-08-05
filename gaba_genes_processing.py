@@ -92,7 +92,7 @@ def clustter_nueronal_genes(path_to_features, path_frac_clust_cells, path_in_clu
     clusters_df = pd.read_csv(path_in_cluseters, header=0, index_col=0).T
     clusters_df['nueral_labels'] = clusters_df['linkage_labels'].map(map_nueral_class)
     clusters_df = clusters_df.T
-    clusters_df.to_excel(path_out)
+    clusters_df.to_csv(path_out)
     # clusters_df.value_counts()
     utils.write_log(f"finished clustter_nueronal_genes {clusters_df.T['nueral_labels'].value_counts().to_dict()}")
 

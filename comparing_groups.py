@@ -27,51 +27,51 @@ def split_clusters_and_groups(path_in_data, path_in_groups_data, folder_out):
         print(f'cluster {cluster}')
         cluster_cells_ids = cell_to_label[cell_to_label['linkage_labels'] == cluster].index.to_list()
         cluster_cells_data_all = all_data[cluster_cells_ids]
-        cluster_cells_data_all.to_csv(f'{folder_out}/{cluster}_all.csv')
+        cluster_cells_data_all.to_csv(f'{folder_out}/{int(float(cluster))}_all.csv')
 
         cluster_cells_ids = cell_to_label[
             (cell_to_label['linkage_labels'] == cluster) & (cell_to_label['female'] == '0')].index.to_list()
         cluster_cells_data = cluster_cells_data_all[cluster_cells_ids]
-        cluster_cells_data.to_csv(f'{folder_out}/{cluster}_males.csv')
+        cluster_cells_data.to_csv(f'{folder_out}/{int(float(cluster))}_males.csv')
 
         cluster_cells_ids = cell_to_label[
             (cell_to_label['linkage_labels'] == cluster) & (cell_to_label['female'] == '1')].index.to_list()
         cluster_cells_data = cluster_cells_data_all[cluster_cells_ids]
-        cluster_cells_data.to_csv(f'{folder_out}/{cluster}_females.csv')
+        cluster_cells_data.to_csv(f'{folder_out}/{int(float(cluster))}_females.csv')
 
         cluster_cells_ids = cell_to_label[
             (cell_to_label['linkage_labels'] == cluster) & (cell_to_label['parent'] == '0')].index.to_list()
         cluster_cells_data = cluster_cells_data_all[cluster_cells_ids]
-        cluster_cells_data.to_csv(f'{folder_out}/{cluster}_virgins.csv')
+        cluster_cells_data.to_csv(f'{folder_out}/{int(float(cluster))}_virgins.csv')
 
         cluster_cells_ids = cell_to_label[
             (cell_to_label['linkage_labels'] == cluster) & (cell_to_label['parent'] == '1')].index.to_list()
         cluster_cells_data = cluster_cells_data_all[cluster_cells_ids]
-        cluster_cells_data.to_csv(f'{folder_out}/{cluster}_parents.csv')
+        cluster_cells_data.to_csv(f'{folder_out}/{int(float(cluster))}_parents.csv')
 
         cluster_cells_ids = cell_to_label[
             (cell_to_label['linkage_labels'] == cluster) & (cell_to_label['parent'] == '1') & (
                         cell_to_label['female'] == '0')].index.to_list()
         cluster_cells_data = cluster_cells_data_all[cluster_cells_ids]
-        cluster_cells_data.to_csv(f'{folder_out}/{cluster}_male_parents.csv')
+        cluster_cells_data.to_csv(f'{folder_out}/{int(float(cluster))}_male_parents.csv')
 
         cluster_cells_ids = cell_to_label[
             (cell_to_label['linkage_labels'] == cluster) & (cell_to_label['parent'] == '1') & (
                         cell_to_label['female'] == '1')].index.to_list()
         cluster_cells_data = cluster_cells_data_all[cluster_cells_ids]
-        cluster_cells_data.to_csv(f'{folder_out}/{cluster}_female_parents.csv')
+        cluster_cells_data.to_csv(f'{folder_out}/{int(float(cluster))}_female_parents.csv')
 
         cluster_cells_ids = cell_to_label[
             (cell_to_label['linkage_labels'] == cluster) & (cell_to_label['parent'] == '0') & (
                         cell_to_label['female'] == '0')].index.to_list()
         cluster_cells_data = cluster_cells_data_all[cluster_cells_ids]
-        cluster_cells_data.to_csv(f'{folder_out}/{cluster}_male_virgins.csv')
+        cluster_cells_data.to_csv(f'{folder_out}/{int(float(cluster))}_male_virgins.csv')
 
         cluster_cells_ids = cell_to_label[
             (cell_to_label['linkage_labels'] == cluster) & (cell_to_label['parent'] == '0') & (
                         cell_to_label['female'] == '1')].index.to_list()
         cluster_cells_data = cluster_cells_data_all[cluster_cells_ids]
-        cluster_cells_data.to_csv(f'{folder_out}/{cluster}_female_virgins.csv')
+        cluster_cells_data.to_csv(f'{folder_out}/{int(float(cluster))}_female_virgins.csv')
 
     utils.write_log(f'end split_clusters_and_groups')
 
@@ -167,48 +167,49 @@ def ranksum_plot(folder_in, path_to_features='./csv_data2/features.csv', plots_f
 
     for cluster in clusters:
         print(f'cluster {cluster}')
-        female_file = f'{folder_in}/{cluster}_females.csv'
-        male_file = f'{folder_in}/{cluster}_males.csv'
+        for group_type in ['s', '_parents', '_virgins']:
+            female_file = f'{folder_in}/{cluster}_female{group_type}.csv'
+            male_file = f'{folder_in}/{cluster}_male{group_type}.csv'
 
-        females = pd.read_csv(female_file, index_col=0, header=0).T
-        males = pd.read_csv(male_file, index_col=0, header=0).T
+            females = pd.read_csv(female_file, index_col=0, header=0).T
+            males = pd.read_csv(male_file, index_col=0, header=0).T
 
-        log_pvalue_res = []
-        means_diff = []
-        gens_names = []
-        for i in males.columns:
-            vec1 = females[i]
-            vec2 = males[i]
-            mean1 = vec1.mean()
-            mean2 = vec2.mean()
-            full_res = ranksums(vec1, vec2)
-            # print(full_res)
-            pvalue_res = full_res.pvalue
-            # print(pvalue_res)
-            log_pvalue_res.append(-log10(pvalue_res))
-            means_diff.append(log10(mean2+1) - log10(mean1+1))  # means_diff.append(mean2 - mean1)
-            gens_names.append(features.loc[i, 'geneName'])
+            log_pvalue_res = []
+            means_diff = []
+            gens_names = []
+            for i in males.columns:
+                vec1 = females[i]
+                vec2 = males[i]
+                mean1 = vec1.mean()
+                mean2 = vec2.mean()
+                full_res = ranksums(vec1, vec2)
+                # print(full_res)
+                pvalue_res = full_res.pvalue
+                # print(pvalue_res)
+                log_pvalue_res.append(-log10(pvalue_res))
+                means_diff.append(log10(mean2+1) - log10(mean1+1))  # means_diff.append(mean2 - mean1)
+                gens_names.append(features.loc[i, 'geneName'])
 
-        fig, ax = plt.subplots()
-        ax.scatter(means_diff, log_pvalue_res, s=5)
-        texts = []
-        radius_w = (plt.xlim()[1] - plt.xlim()[0]) / 50
-        radius_h = (plt.ylim()[1] - plt.ylim()[0]) / 43
-        above_gender = {True: 0, False: 0}
-        for i, txt in enumerate(gens_names):
-            if log_pvalue_res[i] > 3:
-                texts.append(ax.text(means_diff[i], log_pvalue_res[i], txt))
-                ellipse = Ellipse(xy=(means_diff[i], log_pvalue_res[i]), width=radius_w,
-                                  height=radius_h, edgecolor='r', fc='None', lw=1, fill=False)
-                ax.add_patch(ellipse)
-                above_gender[means_diff[i] > 0] += 1
-        plt.title(f"Ranksums for cluster {cluster} - females vs males\n{above_gender[True]} males above, {above_gender[False]} females above")
-        plt.xlabel(f"means_diff (males-females)")
-        plt.ylabel("-log10(ranksum_log_pvalue)")
+            fig, ax = plt.subplots()
+            ax.scatter(means_diff, log_pvalue_res, s=5)
+            texts = []
+            radius_w = (plt.xlim()[1] - plt.xlim()[0]) / 50
+            radius_h = (plt.ylim()[1] - plt.ylim()[0]) / 43
+            above_gender = {True: 0, False: 0}
+            for i, txt in enumerate(gens_names):
+                if log_pvalue_res[i] > 3:
+                    texts.append(ax.text(means_diff[i], log_pvalue_res[i], txt))
+                    ellipse = Ellipse(xy=(means_diff[i], log_pvalue_res[i]), width=radius_w,
+                                      height=radius_h, edgecolor='r', fc='None', lw=1, fill=False)
+                    ax.add_patch(ellipse)
+                    above_gender[means_diff[i] > 0] += 1
+            plt.title(f"Ranksums for cluster {cluster} - female{group_type} vs male{group_type}\n{above_gender[True]} males above, {above_gender[False]} females above")
+            plt.xlabel(f"means_diff [log(males)-log(females)]")
+            plt.ylabel("-log10(ranksum_log_pvalue)")
 
-        # plt.savefig(f'{plots_folder}/female_vs_male_mean{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
-        data_plot_utils.save_plots(plt, f'{plots_folder}/ranksum_{cluster}_')
-        plt.show()
+            # plt.savefig(f'{plots_folder}/female_vs_male_mean{str(datetime.datetime.now().time())[:8].replace(":", "_")}.png')
+            data_plot_utils.save_plots(plt, f'{plots_folder}/ranksum_{cluster}_')
+            plt.show()
     utils.write_log(f'end ranksum_plot')
 
 
