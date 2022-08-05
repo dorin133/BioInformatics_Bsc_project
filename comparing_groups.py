@@ -212,9 +212,19 @@ def ranksum_plot(folder_in, path_to_features='./csv_data2/features.csv', plots_f
 
 
 def size_of_clusters(path_in, plots_folder='./plots_folder1/part4'):
-    utils.write_log(f'start size_of_clusters')
+    # utils.write_log(f'start size_of_clusters')
     df = pd.read_csv(path_in, index_col=0, header=0)
     df = df.T
+    df = df[df['linkage_labels'] != -1]
+    df['linkage_labels'] = df['linkage_labels'].astype(float)
+    df = df.astype({'linkage_labels': 'int32', 'female': 'int32', 'parent': 'int32'})
+    df['group'] = df['female']*2+df['parent']
+    plt.figure(figsize=(20, 10))  # width:20, height:3
+    ax = pd.crosstab(df['linkage_labels'], df['group'], ).plot.bar(width=0.8, figsize=(20, 10))
+    ax.tick_params(axis='x', which='both', labelsize=18)
+    plt.legend(['male_naive', 'male_parent', 'female_naive', 'female_parent'])
+    data_plot_utils.save_plots(plt, f'{plots_folder}/clusters_sizes')
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -224,5 +234,7 @@ if __name__ == '__main__':
 
     # compere_female_vs_male_for_each_cluster(folder_in='gaba_groups12')
 
-    ranksum_plot(folder_in='gaba_groups12')
+    # ranksum_plot(folder_in='gaba_groups12')
+
+    size_of_clusters(path_in='./gaba_clustered_data11/gaba_all_samples_stats.csv')
 
