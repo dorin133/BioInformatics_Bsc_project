@@ -7,7 +7,7 @@ import linkage_and_heatmap as link_and_heat
 import os
 import gaba_genes_processing
 import data_processing2
-
+import comparing_groups
 
 def main():
 
@@ -144,17 +144,17 @@ def main():
     
     # # step 16: heatmap data prep and the heatmap step itself
     # link_and_heat.heatmap_pipeline()
-    # link_and_heat.heatmap_pipeline(path_in_frac='./gaba_clustered_data11/gaba_frac_clust_cells.csv',
-    #                                path_in_avg='./gaba_clustered_data11/gaba_avg_clust_cells.csv',
-    #                                features_csv_path='./csv_data2/features.csv',
-    #                                path_in_translation='./gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
-    #                                path_in_clustter_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
-    #                                path_in_stack_data='./gaba_merged_data10/gaba_stacked_2.csv',
-    #                                path_out_sort_stack_data='./gaba_clustered_data11/gaba_stacked_2_sort_by_clust.csv',
-    #                                path_out_stack_for_heatmap='./gaba_clustered_data11/gaba_stacked_2_for_heatMap.csv',
-    #                                plots_folder='./plots_folder1/part3')
+    link_and_heat.heatmap_pipeline(path_in_frac='./gaba_clustered_data11/gaba_frac_clust_cells.csv',
+                                   path_in_avg='./gaba_clustered_data11/gaba_avg_clust_cells.csv',
+                                   features_csv_path='./csv_data2/features.csv',
+                                   path_in_translation='./gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
+                                   path_in_clustter_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
+                                   path_in_stack_data='./gaba_merged_data10/gaba_stacked_2.csv',
+                                   path_out_sort_stack_data='./gaba_clustered_data11/gaba_stacked_2_sort_by_clust.csv',
+                                   path_out_stack_for_heatmap='./gaba_clustered_data11/gaba_stacked_2_for_heatMap.csv',
+                                   plots_folder='./plots_folder1/part3')
 
-    # step 17: gaba_genes_processing
+    # # step 17: gaba_genes_processing
     # gaba_genes_processing.avg_and_fraction_clustter_expression(path_in_stack='./gaba_merged_data10/gaba_stacked_1.csv',
     #                                                            path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
     #                                                            path_out_avg_clust_cell='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
@@ -165,13 +165,11 @@ def main():
     #                                               path_in_cluseters='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
     #                                               path_out='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv',
     #                                               plots_folder='./plots_folder1/part3')
-
-
+    #
     # data_processing2.clusters_bar_groups(path_in='./gaba_clustered_data11/gaba_tsne_and_clust_labels.csv',
     #                                      path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx',
     #                                      plots_folder='./plots_folder1/part3')
-
-
+    #
     # # step 18: get the 2 marker genes of each cluster
     # gaba_genes_processing.clustter_stats_2marker_genes(path_in_frac='./gaba_clustered_data11/gaba_frac_clust_cells_stk1.csv',
     #                                 path_in_avg='./gaba_clustered_data11/gaba_avg_clust_cells_stk1.csv',
@@ -180,16 +178,32 @@ def main():
     #                                 path_to_features='./csv_data2/features.csv',
     #                                 path_tsne_dbscan_data='./gaba_clustered_data11/gaba_clust_tsne_data.csv',
     #                                 path_out='./gaba_clustered_data11/gaba_all_samples_stats.csv')
-    #
+
     # # sub-step: add to the stats excel on each gaba sample the gender and parenthood of each sample
     # gaba_genes_processing.add_gender_parent_stats(path_to_stats_table='./gaba_clustered_data11/gaba_all_samples_stats.csv',
     #                                               folder_path_in='./csv_gaba7',
     #                                               path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx')
-    #
+
     # # step 19: get the p-value (females/parents) of the cdf of hypergeom distribution (enrichment value)
     # gaba_genes_processing.cluster_enrichment_stats(path_to_stats_table='./gaba_clustered_data11/gaba_all_samples_stats.csv',
     #                   path_to_linkage_labels_table= './gaba_clustered_data11/gaba_clust_idx_translation_table.csv',
     #                   path_out_cluster_stats_table='./gaba_clustered_data11/gaba_all_cluster_stats.csv')
+    #
+    # # step 20: split tables according to groups
+    # comparing_groups.split_clusters_and_groups(path_in_data='./gaba_merged_data10/gaba_stacked_2_v2.csv',  # TODO assume stacked_2, might want stacked_3
+    #                                            path_in_groups_data='./gaba_clustered_data11/gaba_all_samples_stats.csv',
+    #                                            folder_out='gaba_groups12')
+
+    # step 21: gean expression mean vs diff vs female vs male
+    comparing_groups.compere_female_vs_male_for_each_cluster(folder_in='gaba_groups12',
+                                                             path_to_features_csv='./csv_data2/features.csv',
+                                                             plots_folder='./plots_folder1/part4')
+
+    # step 22: ranksum
+    comparing_groups.ranksum_plot(folder_in='gaba_groups12',
+                                  path_to_features='./csv_data2/features.csv',
+                                  plots_folder='./plots_folder1/part4')
+
 
     # utils.write_log('*********************************** Finish pipeline run (v2) ***********************************')
 
