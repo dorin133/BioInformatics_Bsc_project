@@ -245,7 +245,6 @@ def ranksum_present_results(path_in, plots_folder='./plots_folder1/part4'):
     data_plot_utils.save_plots(plt, f'{plots_folder}/ranksum1_present_results')  # TODO
     plt.show()
 
-
     male_parents = list(filter(lambda x: '_male_parents' in x, df.index.to_list()))
     female_parents = list(filter(lambda x: '_female_parents' in x, df.index.to_list()))
     male_virgins = list(filter(lambda x: '_male_virgins' in x, df.index.to_list()))
@@ -257,12 +256,17 @@ def ranksum_present_results(path_in, plots_folder='./plots_folder1/part4'):
     data['female_virgins'] = df.loc[female_virgins].sum().tolist()
 
     df2 = pd.DataFrame(data, index=df.loc[male_parents].sum().index)
+    utils.write_log(f"male_parents: top gens are:\n{df2.nlargest(10, 'male_parents')['male_parents']}")
+    utils.write_log(f"female_parents: top gens are:\n{df2.nlargest(10, 'female_parents')['female_parents']}")
+    utils.write_log(f"male_virgins: top gens are:\n{df2.nlargest(10, 'male_virgins')['male_virgins']}")
+    utils.write_log(f"female_virgins: top gens are:\n{df2.nlargest(10, 'female_virgins')['female_virgins']}")
 
     fig, ax = plt.subplots(figsize=(29, 6))
     sns.heatmap(df2.T)
     ax.format_coord = lambda x, y: 'x={:d}, y={:d}, z={:2f}'.format(int(np.floor(x)), int(np.floor(y), ), df.iloc[int(np.floor(y)), int(np.floor(x))])
     data_plot_utils.save_plots(plt, f'{plots_folder}/ranksum2_present_results')  # TODO
     plt.show()
+
 
     utils.write_log(f'finished ranksum_present_results')
 
