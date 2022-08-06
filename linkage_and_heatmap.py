@@ -288,7 +288,7 @@ def create_heatmap(path_in_heatmap_table,
     ax.set_yticks(ticks_y)
     ax.set_yticklabels(df.index, rotation=360, fontsize=4)
     ax.format_coord = lambda x, y: 'x={:d}, y={:d}, z={:2f}'.format(int(np.floor(x)), int(np.floor(y), ), df.iloc[int(np.floor(y)), int(np.floor(x))])
-    # data_plot_utils.save_plots(plt, f'{plots_folder}/corr_matrix_incl_anno_double')
+    data_plot_utils.save_plots(plt, f'{plots_folder}/corr_matrix_incl_anno_double')
     plt.show()
 
     utils.write_log(f"finished create_heatmap: result of create_heatmap saved to {plots_folder}")

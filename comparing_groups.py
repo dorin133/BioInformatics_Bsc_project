@@ -101,7 +101,7 @@ def compere_female_vs_male_for_each_cluster(folder_in, path_to_features_csv='./c
 
 def plot_female_vs_male_mean_2(females_path, males_path, path_to_features_csv,
                              plots_folder, append_to_plot_name='', frac_or_not=True):
-    # utils.write_log(f'start plot_female_vs_male_mean_2')
+    utils.write_log(f'start plot_female_vs_male_mean_2')
     gr1 = pd.read_csv(females_path, index_col=0, header=0)
     gr2 = pd.read_csv(males_path, index_col=0, header=0)
 
@@ -153,7 +153,7 @@ def plot_female_vs_male_mean_2(females_path, males_path, path_to_features_csv,
 
     data_plot_utils.save_plots(plt, plot_name=f'{plots_folder}/mean_vs_diff_{append_to_plot_name}_')
     plt.show()
-    # utils.write_log(f'end plot_female_vs_male_mean_2')
+    utils.write_log(f'end plot_female_vs_male_mean_2')
 
 
 def ranksum_plot(folder_in, res_out, path_to_features='./csv_data2/features.csv', plots_folder='./plots_folder1/part4'):
@@ -216,11 +216,13 @@ def ranksum_plot(folder_in, res_out, path_to_features='./csv_data2/features.csv'
                         res_dict[f'{cluster}_female{group_type}'].add(txt)
                     dimo_gens.add(txt)
 
-            plt.title(f"Ranksums for cluster {cluster} - female{group_type} vs male{group_type}\n{above_gender[True]} males above, {above_gender[False]} females above")
+            plt.title(f"Ranksums for cluster {cluster} - female{group_type} vs male{group_type}")
+            # plt.title(f"Ranksums for cluster {cluster} - female{group_type} vs male{group_type}\n{above_gender[True]} males above, {above_gender[False]} females above")
+            utils.write_log(f"Ranksums for cluster {cluster} - female{group_type} vs male{group_type}: {above_gender[True]} males above, {above_gender[False]} females above")
             plt.xlabel(f"means_diff [log(males)-log(females)]")
             plt.ylabel("-log10(ranksum_log_pvalue)")
 
-            data_plot_utils.save_plots(plt, f'{plots_folder}/ranksum_{cluster}_')
+            data_plot_utils.save_plots(plt, f'{plots_folder}/ranksum_{cluster}_female{group_type}_vs_male{group_type}', append_time='')
             plt.show()
 
     data = []
@@ -232,18 +234,18 @@ def ranksum_plot(folder_in, res_out, path_to_features='./csv_data2/features.csv'
     utils.write_log(f'end ranksum_plot')
 
 
-def ranksum_present_results(path_in, plots_folder='./plots_folder1/part4'):
+def ranksum_present_results(path_in, res_out, plots_folder='./plots_folder1/part4'):
     # utils.write_log(f'start ranksum_present_results')
     df = pd.read_csv(path_in)
     df = df[df['Unnamed: 0'].str.len() > 10]
     df.set_index('Unnamed: 0', inplace=True)
 
-    fig, ax = plt.subplots(figsize=(35, 70))
-    sns.heatmap(df, cbar=False)
-    # ax.format_coord = lambda x, y: 'x={:d}, y={:d}, z={}'.format(int(np.floor(x)), int(np.floor(y), ), f'{int(np.floor(x))}_{int(np.floor(y))}')
-
-    data_plot_utils.save_plots(plt, f'{plots_folder}/ranksum1_present_results')  # TODO
-    plt.show()
+    # fig, ax = plt.subplots(figsize=(35, 70))
+    # sns.heatmap(df, cbar=False)
+    # # ax.format_coord = lambda x, y: 'x={:d}, y={:d}, z={}'.format(int(np.floor(x)), int(np.floor(y), ), f'{int(np.floor(x))}_{int(np.floor(y))}')
+    #
+    # data_plot_utils.save_plots(plt, f'{plots_folder}/ranksum1_present_results')  # TODO
+    # plt.show()
 
     male_parents = list(filter(lambda x: '_male_parents' in x, df.index.to_list()))
     female_parents = list(filter(lambda x: '_female_parents' in x, df.index.to_list()))
@@ -260,6 +262,13 @@ def ranksum_present_results(path_in, plots_folder='./plots_folder1/part4'):
     utils.write_log(f"female_parents: top gens are:\n{df2.nlargest(10, 'female_parents')['female_parents']}")
     utils.write_log(f"male_virgins: top gens are:\n{df2.nlargest(10, 'male_virgins')['male_virgins']}")
     utils.write_log(f"female_virgins: top gens are:\n{df2.nlargest(10, 'female_virgins')['female_virgins']}")
+    res_dict = {}
+    res_dict['male_parents'] = df2.nlargest(10, 'male_parents')['male_parents'].keys().tolist()
+    res_dict['female_parents'] = df2.nlargest(10, 'female_parents')['female_parents'].keys().tolist()
+    res_dict['male_virgins'] = df2.nlargest(10, 'male_virgins')['male_virgins'].keys().tolist()
+    res_dict['female_virgins'] = df2.nlargest(10, 'female_virgins')['female_virgins'].keys().tolist()
+    res = pd.DataFrame(res_dict, columns=res_dict.keys())
+    res.to_csv(res_out)
 
     fig, ax = plt.subplots(figsize=(29, 6))
     sns.heatmap(df2.T)
@@ -297,7 +306,7 @@ if __name__ == '__main__':
     # compere_female_vs_male_for_each_cluster(folder_in='gaba_groups12')
 
     # ranksum_plot(folder_in='gaba_groups12', res_out='./gaba_clustered_data11/ranksum_res.csv')
-    ranksum_present_results('./gaba_clustered_data11/ranksum_res.csv')
+    ranksum_present_results('./gaba_clustered_data11/ranksum_res.csv', './gaba_clustered_data11/ranksum_top_10.csv')
 
     # size_of_clusters(path_in='./gaba_clustered_data11/gaba_all_samples_stats.csv')
 
