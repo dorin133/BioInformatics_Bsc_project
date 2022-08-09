@@ -220,3 +220,22 @@ def DBScan(path_in, path_out, path_out_tsne_dbscan, print_noise=True, plots_fold
     utils.write_log(f'finish DBScan with eps {round(eps, 5)}. new data with the labels from DBScan ("dbscan_labels",'
                     f' where -1 consider noise else the given label) is in shape {df.shape}. saved to {path_out} ')
 
+
+if __name__ == '__main__':
+    df = pd.read_csv('./gaba_clustered_data11/gaba_dbscan.csv', index_col=0, header=0).T
+    # df = pd.read_csv('./clusttered_data6/dbscan.csv', index_col=0, header=0).T
+    df_print = df[df['dbscan_labels'] != -1]
+    plt.figure(figsize=(16, 10))
+    n_clusters_print=46
+    sns.scatterplot(
+        x="tsne-2d-one",
+        y="tsne-2d-two",
+        hue="dbscan_labels",
+        palette=distinctipy.get_colors(n_clusters_print, pastel_factor=0.6),
+        data=df_print,
+        legend="full",
+        alpha=0.3
+    )
+    plt.title(f'DBScan_eps_1.874 (#46 clusters)')
+    # data_plot_utils.save_plots(plt, f'{plots_folder}/dbscan_eps_{round(eps, 5)}')
+    plt.show()

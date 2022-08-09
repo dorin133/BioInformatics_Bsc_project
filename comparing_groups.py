@@ -240,12 +240,12 @@ def ranksum_present_results(path_in, res_out, plots_folder='./plots_folder1/part
     df = df[df['Unnamed: 0'].str.len() > 10]
     df.set_index('Unnamed: 0', inplace=True)
 
-    # fig, ax = plt.subplots(figsize=(35, 70))
-    # sns.heatmap(df, cbar=False)
-    # # ax.format_coord = lambda x, y: 'x={:d}, y={:d}, z={}'.format(int(np.floor(x)), int(np.floor(y), ), f'{int(np.floor(x))}_{int(np.floor(y))}')
-    #
-    # data_plot_utils.save_plots(plt, f'{plots_folder}/ranksum1_present_results')  # TODO
-    # plt.show()
+    fig, ax = plt.subplots(figsize=(15, 35))
+    sns.heatmap(df, cbar=False)
+    # ax.format_coord = lambda x, y: 'x={:d}, y={:d}, z={}'.format(int(np.floor(x)), int(np.floor(y), ), f'{int(np.floor(x))}_{int(np.floor(y))}')
+
+    data_plot_utils.save_plots(plt, f'{plots_folder}/ranksum1_present_results')  # TODO
+    plt.show()
 
     male_parents = list(filter(lambda x: '_male_parents' in x, df.index.to_list()))
     female_parents = list(filter(lambda x: '_female_parents' in x, df.index.to_list()))

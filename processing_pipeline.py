@@ -102,10 +102,10 @@ def main():
     # ml_processing.tSNE(path_in='./merged_data5/pca4.csv', path_to_MEA='./raw_data/MEA_dimorphism_samples.xlsx',
     #                    path_out='./merged_data5/tsne.csv')
     #
-    # # step 13: DBScan
-    # ml_processing.DBScan_dynm_eps(eps_prc=70, k_neighbor=20, path_in='./merged_data5/tsne.csv',
-    #                               path_out='./clusttered_data6/dbscan.csv',
-    #                               path_out_tsne_dbscan='./clusttered_data6/clust_tsne_data.csv')
+    # step 13: DBScan
+    ml_processing.DBScan_dynm_eps(eps_prc=70, k_neighbor=20, path_in='./merged_data5/tsne.csv',
+                                  path_out='./clusttered_data6/dbscan.csv',
+                                  path_out_tsne_dbscan='./clusttered_data6/clust_tsne_data.csv')
     #
     # # step 14: sanity_checks
     # link_and_heat.sanity_checks(path_in_stack='./merged_data5/stacked_3_v2.csv',
