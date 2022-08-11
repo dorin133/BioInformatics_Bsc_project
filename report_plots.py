@@ -141,11 +141,11 @@ def cdf_plot_gender(plots_folder='./plots_folder1/report_missing_plots'):
                 1.0, 0.048716536050546155 , 0.0015852884916783827 , 0.21703727705991505 , 0.000311695102655718 , 0.7783152754678014 , 0.0038521375528294266 ,
                 0.992263191288008, 0.42726034853305983 , 0.3915040724066826 , 0.0, 0.08304834520090798 , 0.3509228487681816 , 0.003977040855760894 ,
                 0.019363340425667896, 0.12234203342039485 , 0.6176749626480671 , 0.24135849951161303 , 0.33057863091256257 , 0.000282970408967409 ]
-    plt.plot(x_values, y_values)
+    plt.bar(x_values, y_values)
     plt.ylabel('(1 - p) of hypergeometric CDF')
     plt.xlabel('Cluster Index By Linkage')
-    plt.title("GABAergic Clusters' Group Enrichment Female / Male")
-    data_plot_utils.save_plots(plt, f'{plots_folder}/clusters_cdf_gender')
+    # plt.title("GABAergic Clusters' Group Enrichment Female / Male")
+    # data_plot_utils.save_plots(plt, f'{plots_folder}/clusters_cdf_gender')
     plt.show()
 
 def cdf_plot_parenting(plots_folder='./plots_folder1/report_missing_plots'):
@@ -157,15 +157,16 @@ def cdf_plot_parenting(plots_folder='./plots_folder1/report_missing_plots'):
                 0.9764382319298536, 0.9850665978869948 , 0.9998590598124305 , 0.9899020426382378 , 0.7215715248560405 , 0.04823888116573416 , 0.9976966466043441 ,
                 0.0011053261684552673, 0.9801523064539261 , 0.998470164122181 , 0.9999999961898879 , 0.9470555077513186 , 0.0 , 0.5268852067244505 ,
                 0.3200329668098534, 0.5939402672952351, 0.011105211349708655 , 0.9113246499963139 , 0.43213742988486126 , 1.0 ]
-    plt.plot(x_values, y_values)
+    plt.bar(x_values, y_values)
     plt.ylabel('(1 - p) of hypergeometric CDF')
     plt.xlabel('Cluster Index By Linkage')
-    plt.title("GABAergic Clusters' Group Enrichment Parent / Naive")
-    data_plot_utils.save_plots(plt, f'{plots_folder}/clusters_cdf_parenting')
+    # plt.title("GABAergic Clusters' Group Enrichment Parent / Naive")
+    # data_plot_utils.save_plots(plt, f'{plots_folder}/clusters_cdf_parenting')
     plt.show()
 
 
 
 if __name__ == '__main__':
+    cdf_plot_gender()
     cdf_plot_parenting()
     print("Done")
